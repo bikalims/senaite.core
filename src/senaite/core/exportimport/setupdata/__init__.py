@@ -1302,6 +1302,8 @@ class Methods(WorksheetImporter):
         for row in self.get_rows(3):
             if row['title']:
                 calculation = self.get_object(bsc, 'Calculation', row.get('Calculation_title'))
+                instrument = self.get_object(bsc, 'Instrument', row.get('Instrument_title'))
+                supplier = self.get_object(bsc, 'Supplier', row.get('Subcontractor_title'))
                 obj = _createObjectByType("Method", folder, tmpID())
                 obj.edit(
                     title=row['title'],
@@ -1311,6 +1313,8 @@ class Methods(WorksheetImporter):
                     Calculation=calculation,
                     MethodID=row.get('MethodID', ''),
                     Accredited=row.get('Accredited', True),
+                    Supplier=supplier,
+                    Instrument=[instrument.UID()] if instrument else [],
                 )
                 # Obtain all created methods
                 catalog = getToolByName(self.context, 'portal_catalog')
@@ -1575,7 +1579,7 @@ class Analysis_Services(WorksheetImporter):
             # 'Methods' from the Schema).
             # If the Analysis Service has at least one method associated, then
             # one of those methods can be set as the defualt method (field
-            # '_Method' from the Schema).
+            # 'Method' from the Schema).
             #
             # To make it easier, if a DefaultMethod is declared in the
             # Analysis_Services spreadsheet, but the same AS has no method
@@ -1649,10 +1653,11 @@ class Analysis_Services(WorksheetImporter):
                 Price="%02f" % Float(row['Price']),
                 BulkPrice="%02f" % Float(row['BulkPrice']),
                 VAT="%02f" % Float(row['VAT']),
-                _Method=defaultmethod,
+                Method=defaultmethod,
                 Methods=methods,
                 ManualEntryOfResults=allowmanualentry,
                 InstrumentEntryOfResults=allowinstrentry,
+                Instrument=defaultinstrument,
                 Instruments=instruments,
                 Calculation=_calculation,
                 UseDefaultCalculation=usedefaultcalculation,

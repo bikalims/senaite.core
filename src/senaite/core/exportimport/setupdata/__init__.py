@@ -1314,7 +1314,7 @@ class Methods(WorksheetImporter):
                     MethodID=row.get('MethodID', ''),
                     Accredited=row.get('Accredited', True),
                     Supplier=supplier,
-                    Instrument=[instrument.UID()] if instrument else [],
+                    Instruments=[instrument.UID()] if instrument else [],
                 )
                 # Obtain all created methods
                 catalog = getToolByName(self.context, 'portal_catalog')

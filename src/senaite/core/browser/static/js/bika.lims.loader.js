@@ -34,10 +34,6 @@ window.bika.lims.controllers =  {
 
     /** JS objects to be loaded on specific views or pages **/
 
-    // Analysis Profile
-    ".portaltype-analysisprofile.template-base_edit":
-        ['AnalysisProfileEditView'],
-
     // Instruments
     ".portaltype-instrument.template-referenceanalyses":
         ['InstrumentReferenceAnalysesView'],
@@ -96,10 +92,6 @@ window.bika.lims.controllers =  {
     // Supply Orders
     ".portaltype-supplyorder.template-base_edit":
         ['SupplyOrderEditView'],
-
-    // Imports
-    ".portaltype-plone-site.template-import":
-        ['InstrumentImportView'],
 
     // Batches
     ".portaltype-batchfolder":

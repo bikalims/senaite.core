@@ -36,6 +36,7 @@ from bika.lims.config import LDL
 from bika.lims.config import UDL
 from bika.lims.interfaces import IAnalysisRequest
 from bika.lims.interfaces import IFieldIcons
+from bika.lims.interfaces import IRoutineAnalysis
 from bika.lims.permissions import EditFieldResults
 from bika.lims.permissions import EditResults
 from bika.lims.permissions import FieldEditAnalysisHidden
@@ -605,6 +606,7 @@ class AnalysesView(ListingView):
         item['Unit'] = format_supsub(obj.getUnit) if obj.getUnit else ''
         item['retested'] = obj.getRetestOfUID and True or False
         item['class']['retested'] = 'center'
+        item['replace']['Service'] = '<strong>{}</strong>'.format(obj.Title)
 
         # Append info link before the service
         # see: bika.lims.site.coffee for the attached event handler
@@ -663,6 +665,8 @@ class AnalysesView(ListingView):
         self._folder_item_fieldicons(obj)
         # Renders remarks toggle button
         self._folder_item_remarks(obj, item)
+        # Renders the analysis conditions
+        self._folder_item_conditions(obj, item)
 
         return item
 
@@ -1377,3 +1381,19 @@ class AnalysesView(ListingView):
             item[position][element] = html
             return
         item[position][element] = glue.join([original, html])
+
+    def _folder_item_conditions(self, analysis_brain, item):
+        """Renders the analysis conditions
+        """
+        analysis = self.get_object(analysis_brain)
+       
+        if not IRoutineAnalysis.providedBy(analysis):
+            return
+        
+        conditions = analysis.getConditions()
+        if conditions:
+            conditions = map(lambda it: ": ".join([it["title"], it["value"]]),
+                             conditions)
+            conditions = "<br/>".join(conditions)
+            service = item["replace"].get("Service") or item["Service"]
+            item["replace"]["Service"] = "{}<br/>{}".format(service, conditions)

@@ -4,6 +4,16 @@ Changelog
 2.0.1 (unreleased)
 ------------------
 
+- #1861 Fix export interface lookup when name contains uppercase letters
+- #1858 Show "copy to new" transition to Clients in samples listing
+- #1858 Cannot override behavior of Methods folder when using `before_render`
+- #1857 Allow to set default result for analyses
+- #1854 Support for analyses (pre) conditions on sample registration
+- #1856 Fix referenceanalysis popup in Worksheets
+- #1855 Fix analyses results not set after auto import
+- #1853 Fix sample progress update after instrument results import
+- #1852 Fix `{client}` is wrongly stated as a variable on ID generation
+- #1850 Add valid password for portal_setup tarball import new user creation
 - #1845 Added edit form adapter for lab contacts
 - #1846 Fix UnicodeDecodeError on Attachment upload
 - #1847 Added Analysis Profile Edit Form Adapter

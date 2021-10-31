@@ -40,6 +40,8 @@ class LabAnalysesTable(AnalysesView):
         self.show_workflow_action_buttons = True
         self.show_select_column = True
         self.show_search = False
+        self.show_categories = True
+        self.expand_all_categories = True
 
 
 class FieldAnalysesTable(AnalysesView):

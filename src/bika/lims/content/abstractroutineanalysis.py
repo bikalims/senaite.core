@@ -19,15 +19,12 @@
 # Some rights reserved, see README and LICENSE.
 
 import copy
-
 from datetime import timedelta
 
 from AccessControl import ClassSecurityInfo
 from bika.lims import api
 from bika.lims import bikaMessageFactory as _
-from bika.lims.browser.fields import UIDReferenceField
 from bika.lims.browser.widgets import DecimalWidget
-from bika.lims.catalog.indexers.baseanalysis import sortable_title
 from bika.lims.content.abstractanalysis import AbstractAnalysis
 from bika.lims.content.abstractanalysis import schema
 from bika.lims.content.clientawaremixin import ClientAwareMixin
@@ -39,15 +36,14 @@ from bika.lims.interfaces.analysis import IRequestAnalysis
 from bika.lims.workflow import getTransitionDate
 from Products.Archetypes.Field import BooleanField
 from Products.Archetypes.Field import FixedPointField
-from Products.Archetypes.Field import StringField
 from Products.Archetypes.Schema import Schema
 from Products.ATContentTypes.utils import DT2dt
 from Products.ATContentTypes.utils import dt2DT
 from Products.CMFCore.permissions import View
+from senaite.core.catalog.indexer.baseanalysis import sortable_title
 from zope.interface import alsoProvides
 from zope.interface import implements
 from zope.interface import noLongerProvides
-
 
 # The actual uncertainty for this analysis' result, populated when the result
 # is submitted.
@@ -309,19 +305,31 @@ class AbstractRoutineAnalysis(AbstractAnalysis, ClientAwareMixin):
         :rtype: list of IAnalysis
         """
         def is_dependent(analysis):
+            # Never consider myself as dependent
+            if analysis.UID() == self.UID():
+                return False
+
+            # Never consider analyses from same service as dependents
+            self_service_uid = self.getRawAnalysisService()
+            if analysis.getRawAnalysisService() == self_service_uid:
+                return False
+
+            # Without calculation, no dependency relationship is possible
             calculation = analysis.getCalculation()
             if not calculation:
                 return False
 
+            # Calculation must have the service I belong to
             services = calculation.getRawDependentServices()
-            if not services:
-                return False
+            return self_service_uid in services
+        
+        request = self.getRequest()
+        if request.isPartition():
+            parent = request.getParentAnalysisRequest()
+            siblings = parent.getAnalyses(full_objects=True)
+        else:
+            siblings = self.getSiblings(with_retests=with_retests)
 
-            query = dict(UID=services, getKeyword=self.getKeyword())
-            services = api.search(query, "bika_setup_catalog")
-            return len(services) > 0
-
-        siblings = self.getSiblings(with_retests=with_retests)
         dependents = filter(lambda sib: is_dependent(sib), siblings)
         if not recursive:
             return dependents
@@ -351,6 +359,10 @@ class AbstractRoutineAnalysis(AbstractAnalysis, ClientAwareMixin):
         # If the calculation this analysis is bound does not have analysis
         # keywords (only interims), no need to go further
         service_uids = calc.getRawDependentServices()
+
+        # Ensure we exclude ourselves
+        service_uid = self.getRawAnalysisService()
+        service_uids = filter(lambda serv: serv != service_uid, service_uids)
         if len(service_uids) == 0:
             return []
 
@@ -367,7 +379,9 @@ class AbstractRoutineAnalysis(AbstractAnalysis, ClientAwareMixin):
                                                       recursive=True)
                     dependencies.extend(up_deps)
 
-        return dependencies
+        # Exclude analyses of same service as me to prevent max recursion depth
+        return filter(lambda dep: dep.getRawAnalysisService() != service_uid,
+                      dependencies)
 
     @security.public
     def getPrioritySortkey(self):

@@ -13,9 +13,11 @@
   <!-- package includes -->
   <include package=".adapters" />
   <include package=".browser" />
+  <include package=".catalog" />
   <include package=".datamanagers" />
   <include package=".exportimport" />
   <include package=".locales" />
+  <include package=".patches" />
   <include package=".schema" />
   <include package=".upgrade" />
   <include package=".z3cform" />

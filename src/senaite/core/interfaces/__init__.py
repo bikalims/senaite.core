@@ -21,6 +21,7 @@
 from plone.app.z3cform.interfaces import IPloneFormLayer
 from senaite.core.interfaces.datamanager import IDataManager  # noqa (convenience import)
 from zope.interface import Interface
+from senaite.core.interfaces.catalog import *  # noqa
 
 
 class ISenaiteCore(Interface):
@@ -81,4 +82,9 @@ class ISamples(Interface):
 
 class ISamplesView(Interface):
     """Marker interface for samples listing view
+    """
+
+
+class IHaveUIDReferences(Interface):
+    """Marker interface when the object contains UID references
     """

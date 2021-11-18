@@ -249,8 +249,8 @@ Conditions = RecordsField(
         "title": "service_conditions_validator",
     },
     subfield_maxlength={
-        "title": 20,
-        "description": 100,
+        "title": 50,
+        "description": 200,
     },
     subfield_vocabularies={
         "type": DisplayList((
@@ -594,7 +594,7 @@ class AnalysisService(AbstractBaseAnalysis):
         return DisplayList(containers)
 
     def getPreservations(self):
-        bsc = getToolByName(self, 'bika_setup_catalog')
+        bsc = getToolByName(self, 'senaite_catalog_setup')
         items = [(o.UID, o.Title) for o in
                  bsc(portal_type='Preservation', is_active=True)]
         items.sort(lambda x, y: cmp(x[1], y[1]))

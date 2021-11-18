@@ -4,6 +4,16 @@ Changelog
 2.0.1 (unreleased)
 ------------------
 
+- #1878 Fix two dimension results parser for Analyses containing a dash in the name
+- #1876 Hide contents listing for dexterity containers
+- #1872 Upgrade/migrate catalogs and remove dependency to TextindexNG3
+- #1862 Fix failing instrument import for some QC analyes
+- #1875 Prevent max recursion depth error with copies of same analysis
+- #1874 Support for `%(context_uid)s` wildcard in calculations
+- #1871 Allow calculations to rely on results of tests in subsamples (partitiones)
+- #1864 Added UID reference field/widget for Dexterity Contents
+- #1867 Fix error when invalidating samples with copies of analyses
+- #1865 Fix indexing of temporary objects resulting in orphan entries in catalog
 - #1861 Fix export interface lookup when name contains uppercase letters
 - #1858 Show "copy to new" transition to Clients in samples listing
 - #1858 Cannot override behavior of Methods folder when using `before_render`

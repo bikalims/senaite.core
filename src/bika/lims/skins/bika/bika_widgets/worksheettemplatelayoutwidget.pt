@@ -7,6 +7,9 @@
   <body>
 
     <metal:view_macro define-macro="view">
+      <span id="worksheettemplatelayoutwidget">
+        <span tal:content="structure python:len(widget.Layout)"/>
+      </span>
     </metal:view_macro>
 
     <metal:edit_macro define-macro="edit">

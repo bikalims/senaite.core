@@ -347,7 +347,7 @@ class Lab_Information(WorksheetImporter):
     def Import(self):
         laboratory = self.context.bika_setup.laboratory
         values = {}
-        for row in self.get_rows(3):
+        for i, row in enumerate(self.get_rows(3)):
             values[row['Field']] = row['Value']
 
         if values['AccreditationBodyLogo']:
@@ -387,9 +387,8 @@ class Lab_Contacts(WorksheetImporter):
         portal_groups = getToolByName(self.context, 'portal_groups')
         portal_registration = getToolByName(
             self.context, 'portal_registration')
-        rownum = 2
-        for row in self.get_rows(3):
-            rownum+=1
+        for i, row in enumerate(self.get_rows(3)):
+            rownum = i + 3
             if not row.get('Firstname',None):
                 continue
 
@@ -603,16 +602,18 @@ class Client_Contacts(WorksheetImporter):
 
     def Import(self):
         portal_groups = getToolByName(self.context, 'portal_groups')
-        pc = getToolByName(self.context, 'portal_catalog')
+        cfolder = self.context.clients
+
         for i, row in enumerate(self.get_rows(3)):
             fullname = "{Firstname} {Surname}".format(**row).strip()
-            brains = pc(portal_type="Client", getName=row['Client_title'])
-            if len(brains) == 0:
+            if not fullname:
+                continue
+            client = getobj(cfolder, "Client", getName=row['Client_title'])
+            if not client:
                 error = "Client invalid: '%s'. The Client Contact %s will " \
                         "not be uploaded."
                 logger.error(error, row['Client_title'], fullname)
                 continue
-            client = brains[0].getObject()
             if getobj(client, "Contact", getFullname=fullname):
                 continue
             contact = _createObjectByType("Contact", client, tmpID())
@@ -1298,22 +1299,21 @@ class Sample_Points(WorksheetImporter):
 
     def Import(self):
         setup_folder = self.context.bika_setup.bika_samplepoints
-        bsc = getToolByName(self.context, 'senaite_catalog_setup')
-        pc = getToolByName(self.context, 'portal_catalog')
         stfolder = self.context.bika_setup.bika_samplepoints
+        cfolder = self.context.clients
         for i, row in enumerate(self.get_rows(3)):
             title = row['title']
             if not title:
                 continue
             client_title = row['Client_title']
             if client_title:
-                brains = pc(portal_type="Client", getName=client_title)
-                if len(brains) == 0:
+                client = getobj(cfolder, "Client", getName=client_title)
+                if not client:
                     error = "Sample Point %s: Client invalid: '%s'. The " \
                             "Sample point will not be uploaded."
                     logger.error(error, title, client_title)
                     continue
-                folder = brains[0].getObject()
+                folder = client
             else:
                 folder = setup_folder
 
@@ -1333,7 +1333,7 @@ class Sample_Points(WorksheetImporter):
                 Elevation=row['Elevation'],
             )
             sampletype = getobj(stfolder, 'SampleType',
-                                    Title=row.get('SampleType_title'))
+                                Title=row.get('SampleType_title'))
             if sampletype:
                 obj.setSampleTypes([sampletype, ])
             obj.unmarkCreationFlag()
@@ -1889,10 +1889,8 @@ def resolve_service(context, *texts):
 class Analysis_Specifications(WorksheetImporter):
 
     def Import(self):
-        s_t = ""
         bucket = {}
-        pc = getToolByName(self.context, "portal_catalog")
-        bsc = getToolByName(self.context, "senaite_catalog_setup")
+        cfolder = self.context.clients
         # collect up all values into the bucket
         for i, row in enumerate(self.get_rows(3)):
             title = row.get("Title", False)
@@ -1923,10 +1921,7 @@ class Analysis_Specifications(WorksheetImporter):
                 if parent == "lab":
                     folder = self.context.bika_setup.bika_analysisspecs
                 else:
-                    proxy = \
-                        pc(portal_type="Client", getName=safe_unicode(parent))[
-                            0]
-                    folder = proxy.getObject()
+                    folder = getobj(cfolder, 'Client', getName=parent)
                 if getobj(folder, "AnalysisSpec", Title=title):
                     continue
 
@@ -1976,17 +1971,17 @@ class Analysis_Profiles(WorksheetImporter):
             if getobj(folder, "AnalysisProfile", Title=title):
                 continue
             obj = _createObjectByType("AnalysisProfile", folder, tmpID())
+            price = Float(row.get('Price', '0.0'))
+            vat = Float(row.get('VAT', '0.0'))
+            use_price = row.get('UseAnalysisProfilePrice', False)
+
             obj.edit(title=row['title'],
                      description=row.get('description', ''),
                      ProfileKey=row['ProfileKey'],
                      CommercialID=row.get('CommercialID', ''),
-                     AnalysisProfilePrice="%02f" % Float(
-                         row.get('AnalysisProfilePrice', '0.0')),
-                     AnalysisProfileVAT="%02f" % Float(
-                         row.get('AnalysisProfileVAT', '0.0')),
-                     UseAnalysisProfilePrice=row.get('UseAnalysisProfilePrice',
-                                                     False)
-                     )
+                     AnalysisProfilePrice="%02f" % price,
+                     AnalysisProfileVAT="%02f" % vat,
+                     UseAnalysisProfilePrice=use_price)
             obj.setService(self.profile_services[row['title']])
             obj.unmarkCreationFlag()
             renameAfterCreation(obj)
@@ -2043,9 +2038,9 @@ class AR_Templates(WorksheetImporter):
     def Import(self):
         self.load_artemplate_analyses()
         self.load_artemplate_partitions()
+        cfolder = self.context.clients
         stfolder = self.context.bika_setup.bika_sampletypes
         spfolder = self.context.bika_setup.bika_samplepoints
-        pc = getToolByName(self.context, 'portal_catalog')
         for i, row in enumerate(self.get_rows(3)):
             title = row['title']
             if not title:
@@ -2062,8 +2057,7 @@ class AR_Templates(WorksheetImporter):
             if client_title == 'lab':
                 folder = self.context.bika_setup.bika_artemplates
             else:
-                folder = pc(portal_type='Client',
-                            getName=client_title)[0].getObject()
+                folder = getobj(cfolder, 'Client', getName=client_title)
 
             if getobj(folder, "ARTemplate", Title=title):
                 continue
@@ -2317,10 +2311,11 @@ class Attachment_Types(WorksheetImporter):
     def Import(self):
         folder = self.context.bika_setup.bika_attachmenttypes
         for i, row in enumerate(self.get_rows(3)):
+            title = row['title']
+            if not title:
+                continue
             obj = _createObjectByType("AttachmentType", folder, tmpID())
-            obj.edit(
-                title=row['title'],
-                description=row.get('description', ''))
+            obj.edit(title=title, description=row.get('description', ''))
             obj.unmarkCreationFlag()
             renameAfterCreation(obj)
             notify(ObjectInitializedEvent(obj))

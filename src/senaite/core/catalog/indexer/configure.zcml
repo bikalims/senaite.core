@@ -18,6 +18,9 @@
   <!-- AnalysisCategory Indexer -->
   <adapter name="sortable_title" factory=".analysiscategory.sortable_title"/>
 
+  <!-- AnalysisService Indexer -->
+  <adapter name="category_sort_key" factory=".analysisservice.category_sort_key"/>
+
   <!-- ARReport Indexer -->
   <adapter name="sample_uid" factory=".arreport.sample_uid"/>
 

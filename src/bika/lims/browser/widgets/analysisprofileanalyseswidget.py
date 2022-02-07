@@ -46,7 +46,7 @@ class AnalysisProfileAnalysesView(BikaListingView):
         self.catalog = "senaite_catalog_setup"
         self.contentFilter = {
             "portal_type": "AnalysisService",
-            "sort_on": "sortable_title",
+            "sort_on": "category_sort_key",
             "sort_order": "ascending",
             "is_active": True,
         }
@@ -189,7 +189,6 @@ class AnalysisProfileAnalysesView(BikaListingView):
 
     def folderitems(self):
         items = super(AnalysisProfileAnalysesView, self).folderitems()
-        self.categories.sort()
         return items
 
     def folderitem(self, obj, item, index):

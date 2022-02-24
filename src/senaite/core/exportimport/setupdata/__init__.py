@@ -1931,7 +1931,7 @@ class Analysis_Specifications(WorksheetImporter):
                 if st:
                     fldr = self.context.bika_setup.bika_sampletypes
                     st_uid = getobj(fldr, portal_type="SampleType",
-                                    Title=safe_unicode(st)).UID
+                                    Title=safe_unicode(st)).UID()
 
                 obj = _createObjectByType("AnalysisSpec", folder, tmpID())
                 obj.edit(title=title)

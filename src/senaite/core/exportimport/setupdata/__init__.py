@@ -2165,18 +2165,21 @@ class Worksheet_Templates(WorksheetImporter):
         self.load_wst_services()
         self.load_wst_layouts()
         folder = self.context.bika_setup.bika_worksheettemplates
+        insfolder = self.context.bika_setup.bika_instruments
         for i, row in enumerate(self.get_rows(3)):
             title = row['title']
             if not title:
                 continue
             if getobj(folder, "WorksheetTemplate", Title=title):
                 continue
+            instrument = getobj(insfolder, 'Instrument', Title=row.get('Instrument_title'))
             obj = _createObjectByType("WorksheetTemplate", folder, tmpID())
             obj.edit(
                 title=row['title'],
                 description=row.get('description', ''),
                 Layout=self.wst_layouts[row['title']])
             obj.setService(self.wst_services[row['title']])
+            obj.setInstrument(instrument)
             obj.unmarkCreationFlag()
             renameAfterCreation(obj)
             notify(ObjectInitializedEvent(obj))

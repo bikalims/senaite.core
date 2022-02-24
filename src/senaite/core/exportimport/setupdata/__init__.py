@@ -309,7 +309,7 @@ class WorksheetImporter:
         contentFilter.update(kwargs)
         brains = catalog(contentFilter)
         if len(brains) > 1:
-            __import__('pdb').set_trace()
+            # __import__('pdb').set_trace()
             logger.info("More than one object found for %s" % contentFilter)
             return None
         elif len(brains) == 0:
@@ -894,7 +894,7 @@ class Instruments(WorksheetImporter):
             manufacturer = getobj(manfolder, 'Manufacturer',
                                     Title=row.get('Brand'))
             supplier = getobj(supplierfolder, 'Supplier',
-                                    getTName=row.get('Supplier'))
+                                    getName=row.get('Supplier'))
             method = getobj(methodfolder, 'Method',
                             Title=row.get('Method'))
             obj.setInstrumentType(instrumenttype)
@@ -1651,7 +1651,7 @@ class Analysis_Services(WorksheetImporter):
             service = getobj(self.context.bika_setup.bika_analysisservices,
                              'AnalysisService', Title=row.get('Service_title'))
             if not service:
-                __import__('pdb').set_trace()
+                # __import__('pdb').set_trace()
                 warning = ("Unable to load an Analysis Service uncertainty. "
                            "Service '%s' not found." % row.get('Service_title'))
                 logger.warning(warning)

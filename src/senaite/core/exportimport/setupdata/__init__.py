@@ -31,6 +31,7 @@ from bika.lims import api
 from bika.lims import bikaMessageFactory as _
 from bika.lims import logger
 from bika.lims import to_utf8
+from bika.lims.config import ANALYSIS_TYPES
 from bika.lims.idserver import renameAfterCreation
 from bika.lims.interfaces import ISetupDataSetList
 from bika.lims.utils import getFromString
@@ -2134,15 +2135,17 @@ class Worksheet_Templates(WorksheetImporter):
         self.wst_layouts = {}
         if not worksheet:
             return
+        vocab = ANALYSIS_TYPES
         for i, row in enumerate(self.get_rows(3, worksheet=worksheet)):
             if row['WorksheetTemplate_title'] \
                not in self.wst_layouts.keys():
                 self.wst_layouts[
                     row['WorksheetTemplate_title']] = []
+            contr_type = vocab.getKey(row.get('type', ''))
             self.wst_layouts[
                 row['WorksheetTemplate_title']].append({
                     'pos': row['pos'],
-                    'type': row['type'],
+                    'type': contr_type,
                     'blank_ref': row['blank_ref'],
                     'control_ref': row['control_ref'],
                     'dup': row['dup']})

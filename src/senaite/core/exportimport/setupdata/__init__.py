@@ -1443,8 +1443,25 @@ class Analysis_Categories(WorksheetImporter):
 
 
 class Methods(WorksheetImporter):
+    def load_instrument_methods(self):
+        sheetname = 'Instrument Methods'
+        worksheet = self.workbook[sheetname]
+        insfolder = self.context.bika_setup.bika_instruments
+        self.instrument_methods = {}
+        if not worksheet:
+            return
+        for i, row in enumerate(self.get_rows(3, worksheet=worksheet)):
+            if not row.get('Instrument_title', '') or not row.get('Method_title', ''):
+                continue
+            if row['Method_title'] not in self.instrument_methods.keys():
+                self.instrument_methods[row['Method_title']] = []
+            instrument = getobj(insfolder,
+                             'Instrument', title=row['Instrument_title'])
+            if instrument:
+                self.instrument_methods[row['Method_title']].append(instrument)
 
     def Import(self):
+        self.load_instrument_methods()
         folder = self.context.methods
         bsc = getToolByName(self.context, 'senaite_catalog_setup')
         calcfolder = self.context.bika_setup.bika_calculations
@@ -1461,6 +1478,10 @@ class Methods(WorksheetImporter):
                                  Title=row.get('Calculation_title'))
             instrument = getobj(insfolder, 'Instrument',
                                 Title=row.get('Instrument_title'))
+            instruments = self.instrument_methods.get(row['title'], [])
+            if instrument:
+                instruments.append(instrument)
+            instruments_uids = [inst.UID() for inst in instruments]
             supplier = getobj(supplierfolder, 'Supplier',
                               Title=row.get('Subcontractor_title'))
             obj = _createObjectByType("Method", folder, tmpID())
@@ -1473,7 +1494,7 @@ class Methods(WorksheetImporter):
                 MethodID=row.get('MethodID', ''),
                 Accredited=row.get('Accredited', True),
                 Supplier=supplier,
-                Instruments=[instrument.UID()] if instrument else [],
+                Instruments=instruments_uids,
             )
             # Obtain all created methods
             catalog = getToolByName(self.context, 'portal_catalog')

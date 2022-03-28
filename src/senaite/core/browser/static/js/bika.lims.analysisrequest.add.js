@@ -532,7 +532,6 @@
       options.force_all = "false";
       field.combogrid(options);
       field.attr("search_query", "{}");
-      return field.trigger("blur");
     };
 
     AnalysisRequestAdd.prototype.set_reference_field = function(field, uid, title) {

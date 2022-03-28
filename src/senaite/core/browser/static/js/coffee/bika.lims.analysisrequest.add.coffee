@@ -525,7 +525,6 @@ class window.AnalysisRequestAdd
     field.attr "search_query", "{}"
 
     # close on any open searchbox to force reload on the next focus
-    field.trigger("blur")
 
 
   set_reference_field: (field, uid, title) =>

@@ -1881,7 +1881,7 @@ class Reference_Definitions(WorksheetImporter):
             if row['ReferenceDefinition_title'] not in self.results.keys():
                 self.results[row['ReferenceDefinition_title']] = []
             service = self.get_object(bsc, 'AnalysisService',
-                                      row.get('service'))
+                    row.get('service'), **{"getKeyword": row.get("Keyword")})
             self.results[
                 row['ReferenceDefinition_title']].append({
                     'uid': service.UID(),

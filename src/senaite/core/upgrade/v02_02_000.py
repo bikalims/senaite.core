@@ -18,6 +18,12 @@
 # Copyright 2018-2021 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
+
+from Products.Archetypes.event import ObjectEditedEvent
+from zope.event import notify
+
+from bika.lims import api
+from bika.lims.catalog import SETUP_CATALOG
 from senaite.core import logger
 from senaite.core.config import PROJECTNAME as product
 from senaite.core.upgrade import upgradestep
@@ -35,14 +41,44 @@ def upgrade(tool):
     ver_from = ut.getInstalledVersion(product)
 
     if ut.isOlderVersion(product, version):
-        logger.info("Skipping upgrade of {0}: {1} > {2}".format(
-            product, ver_from, version))
+        logger.info(
+            "Skipping upgrade of {0}: {1} > {2}".format(product, ver_from, version)
+        )
         return True
 
     logger.info("Upgrading {0}: {1} -> {2}".format(product, ver_from, version))
 
     # -------- ADD YOUR STUFF BELOW --------
     setup.runImportStepFromProfile(profile, "viewlets")
+    migrate_calculations_of_analysisservice(portal)
 
     logger.info("{0} upgraded to version {1}".format(product, version))
     return True
+
+
+def migrate_calculations_of_analysisservice(portal):
+    logger.info("Migrate AnalysisService `Calculation` field ...")
+    query = {"portal_type": "AnalysisService"}
+    for brain in api.search(query, SETUP_CATALOG):
+        obj = api.get_object(brain)
+        methods = obj.getMethods()
+        defaultcalculation = None
+        for m, meth in enumerate(methods):
+            if meth.getCalculations():
+                for c, calc in enumerate(meth.getCalculations()):
+                    if calc.Title() == "Correction":
+                        defaultcalculation = calc
+                        break
+                if defaultcalculation:
+                    break
+
+        if defaultcalculation:
+            logger.info(
+                "{0} calculation is {1}".format(obj.title, obj.getCalculation())
+            )
+            logger.info("Method calculation is {0}".format(defaultcalculation.Title()))
+            obj.setCalculation(defaultcalculation)
+            notify(ObjectEditedEvent(obj))
+            logger.info("Migrate AnalysisService `Calculation` field ...")
+
+    logger.info("Migrate AnalysisService `Calculation` field ... [DONE]")

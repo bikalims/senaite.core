@@ -514,7 +514,7 @@ class AnalysesView(BaseView):
             obj_id = api.get_id(obj)
             sample_id = api.get_id(sample)
             reference_analysis_group_id = obj.getReferenceAnalysesGroupID()
-            item_title = "%s (%s) (%s)" % (obj_id, sample_id, reference_analysis_group_id)
+            item_title = "%s (%s)" % (obj_id, reference_analysis_group_id)
             item_url = api.get_url(sample)
             item_img_url = api.get_url(sample)
             item_img = "control.png"

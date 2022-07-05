@@ -18,13 +18,14 @@
 # Copyright 2018-2021 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-from bika.lims import api
 from bika.lims import FieldEditAnalysisResult
-from bika.lims import WorksheetAddAttachment
+from bika.lims import api
 from bika.lims.api.security import check_permission
+from bika.lims.interfaces import IReferenceAnalysis
 from plone.app.layout.viewlets.common import ViewletBase
 from plone.memoize import view
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from senaite.core.permissions.worksheet import can_add_worksheet_attachment
 
 
 class AttachmentsViewlet(ViewletBase):
@@ -78,7 +79,7 @@ class WorksheetAttachmentsViewlet(AttachmentsViewlet):
         # XXX: Hack to show the viewlet only on the WS manage_results view
         if not self.request.getURL().endswith("manage_results"):
             return False
-        return check_permission(WorksheetAddAttachment, self.context)
+        return can_add_worksheet_attachment(self.context)
 
     @view.memoize
     def get_services(self):
@@ -112,6 +113,10 @@ class WorksheetAttachmentsViewlet(AttachmentsViewlet):
         """
         analyses = set()
         for analysis in self.context.getAnalyses():
+            # Skip Reference Analysis
+            if IReferenceAnalysis.providedBy(analysis):
+                continue
+                
             # Skip non-editable analyses
             if not check_permission(FieldEditAnalysisResult, analysis):
                 continue

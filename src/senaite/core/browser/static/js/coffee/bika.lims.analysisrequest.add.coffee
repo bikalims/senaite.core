@@ -525,6 +525,7 @@ class window.AnalysisRequestAdd
     field.attr "search_query", "{}"
 
     # close on any open searchbox to force reload on the next focus
+    field.trigger("blur")
 
 
   set_reference_field: (field, uid, title) =>
@@ -1378,7 +1379,7 @@ class window.AnalysisRequestAdd
       if data['errors']
         msg = data.errors.message
         if msg isnt ""
-          msg = "#{msg}<br/>"
+          msg = _t("Sorry, an error occured 🙈<p class='code'>#{msg}</p>")
 
         for fieldname of data.errors.fielderrors
           field = $("##{fieldname}")

@@ -54,10 +54,6 @@ from Products.Archetypes import PloneMessageFactory as PMF  # noqa
 
 def initialize(context):
     logger.info("*** Initializing BIKA.LIMS ***")
-    # DELETE AFTER 2.0.0
-    from bika.lims.content.supplyorder import SupplyOrder  # noqa
-    from bika.lims.content.supplyorderfolder import SupplyOrderFolder  # noqa
-    # /DELETE AFTER 2.0.0
     from bika.lims.content.analysis import Analysis  # noqa
     from bika.lims.content.analysiscategory import AnalysisCategory  # noqa
     from bika.lims.content.analysisprofile import AnalysisProfile  # noqa
@@ -155,6 +151,7 @@ def initialize(context):
     from bika.lims.controlpanel.bika_worksheettemplates import WorksheetTemplates  # noqa
 
     from bika.lims import permissions
+    from senaite.core import permissions as core_permissions
 
     content_types, constructors, ftis = process_types(
         listTypes(PROJECTNAME), PROJECTNAME)
@@ -165,7 +162,11 @@ def initialize(context):
     for atype, constructor in allTypes:
         kind = "%s: Add %s" % (PROJECTNAME, atype.portal_type)
         perm_name = "Add{}".format(atype.portal_type)
-        perm = getattr(permissions, perm_name, AddPortalContent)
+        # check first if the permission is set in senaite.core
+        perm = getattr(core_permissions, perm_name, None)
+        if perm is None:
+            # check bika.lims.permissions or use fallback permission
+            perm = getattr(permissions, perm_name, AddPortalContent)
         ContentInit(kind,
                     content_types=(atype,),
                     permission=perm,

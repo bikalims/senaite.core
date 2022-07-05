@@ -83,15 +83,11 @@ window.bika.lims.controllers =  {
     ".portaltype-analysisrequest.template-analyses":
         ['AnalysisRequestAnalysesView'],
 
-	// Common and utilities for AR Add forms
-	".portaltype-analysisrequest.template-ar_add": ['AnalysisRequestAddView'],
+    // Common and utilities for AR Add forms
+    ".portaltype-analysisrequest.template-ar_add": ['AnalysisRequestAddView'],
 
   // AR Add 2
-	"#analysisrequest_add_form": ['AnalysisRequestAdd'],
-
-    // Supply Orders
-    ".portaltype-supplyorder.template-base_edit":
-        ['SupplyOrderEditView'],
+    "#analysisrequest_add_form": ['AnalysisRequestAdd'],
 
     // Batches
     ".portaltype-batchfolder":
@@ -103,9 +99,6 @@ window.bika.lims.controllers =  {
 
     ".portaltype-worksheet.template-manage_results":
         ['WorksheetManageResultsView'],
-
-    ".portaltype-worksheettemplate.template-base_edit":
-        ['WorksheetTemplateEdit'],
 
     "#worksheet-printview-wrapper":
         ['WorksheetPrintView'],

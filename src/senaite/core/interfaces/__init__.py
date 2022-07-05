@@ -88,3 +88,28 @@ class ISamplesView(Interface):
 class IHaveUIDReferences(Interface):
     """Marker interface when the object contains UID references
     """
+
+
+class ISampleContainers(Interface):
+    """Marker interface for sample container setup folder
+    """
+
+
+class ISampleContainer(Interface):
+    """Marker interface for sample containers
+    """
+
+
+class IContentMigrator(Interface):
+    """Marker interface for content migrator
+    """
+
+
+class IFieldMigrator(Interface):
+    """Marker interface for field migrator
+    """
+
+
+class IDynamicLocalRoles(Interface):
+    """Marker interface for objects with dynamic assignment of local roles
+    """

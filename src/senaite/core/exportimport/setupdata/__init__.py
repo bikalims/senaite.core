@@ -715,35 +715,26 @@ class Preservations(WorksheetImporter):
 class Containers(WorksheetImporter):
 
     def Import(self):
-        folder = self.context.bika_setup.bika_containers
-        contfolder = self.context.bika_setup.bika_containertypes
-        presfolder = self.context.bika_setup.bika_preservations
-        for i, row in enumerate(self.get_rows(3)):
-            title = row['title']
-            if not title:
+        folder = self.context.bika_setup.sample_containers
+        bsc = getToolByName(self.context, "senaite_catalog_setup")
+        for row in self.get_rows(3):
+            if not row["title"]:
                 continue
-            if getobj(folder, "Container", Title=title):
-                continue
-            obj = _createObjectByType("Container", folder, tmpID())
-            obj.edit(
-                title=row['title'],
-                description=row.get('description', ''),
-                Capacity=row.get('Capacity', 0),
-                PrePreserved=self.to_bool(row['PrePreserved'])
-            )
-            if row['ContainerType_title']:
-                ct = getobj(contfolder, 'ContainerType',
-                            Title=row.get('ContainerType_title', ''))
+            obj = api.create(folder, "SampleContainer")
+            obj.setTitle(row["title"])
+            obj.setDescription(row.get("description", ""))
+            obj.setCapacity(row.get("Capacity", 0))
+            obj.setPrePreserved(self.to_bool(row["PrePreserved"]))
+            if row["ContainerType_title"]:
+                ct = self.get_object(
+                    bsc, "ContainerType", row.get("ContainerType_title", ""))
                 if ct:
                     obj.setContainerType(ct)
-            if row['Preservation_title']:
-                pres = getobj(presfolder, 'Preservation',
-                              Title=row.get('Preservation_title', ''))
+            if row["Preservation_title"]:
+                pres = self.get_object(
+                    bsc, "Preservation", row.get("Preservation_title", ""))
                 if pres:
                     obj.setPreservation(pres)
-            obj.unmarkCreationFlag()
-            renameAfterCreation(obj)
-            notify(ObjectInitializedEvent(obj))
 
 
 class Suppliers(WorksheetImporter):
@@ -2119,7 +2110,8 @@ class Reference_Definitions(WorksheetImporter):
         for i, row in enumerate(self.get_rows(3, worksheet=worksheet)):
             if row['ReferenceDefinition_title'] not in self.results.keys():
                 self.results[row['ReferenceDefinition_title']] = []
-            service = resolve_service(self.context, row.get('service'))
+            service = self.get_object(bsc, 'AnalysisService',
+                    row.get('service'), **{"getKeyword": row.get("Keyword")})
             self.results[
                 row['ReferenceDefinition_title']].append({
                     'uid': service.UID(),

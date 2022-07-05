@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2022-01-26 15:46+0000\n"
+"POT-Creation-Date: 2022-06-29 10:35+0000\n"
 "PO-Revision-Date: 2018-06-01 18:44+0000\n"
 "Last-Translator: trendspotter <jirka.p@volny.cz>, 2021\n"
 "Language-Team: Czech (https://www.transifex.com/senaite/teams/87045/cs/)\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Domain: DOMAIN\n"
 "Language: cs\n"
 
-#: bika/lims/content/bikasetup.py:778
+#: bika/lims/content/bikasetup.py:779
 msgid " <p>The ID Server provides unique sequential IDs for objects such as Samples and Worksheets etc, based on a format specified for each content type.</p><p>The format is constructed similarly to the Python format syntax, using predefined variables per content type, and advancing the IDs through a sequence number, 'seq' and its padding as a number of digits, e.g. '03d' for a sequence of IDs from 001 to 999.</p><p>Alphanumeric prefixes for IDs are included as is in the formats, e.g. WS for Worksheet in WS-{seq:03d} produces sequential Worksheet IDs: WS-001, WS-002, WS-003 etc.</p><p>For dynamic generation of alphanumeric and sequential IDs, the wildcard {alpha} can be used. E.g WS-{alpha:2a3d} produces WS-AA001, WS-AA002, WS-AB034, etc.</p><p>Variables that can be used include:<table><tr><th style='width:150px'>Content Type</th><th>Variables</th></tr><tr><td>Client ID</td><td>{clientId}</td></tr><tr><td>Year</td><td>{year}</td></tr><tr><td>Sample ID</td><td>{sampleId}</td></tr><tr><td>Sample Type</td><td>{sampleType}</td></tr><tr><td>Sampling Date</td><td>{samplingDate}</td></tr><tr><td>Date Sampled</td><td>{dateSampled}</td></tr></table></p><p>Configuration Settings:<ul><li>format:<ul><li>a python format string constructed from predefined variables like sampleId, clientId, sampleType.</li><li>special variable 'seq' must be positioned last in theformat string</li></ul></li><li>sequence type: [generated|counter]</li><li>context: if type counter, provides context the counting function</li><li>counter type: [backreference|contained]</li><li>counter reference: a parameter to the counting function</li><li>prefix: default prefix if none provided in format string</li><li>split length: the number of parts to be included in the prefix</li></ul></p>"
 msgstr ""
 
@@ -29,8 +29,6 @@ msgstr ""
 msgid "${amount} attachments with a total size of ${total_size}"
 msgstr "${amount} příloh o celkové velikosti ${total_size}"
 
-#: bika/lims/browser/analysisrequest/templates/reject_samples.pt:21
-#: bika/lims/browser/templates/partition_magic.pt:29
 #: senaite/core/browser/samples/templates/dispatch_samples.pt:23
 msgid "${back_link}"
 msgstr "${back_link}"
@@ -69,8 +67,6 @@ msgstr "%s byl odmítnut"
 msgid "%s has no '%s' column."
 msgstr "%s nemá sloupec  '%s' ."
 
-#: bika/lims/browser/analysisrequest/templates/reject_samples.pt:21
-#: bika/lims/browser/templates/partition_magic.pt:29
 #: senaite/core/browser/samples/templates/dispatch_samples.pt:23
 msgid "&larr; Back"
 msgstr "&larr; Zpět"
@@ -79,11 +75,38 @@ msgstr "&larr; Zpět"
 msgid "&larr; Back to the ${back_link}"
 msgstr "&larr; Zpět na ${back_link}"
 
+#: bika/lims/validators.py:895
+msgid "'Max' value must be above 'Min' value"
+msgstr ""
+
+#: bika/lims/validators.py:890
+msgid "'Max' value must be numeric"
+msgstr ""
+
 #: bika/lims/content/analysisspec.py:83
 msgid "'Min' and 'Max' values indicate a valid results range. Any result outside this results range will raise an alert. 'Min warn' and 'Max warn' values indicate a shoulder range. Any result outside the results range but within the shoulder range will raise a less severe alert. If the result is out of range, the value set for '< Min' or '< Max' will be displayed in lists and results reports instead of the real result."
 msgstr "Hodnoty 'Min' a 'Max' označují platný rozsah výsledků. Jakýkoli výsledek mimo tento rozsah výsledků vyvolá upozornění. Hodnoty „Min warn“ a „Max warn“ označují rozpětí varování. Jakýkoli výsledek mimo rozsah výsledků, ale uvnitř rozpětí, vyvolá méně závažné varování. Pokud je výsledek mimo rozsah, zobrazí se namísto skutečného výsledku hodnota nastavená pro  '< Min' nebo  '< Max'."
 
-#: bika/lims/content/referencesample.py:198
+#: bika/lims/validators.py:888
+msgid "'Min' value must be numeric"
+msgstr ""
+
+#: bika/lims/validators.py:909
+msgid "'Warn Max' value must be above 'Max' value"
+msgstr ""
+
+#: bika/lims/validators.py:906
+msgid "'Warn Max' value must be numeric or empty"
+msgstr ""
+
+#: bika/lims/validators.py:902
+msgid "'Warn Min' value must be below 'Min' value"
+msgstr ""
+
+#: bika/lims/validators.py:899
+msgid "'Warn Min' value must be numeric or empty"
+msgstr ""
+
 #: senaite/core/browser/viewlets/templates/attachments.pt:260
 msgid "(Blank)"
 msgstr "(Prázdná položka)"
@@ -108,16 +131,20 @@ msgstr "(Požadováno)"
 msgid "*** This is an automatically generated email, please do not reply to this message. ***"
 msgstr "*** Toto je automaticky generovaný e-mail, na tuto zprávu neodpovídejte. ***"
 
-#: bika/lims/browser/analyses/view.py:159
+#: bika/lims/browser/analyses/view.py:162
 #: bika/lims/browser/referencesample.py:175
-#: bika/lims/browser/worksheet/views/analyses.py:106
+#: bika/lims/browser/worksheet/views/analyses.py:107
 msgid "+-"
 msgstr "+-"
 
 #: bika/lims/browser/fields/resultrangefield.py:39
-#: bika/lims/browser/widgets/analysisspecificationwidget.py:111
+#: bika/lims/browser/widgets/analysisspecificationwidget.py:110
 msgid "< Min"
 msgstr "< Min"
+
+#: bika/lims/browser/worksheet/templates/add_analyses.pt:61
+msgid "<i class=\"fas fa-link\" aria-hidden=\"true\" /> Go to worksheet template setup"
+msgstr ""
 
 #: bika/lims/browser/templates/senaite-frontpage.pt:15
 msgid "<img src=\"${DYNAMIC_CONTENT}\" /> Welcome to SENAITE"
@@ -132,7 +159,7 @@ msgid "<span>x</span> <span class=\"formHelp\">x</span>"
 msgstr "<span>x</span> <span class=\"formHelp\">x</span>"
 
 #: bika/lims/browser/fields/resultrangefield.py:40
-#: bika/lims/browser/widgets/analysisspecificationwidget.py:114
+#: bika/lims/browser/widgets/analysisspecificationwidget.py:113
 msgid "> Max"
 msgstr "> Max"
 
@@ -189,7 +216,7 @@ msgstr "Označení akreditace"
 msgid "Accreditation page header"
 msgstr "Záhlaví stránky akreditace"
 
-#: bika/lims/browser/analyses/view.py:1284
+#: bika/lims/browser/analyses/view.py:1364
 #: bika/lims/browser/analysisrequest/manage_analyses.py:259
 #: bika/lims/browser/referencesample.py:357
 msgid "Accredited"
@@ -211,9 +238,9 @@ msgstr "Akce prováděné uživateli (nebo konkrétním uživatelem) v časovém
 msgid "Activate"
 msgstr "aktivovat"
 
-#: bika/lims/browser/client/views/analysisprofiles.py:64
-#: bika/lims/browser/client/views/artemplates.py:61
-#: bika/lims/browser/client/views/contacts.py:79
+#: senaite/core/browser/controlpanel/instrumentlocations.py:71
+#: senaite/core/browser/controlpanel/interpretationtemplates.py:65
+#: senaite/core/browser/controlpanel/samplecontainers.py:62
 msgid "Active"
 msgstr "Aktivní"
 
@@ -222,13 +249,13 @@ msgstr "Aktivní"
 msgid "Actor"
 msgstr "osoba hrající roli"
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:329
-#: bika/lims/browser/batchfolder.py:130
-#: bika/lims/browser/client/views/analysisprofiles.py:83
+#: senaite/core/browser/controlpanel/instrumentlocations.py:43
+#: senaite/core/browser/controlpanel/interpretationtemplates.py:46
+#: senaite/core/browser/controlpanel/samplecontainers.py:24
 msgid "Add"
 msgstr "Vložit"
 
-#: bika/lims/browser/worksheet/views/add_analyses.py:62
+#: bika/lims/browser/worksheet/views/add_analyses.py:78
 #: bika/lims/profiles/default/types/Worksheet.xml
 msgid "Add Analyses"
 msgstr "Vlož analýzu"
@@ -257,7 +284,7 @@ msgstr "Vlož duplicitní vzorek"
 msgid "Add Samples"
 msgstr "Přidat vzorky"
 
-#: bika/lims/content/bikasetup.py:331
+#: bika/lims/content/bikasetup.py:332
 msgid "Add a remarks field to all analyses"
 msgstr "Do všech analýz přidejte pole s poznámkami"
 
@@ -266,11 +293,11 @@ msgid "Add analyses from the selected profile to the template"
 msgstr "Přidat do šablony analýzy z vybraného profilu"
 
 #: senaite/core/browser/viewlets/templates/attachments.pt:210
-#: senaite/core/browser/viewlets/templates/worksheet_attachments.pt:37
+#: senaite/core/browser/viewlets/templates/worksheet_attachments.pt:38
 msgid "Add new Attachment"
 msgstr "Přidat novou přílohu"
 
-#: bika/lims/content/analysisrequest.py:1001
+#: bika/lims/content/analysisrequest.py:1007
 msgid "Add one or more attachments to describe the sample in this sample, or to specify your request."
 msgstr "Přidat jednu nebo více příloh k popisu vzorku v tomto vzorku nebo k zadání vašeho požadavku."
 
@@ -294,10 +321,13 @@ msgstr "Další e-mailové adresy, které mají být obeznámeny"
 msgid "Additional result values"
 msgstr "Další hodnoty výsledků"
 
-#: bika/lims/content/storagelocation.py:93
-#: bika/lims/skins/bika/bika_widgets/addresswidget.pt:137
+#: senaite/core/z3cform/widgets/address.py:119
 msgid "Address"
 msgstr "Adresa"
+
+#: senaite/core/behaviors/configure.zcml:23
+msgid "Adds the ability to share a content across clients"
+msgstr ""
 
 #: bika/lims/profiles/default/types/ReportFolder.xml
 msgid "Administration"
@@ -328,9 +358,9 @@ msgstr "Po ${end_date}"
 msgid "Agency"
 msgstr "Agentura"
 
-#: bika/lims/browser/accreditation.py:83
-#: bika/lims/browser/analyses/view.py:228
-#: bika/lims/browser/analysisrequest/manage_analyses.py:109
+#: senaite/core/browser/controlpanel/instrumentlocations.py:81
+#: senaite/core/browser/controlpanel/interpretationtemplates.py:77
+#: senaite/core/browser/controlpanel/samplecontainers.py:72
 msgid "All"
 msgstr "Vše"
 
@@ -338,11 +368,11 @@ msgstr "Vše"
 msgid "All Accredited analysis services are listed here."
 msgstr "Zde jsou uvedeny všechny služby akreditované analýzy."
 
-#: senaite/core/browser/viewlets/templates/worksheet_attachments.pt:40
+#: senaite/core/browser/viewlets/templates/worksheet_attachments.pt:41
 msgid "All Analyses of Service"
 msgstr "Všechny analýzy služeb"
 
-#: senaite/core/browser/samples/view.py:541
+#: senaite/core/browser/samples/view.py:545
 msgid "All analyses assigned"
 msgstr "Všechny vázané analýzy"
 
@@ -350,23 +380,27 @@ msgstr "Všechny vázané analýzy"
 msgid "Allow Manual Detection Limit input"
 msgstr "Povolit zápis ručního detekčního limitu"
 
-#: bika/lims/content/bikasetup.py:171
+#: bika/lims/content/bikasetup.py:172
 msgid "Allow access to worksheets only to assigned analysts"
 msgstr "Povolit přístup k pracovním listům pouze přiřazeným analytikům"
+
+#: bika/lims/browser/fields/interimfieldsfield.py:60
+msgid "Allow empty"
+msgstr ""
 
 #: bika/lims/content/abstractbaseanalysis.py:529
 msgid "Allow manual uncertainty value input"
 msgstr "Povolit ruční zadání hodnoty nejistoty"
 
-#: bika/lims/config.py:133
+#: bika/lims/config.py:134
 msgid "Allow same user to verify multiple times"
 msgstr "Umožnit stejnému uživateli několikrát ověřit"
 
-#: bika/lims/config.py:134
+#: bika/lims/config.py:135
 msgid "Allow same user to verify multiple times, but not consecutively"
 msgstr "Umožněte stejnému uživateli, aby ověřoval vícekrát, ale ne postupně"
 
-#: bika/lims/content/bikasetup.py:357
+#: bika/lims/content/bikasetup.py:358
 msgid "Allow self-verification of results"
 msgstr "Povolit vlastní ověření výsledků"
 
@@ -382,7 +416,7 @@ msgstr "Nechte analytika ručně nahradit výchozí nejistou hodnotu."
 msgid "Allow to introduce analysis results manually"
 msgstr "Umožňuje zavést výsledky analýzy ručně"
 
-#: bika/lims/content/bikasetup.py:180
+#: bika/lims/content/bikasetup.py:181
 msgid "Allow to submit results for unassigned analyses or for analyses assigned to others"
 msgstr "Umožňují předkládat výsledky pro nepřiřazené analýzy nebo pro analýzy přiřazené jiným"
 
@@ -399,9 +433,8 @@ msgstr "Množství"
 msgid "Analysed by"
 msgstr "Analyzováno"
 
-#: bika/lims/browser/reports/templates/productivity_dataentrydaybook.pt:95
-#: bika/lims/browser/worksheet/templates/print/ar_by_column.pt:118
-#: bika/lims/content/artemplate.py:274
+#: senaite/core/browser/dashboard/dashboard.py:585
+#: senaite/core/browser/viewlets/sampleanalyses.py:32
 msgid "Analyses"
 msgstr "Analýzy"
 
@@ -442,9 +475,8 @@ msgstr "Požadované analýzy"
 msgid "Analyses summary per department"
 msgstr "Shrnutí analýz podle oddělení"
 
-#: bika/lims/browser/analyses/view.py:117
-#: bika/lims/browser/reports/productivity_analysestats.py:134
-#: bika/lims/browser/reports/templates/productivity_analysesperformedpertotal.pt:96
+#: senaite/core/browser/viewlets/templates/attachments.pt:68
+#: senaite/core/browser/viewlets/templates/worksheet_attachments.pt:40
 msgid "Analysis"
 msgstr "Analýzy"
 
@@ -499,7 +531,7 @@ msgstr "Analytická služba"
 msgid "Analysis Services"
 msgstr "Analytické služby"
 
-#: bika/lims/content/analysisrequest.py:657
+#: bika/lims/content/analysisrequest.py:662
 #: bika/lims/controlpanel/bika_analysisspecs.py:76
 #: bika/lims/profiles/default/types/AnalysisSpec.xml
 msgid "Analysis Specification"
@@ -515,7 +547,7 @@ msgstr "Specifikace analýz"
 msgid "Analysis State"
 msgstr "Stav analýzy"
 
-#: bika/lims/content/worksheettemplate.py:60
+#: bika/lims/content/worksheettemplate.py:59
 #: bika/lims/skins/bika/bika_widgets/worksheettemplatelayoutwidget.pt:71
 msgid "Analysis Type"
 msgstr "Typ analýze"
@@ -528,6 +560,10 @@ msgstr "Kategorie analýzy"
 msgid "Analysis conditions"
 msgstr ""
 
+#: senaite/core/browser/modals/analysis.py:93
+msgid "Analysis conditions updated: {}"
+msgstr ""
+
 #: bika/lims/content/analysisrequest.py:407
 msgid "Analysis profiles apply a certain set of analyses"
 msgstr "Profily analýzy používají určitou sadu analýz"
@@ -537,7 +573,7 @@ msgstr "Profily analýzy používají určitou sadu analýz"
 msgid "Analysis service"
 msgstr "Analytická služba"
 
-#: bika/lims/content/bikasetup.py:307
+#: bika/lims/content/bikasetup.py:308
 msgid "Analysis specifications which are edited directly on the Sample."
 msgstr "Specifikace analýzy, které jsou editovány přímo na vzorku."
 
@@ -557,13 +593,13 @@ msgstr "Časy analytického cyklu"
 msgid "Analysis turnaround times over time"
 msgstr "Analýza cyklů v čase"
 
-#: bika/lims/browser/analyses/view.py:136
+#: bika/lims/browser/analyses/view.py:139
 #: bika/lims/browser/reports/productivity_analysestats_overtime.py:152
 #: bika/lims/browser/reports/selection_macros/select_analyst.pt:4
 msgid "Analyst"
 msgstr "Analytik"
 
-#: bika/lims/browser/worksheet/views/add_worksheet.py:45
+#: bika/lims/browser/worksheet/views/add_worksheet.py:42
 msgid "Analyst must be specified."
 msgstr "Musí být zadán analytik."
 
@@ -571,15 +607,15 @@ msgstr "Musí být zadán analytik."
 msgid "Any"
 msgstr "Jakýkoli"
 
-#: bika/lims/browser/worksheet/templates/results.pt:178
+#: bika/lims/browser/worksheet/templates/results.pt:217
 msgid "Apply"
 msgstr "Použít"
 
-#: bika/lims/browser/worksheet/templates/add_analyses.pt:43
+#: bika/lims/browser/worksheet/templates/add_analyses.pt:52
 msgid "Apply template"
 msgstr "Použij šablonu"
 
-#: bika/lims/browser/fields/interimfieldsfield.py:50
+#: bika/lims/browser/fields/interimfieldsfield.py:64
 msgid "Apply wide"
 msgstr "Použít šířeji"
 
@@ -595,13 +631,13 @@ msgstr "Číslo prostředku"
 msgid "Assign"
 msgstr "Přiřadit"
 
-#: senaite/core/browser/samples/view.py:385
+#: senaite/core/browser/samples/view.py:389
 #: senaite/core/profiles/default/workflows/senaite_analysis_workflow/definition.xml
 #: senaite/core/profiles/default/workflows/senaite_duplicateanalysis_workflow/definition.xml
 msgid "Assigned"
 msgstr "Přiděleno"
 
-#: bika/lims/browser/analyses/view.py:1273
+#: bika/lims/browser/analyses/view.py:1353
 msgid "Assigned to: ${worksheet_id}"
 msgstr "Přiřazeno na: ${worksheet_id}"
 
@@ -609,7 +645,7 @@ msgstr "Přiřazeno na: ${worksheet_id}"
 msgid "Assignment pending"
 msgstr "Úkol čeká na vyřízení"
 
-#: bika/lims/validators.py:478
+#: bika/lims/validators.py:481
 msgid "At least, two options for choices field are required"
 msgstr "Pro pole volby jsou vyžadovány alespoň dvě možnosti."
 
@@ -617,7 +653,7 @@ msgstr "Pro pole volby jsou vyžadovány alespoň dvě možnosti."
 msgid "Attach to Sample"
 msgstr "Připojit ke vzorku"
 
-#: bika/lims/content/analysisrequest.py:1000
+#: bika/lims/content/analysisrequest.py:1006
 #: bika/lims/content/attachment.py:51
 #: bika/lims/content/samplepoint.py:124
 msgid "Attachment"
@@ -650,7 +686,7 @@ msgstr "Příloha přidána k analýze '{}'"
 msgid "Attachment added to the current sample"
 msgstr "Příloha přidána k aktuálnímu vzorku"
 
-#: bika/lims/browser/analyses/view.py:1050
+#: bika/lims/browser/analyses/view.py:1130
 #: bika/lims/browser/analysisrequest/manage_analyses.py:262
 #: bika/lims/browser/referencesample.py:360
 msgid "Attachment required"
@@ -672,14 +708,11 @@ msgstr "Příloha (přílohy) odstraněna"
 msgid "Attachment(s) updated"
 msgstr "Aktualizace přílohy (příloh)"
 
-#: bika/lims/browser/analyses/view.py:167
-#: bika/lims/browser/client/views/attachments.py:45
-#: bika/lims/browser/publish/templates/email.pt:129
+#: senaite/core/browser/viewlets/templates/attachments.pt:10
+#: senaite/core/browser/viewlets/templates/worksheet_attachments.pt:10
 msgid "Attachments"
 msgstr "Přílohy"
 
-#: bika/lims/controlpanel/auditlog.py:58
-#: bika/lims/profiles/default/types/AuditLog.xml
 #: senaite/core/profiles/default/actions.xml
 msgid "Audit Log"
 msgstr "Protokol auditu"
@@ -708,23 +741,23 @@ msgstr "Protokoly automatického importu"
 msgid "Auto-partition on receive"
 msgstr "Automatické oddělování při příjmu"
 
-#: bika/lims/content/bikasetup.py:505
+#: bika/lims/content/bikasetup.py:506
 msgid "Auto-receive samples"
 msgstr "Automatické přijímání vzorků"
 
-#: bika/lims/browser/worksheet/templates/results.pt:127
+#: bika/lims/browser/worksheet/templates/results.pt:166
 msgid "Autofill"
 msgstr "Automatické vyplnění"
 
-#: bika/lims/content/bikasetup.py:160
+#: bika/lims/content/bikasetup.py:161
 msgid "Automatic log-off"
 msgstr "Automatické odhlášení"
 
-#: bika/lims/content/bikasetup.py:660
+#: bika/lims/content/bikasetup.py:661
 msgid "Automatic sticker printing"
 msgstr "Automatický tisk nálepek"
 
-#: bika/lims/content/bikasetup.py:343
+#: bika/lims/content/bikasetup.py:344
 msgid "Automatic verification of samples"
 msgstr "Automatické ověřování vzorků"
 
@@ -787,9 +820,7 @@ msgstr "Dávka"
 msgid "Batch Book"
 msgstr "Kniha dávek"
 
-#: bika/lims/browser/batchfolder.py:67
-#: bika/lims/browser/templates/batch_publish.pt:52
-#: bika/lims/content/analysisrequest.py:323
+#: senaite/core/browser/samples/view.py:134
 msgid "Batch ID"
 msgstr "ID Dávky"
 
@@ -833,14 +864,13 @@ msgstr "Před ${start_date}"
 msgid "Biannual"
 msgstr "Půlroční"
 
-#: bika/lims/config.py:87
-#: bika/lims/content/organisation.py:109
+#: senaite/core/z3cform/widgets/address.py:122
 msgid "Billing address"
 msgstr "Fakturační adresa"
 
 #: bika/lims/browser/referencesample.py:514
 #: bika/lims/browser/templates/referencesample_view.pt:21
-#: bika/lims/browser/worksheet/views/analyses.py:521
+#: bika/lims/browser/worksheet/views/analyses.py:526
 msgid "Blank"
 msgstr "Blank"
 
@@ -870,6 +900,10 @@ msgstr "Hromadná cena (bez DPH)"
 msgid "Business Phone"
 msgstr "Služební telefon"
 
+#: senaite/core/z3cform/widgets/address.py:123
+msgid "Business address"
+msgstr ""
+
 #: bika/lims/browser/reports/__init__.py:138
 msgid "By"
 msgstr "Od"
@@ -895,7 +929,7 @@ msgstr "V kopii"
 msgid "Calculate Precision from Uncertainties"
 msgstr "Vypočítejte přesnost z nejistot"
 
-#: bika/lims/browser/analyses/view.py:132
+#: bika/lims/browser/analyses/view.py:135
 #: bika/lims/browser/templates/analysisservice_info.pt:152
 #: bika/lims/browser/widgets/serviceswidget.py:87
 msgid "Calculation"
@@ -909,7 +943,7 @@ msgstr "Výpočet \"{}\" je používán službou \"{}\"."
 msgid "Calculation Formula"
 msgstr "Výpočetní vztah"
 
-#: bika/lims/content/abstractanalysis.py:147
+#: bika/lims/content/abstractanalysis.py:149
 #: bika/lims/content/calculation.py:57
 msgid "Calculation Interim Fields"
 msgstr "Výpočetní pole"
@@ -947,23 +981,23 @@ msgstr "Kalibrace"
 msgid "Calibrator"
 msgstr "Kalibrátor"
 
-#: bika/lims/browser/analyses/view.py:1221
+#: bika/lims/browser/analyses/view.py:1301
 msgid "Can verify, but submitted by current user"
 msgstr "Může ověřit, ale odesláno od aktuálního uživatele"
 
-#: bika/lims/browser/analyses/view.py:1245
+#: bika/lims/browser/analyses/view.py:1325
 msgid "Can verify, but was already verified by current user"
 msgstr "Lze to ověřit, ale byl již ověřen aktuálním uživatelem"
 
-#: bika/lims/browser/analysisrequest/templates/reject_samples.pt:119
-#: bika/lims/browser/publish/templates/email.pt:205
-#: bika/lims/browser/templates/partition_magic.pt:251
+#: senaite/core/browser/samples/templates/dispatch_samples.pt:83
+#: senaite/core/profiles/default/workflows/senaite_analysis_workflow/definition.xml
+#: senaite/core/profiles/default/workflows/senaite_batch_workflow/definition.xml
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: bika/lims/browser/batchfolder.py:107
-#: bika/lims/browser/instrument.py:106
 #: senaite/core/browser/samples/dispatch_samples.py:52
+#: senaite/core/browser/samples/view.py:349
+#: senaite/core/profiles/default/workflows/senaite_analysis_workflow/definition.xml
 msgid "Cancelled"
 msgstr "Zrušen"
 
@@ -975,24 +1009,24 @@ msgstr "Výpočet nelze aktivovat, protože následující závislosti na služb
 msgid "Cannot deactivate calculation, because it is in use by the following services: ${calc_services}"
 msgstr "Nelze deaktivovat výpočet, protože je používán následujícími službami: ${calc_services}"
 
-#: bika/lims/browser/analyses/view.py:1251
+#: bika/lims/browser/analyses/view.py:1331
 msgid "Cannot verify, last verified by current user"
 msgstr "Nelze ověřit, naposledy ověřeno aktuálním uživatelem"
 
-#: bika/lims/browser/analyses/view.py:1227
+#: bika/lims/browser/analyses/view.py:1307
 msgid "Cannot verify, submitted by current user"
 msgstr "Nelze ověřit, odeslal aktuální uživatel"
 
-#: bika/lims/browser/analyses/view.py:1236
+#: bika/lims/browser/analyses/view.py:1316
 msgid "Cannot verify, was verified by current user"
 msgstr "Nelze ověřit, byl ověřen současným uživatelem"
 
-#: bika/lims/content/container.py:57
-#: bika/lims/controlpanel/bika_containers.py:82
+#: senaite/core/browser/controlpanel/samplecontainers.py:49
+#: senaite/core/content/samplecontainer.py:54
 msgid "Capacity"
 msgstr "Kapacita"
 
-#: bika/lims/browser/analyses/view.py:170
+#: bika/lims/browser/analyses/view.py:173
 #: bika/lims/browser/referencesample.py:171
 msgid "Captured"
 msgstr "Zachyceno"
@@ -1011,13 +1045,13 @@ msgstr "Catalog Dexterity contents ve více katalozích"
 msgid "Catalogue Number"
 msgstr "Katalogové číslo"
 
-#: bika/lims/content/bikasetup.py:297
+#: bika/lims/content/bikasetup.py:298
 msgid "Categorise analysis services"
 msgstr "Kategorizujte analytické služby"
 
 #: bika/lims/browser/referencesample.py:147
 #: bika/lims/browser/templates/analysisservice_info.pt:59
-#: bika/lims/browser/worksheet/views/add_analyses.py:92
+#: bika/lims/browser/worksheet/views/add_analyses.py:108
 msgid "Category"
 msgstr "Kategorie"
 
@@ -1038,13 +1072,13 @@ msgstr "Kód certifikátu"
 msgid "Changes"
 msgstr "Změny"
 
-#: bika/lims/browser/analysisrequest/resultsinterpretation.py:58
+#: senaite/core/browser/viewlets/resultsinterpretation.py:40
 msgid "Changes Saved"
 msgstr "Změny uloženy"
 
-#: bika/lims/browser/header_table.py:93
+#: bika/lims/browser/header_table.py:92
 #: bika/lims/browser/workflow/__init__.py:195
-#: bika/lims/browser/worksheet/views/add_analyses.py:132
+#: bika/lims/browser/worksheet/views/add_analyses.py:148
 msgid "Changes saved."
 msgstr "Změny uloženy."
 
@@ -1064,7 +1098,7 @@ msgstr "Zaškrtněte toto políčko, pokud je analytická služba zahrnuta do ha
 msgid "Check this box if the samples taken at this point are 'composite' and put together from more than one sub sample, e.g. several surface samples from a dam mixed together to be a representative sample for the dam. The default, unchecked, indicates 'grab' samples"
 msgstr "Toto políčko zaškrtněte, pokud jsou vzorky odebrané v tomto bodě „složené“ a sestavené z více než jednoho dílčího vzorku, např. několik vzorků povrchu z množství smíchaných dohromady, aby byly reprezentativním vzorkem celého množství. Výchozí, nezaškrtnuté, označuje „konkrétně vybrané“ vzorky"
 
-#: bika/lims/content/container.py:66
+#: senaite/core/content/samplecontainer.py:62
 msgid "Check this box if this container is already preserved.Setting this will short-circuit the preservation workflow for sample partitions stored in this container."
 msgstr "Zaškrtněte toto políčko, pokud je tento kontejner již zachován. Tímto se zkrátí pracovní postup uchování pro oddělky vzorků uložené v tomto kontejneru."
 
@@ -1080,20 +1114,20 @@ msgstr "Zaškrtnutím tohoto políčka zajistíte, aby byl pro tuto analytickou 
 msgid "Checkbox"
 msgstr ""
 
-#: bika/lims/browser/fields/interimfieldsfield.py:46
+#: bika/lims/browser/fields/interimfieldsfield.py:58
 #: bika/lims/content/analysisservice.py:225
 msgid "Choices"
 msgstr "Možnosti"
 
-#: bika/lims/content/analysisrequest.py:658
+#: bika/lims/content/analysisrequest.py:663
 msgid "Choose default Sample specification values"
 msgstr "Zvolte výchozí hodnoty specifikací vzorku"
 
-#: bika/lims/content/bikasetup.py:388
+#: bika/lims/content/bikasetup.py:389
 msgid "Choose type of multiple verification for the same user.This setting can enable/disable verifying/consecutively verifyingmore than once for the same user."
 msgstr "Vyberte typ vícenásobného ověření pro stejného uživatele. Toto nastavení může povolit / zakázat ověřování / následně ověřovat více než jednou pro stejného uživatele."
 
-#: bika/lims/skins/bika/bika_widgets/addresswidget.pt:111
+#: senaite/core/z3cform/widgets/address.py:225
 msgid "City"
 msgstr "Město"
 
@@ -1103,23 +1137,21 @@ msgstr "Typický"
 
 # senaite.app.listing: ButtonBar
 msgid "Clear selection"
-msgstr "Vymazat výběr"
+msgstr ""
 
 #: bika/lims/content/referencedefinition.py:46
 msgid "Click on Analysis Categories (against shaded backgroundto see Analysis Services in each category. Enter minimum and maximum values to indicate a valid results range. Any result outside this range will raise an alert. The % Error field allows for an % uncertainty to be considered when evaluating results against minimum and maximum values. A result out of range but still in range if the % error is taken into consideration, will raise a less severe alert."
 msgstr "Klikněte na Analytické kategorie (proti zastíněnému pozadí, abyste viděli Analysis Services v každé kategorii. Zadejte minimální a maximální hodnoty pro označení platného rozsahu výsledků. Jakýkoli výsledek mimo tento rozsah zvýší varování. Pole % Chyby umožňuje zohlednit % nejistoty,  ve vyhodnocení výsledků oproti minimálním a maximálním hodnotám. Výsledek mimo rozsah, ale stále v rozsahu, pokud se vezme v úvahu chyba v %, vyvolá méně závažné varování."
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:480
+#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:486
 msgid "Click to expand this category"
 msgstr "Klepnutím rozbalte tuto kategorii"
 
 # senaite.app.listing: TableColumnConfig
 msgid "Click to toggle the visibility or drag&drop to change the order"
-msgstr "Klepnutím přepnete viditelnost nebo přetažením změníte pořadí"
+msgstr ""
 
-#: bika/lims/browser/analysisrequest/templates/analysisrequest_retract_pdf.pt:76
-#: bika/lims/browser/batchfolder.py:75
-#: bika/lims/browser/reports/__init__.py:160
+#: senaite/core/browser/samples/view.py:139
 msgid "Client"
 msgstr "Zákazník"
 
@@ -1128,9 +1160,7 @@ msgstr "Zákazník"
 msgid "Client Batch ID"
 msgstr "ID šarže klienta"
 
-#: bika/lims/browser/analysisrequest/templates/analysisrequest_retract_pdf.pt:80
-#: bika/lims/browser/batchfolder.py:78
-#: bika/lims/browser/clientfolder.py:75
+#: senaite/core/browser/samples/view.py:145
 msgid "Client ID"
 msgstr "ID zákazníka"
 
@@ -1138,45 +1168,49 @@ msgstr "ID zákazníka"
 msgid "Client Landing Page"
 msgstr "Vstupní stránka klienta"
 
-#: senaite/core/browser/samples/view.py:88
+#: senaite/core/browser/samples/view.py:92
 msgid "Client Order"
 msgstr "Objednávka zákazníka"
 
 #: bika/lims/browser/analysisrequest/templates/invoice_content.pt:115
-#: bika/lims/browser/batch/batchbook.py:78
-#: bika/lims/content/analysisrequest.py:778
+#: bika/lims/browser/batch/batchbook.py:81
+#: bika/lims/content/analysisrequest.py:783
 msgid "Client Order Number"
 msgstr "Číslo objednávky klienta"
 
-#: senaite/core/browser/samples/view.py:159
+#: senaite/core/browser/samples/view.py:163
 msgid "Client Ref"
 msgstr "Ref. zákazníka"
 
 #: bika/lims/browser/analysisrequest/templates/invoice_content.pt:66
-#: bika/lims/content/analysisrequest.py:795
+#: bika/lims/content/analysisrequest.py:800
 msgid "Client Reference"
 msgstr "Reference zákazníka"
 
-#: bika/lims/content/analysisrequest.py:288
-#: senaite/core/browser/samples/view.py:164
+#: senaite/core/browser/samples/view.py:168
 msgid "Client SID"
 msgstr "Zákaznické SID"
 
-#: bika/lims/content/analysisrequest.py:811
+#: bika/lims/content/analysisrequest.py:817
 msgid "Client Sample ID"
 msgstr "ID vzorku klienta"
 
-#: bika/lims/browser/clientfolder.py:49
-#: bika/lims/profiles/default/types/ClientFolder.xml
+#: senaite/core/behaviors/configure.zcml:23
+msgid "ClientShareableBehavior"
+msgstr ""
+
+#: senaite/core/behaviors/clientshareable.py:57
 msgid "Clients"
 msgstr "Klienti"
+
+#: senaite/core/behaviors/clientshareable.py:58
+msgid "Clients with whom this content will be shared across. This content will become available on searches to users that belong to any of the selected clients thanks to the role 'ClientGuest'"
+msgstr ""
 
 #: senaite/core/profiles/default/workflows/senaite_batch_workflow/definition.xml
 msgid "Close"
 msgstr "Zavřít"
 
-#: bika/lims/browser/batchfolder.py:102
-#: bika/lims/content/instrumentmaintenancetask.py:128
 #: senaite/core/profiles/default/workflows/senaite_batch_workflow/definition.xml
 msgid "Closed"
 msgstr "Uzavřeno"
@@ -1206,7 +1240,7 @@ msgstr "Čárka (,)"
 msgid "Comments"
 msgstr "Komentáře"
 
-#: bika/lims/content/analysisrequest.py:1304
+#: bika/lims/content/analysisrequest.py:1310
 msgid "Comments or results interpretation"
 msgstr "Interpretace komentářů nebo výsledků"
 
@@ -1215,7 +1249,7 @@ msgstr "Interpretace komentářů nebo výsledků"
 msgid "Commercial ID"
 msgstr "Obchodní ID"
 
-#: bika/lims/content/analysisrequest.py:931
+#: bika/lims/content/analysisrequest.py:937
 #: bika/lims/content/samplepoint.py:112
 #: bika/lims/controlpanel/bika_samplepoints.py:83
 msgid "Composite"
@@ -1235,7 +1269,7 @@ msgstr "Konfidenční interval %"
 
 # senaite.app.listing: TableColumnConfig
 msgid "Configure Table Columns"
-msgstr "Konfigurovat sloupce tabulky"
+msgstr ""
 
 #: bika/lims/content/artemplate.py:166
 msgid "Configure the sample partitions and preservations for this template. Assign analyses to the different partitions on the template's Analyses tab"
@@ -1251,9 +1285,7 @@ msgstr "Potvrzení hesla"
 msgid "Considerations"
 msgstr "K úvaze"
 
-#: bika/lims/browser/reports/selection_macros/select_contact.pt:4
-#: bika/lims/content/analysisrequest.py:150
-#: bika/lims/profiles/default/types/Contact.xml
+#: senaite/core/browser/samples/view.py:171
 msgid "Contact"
 msgstr "Kontakt"
 
@@ -1280,15 +1312,12 @@ msgstr "Kontakty v CC"
 msgid "Contained Samples"
 msgstr "Obsahuje vzorky"
 
-#: bika/lims/browser/fields/partitionsetupfield.py:116
-#: bika/lims/browser/templates/partition_magic.pt:165
-#: bika/lims/content/analysisrequest.py:554
+#: senaite/core/browser/controlpanel/samplecontainers.py:38
 msgid "Container"
 msgstr "Nádoba"
 
-#: bika/lims/browser/fields/partitionsetupfield.py:83
-#: bika/lims/content/container.py:50
-#: bika/lims/controlpanel/bika_containers.py:79
+#: senaite/core/browser/controlpanel/samplecontainers.py:46
+#: senaite/core/content/samplecontainer.py:46
 msgid "Container Type"
 msgstr "Typ kontejneru"
 
@@ -1298,7 +1327,6 @@ msgid "Container Types"
 msgstr "Typy kontejnerů"
 
 #: bika/lims/controlpanel/bika_containers.py:58
-#: bika/lims/profiles/default/types/Containers.xml
 msgid "Containers"
 msgstr "Kontejnery"
 
@@ -1314,7 +1342,7 @@ msgstr "Typ obsahu"
 msgid "Contents of the file {}"
 msgstr "Obsah souboru {}"
 
-#: bika/lims/browser/worksheet/views/analyses.py:518
+#: bika/lims/browser/worksheet/views/analyses.py:523
 #: bika/lims/config.py:68
 msgid "Control"
 msgstr "Kontrola"
@@ -1323,10 +1351,15 @@ msgstr "Kontrola"
 msgid "Control QC analyses"
 msgstr "Kontrolní analýzy QC"
 
+#: bika/lims/browser/fields/interimfieldsfield.py:59
 #: bika/lims/content/abstractbaseanalysis.py:576
 #: bika/lims/content/analysisservice.py:224
 msgid "Control type"
 msgstr "Typ ovládání"
+
+#: bika/lims/validators.py:457
+msgid "Control type is not supported for empty choices"
+msgstr ""
 
 #: bika/lims/controlpanel/templates/analysisservice_copy.pt:54
 msgid "Copy"
@@ -1340,8 +1373,7 @@ msgstr "Služby analýzy kopií"
 msgid "Copy from"
 msgstr "Kopírovat z"
 
-#: bika/lims/browser/batch/batchbook.py:125
-#: senaite/core/browser/samples/view.py:683
+#: senaite/core/browser/samples/view.py:698
 msgid "Copy to new"
 msgstr "Kopírovat do nového"
 
@@ -1365,9 +1397,7 @@ msgstr ""
 msgid "Count"
 msgstr "Počet"
 
-#: bika/lims/browser/clientfolder.py:82
-#: bika/lims/content/bikasetup.py:229
-#: bika/lims/skins/bika/bika_widgets/addresswidget.pt:33
+#: senaite/core/z3cform/widgets/address.py:222
 msgid "Country"
 msgstr "Země"
 
@@ -1383,6 +1413,10 @@ msgstr "Vytvořit Oddělky"
 msgid "Create SENAITE Site"
 msgstr "Vytvořit stránky SENAITE"
 
+#: senaite/core/browser/samples/view.py:672
+msgid "Create Worksheet"
+msgstr ""
+
 #: senaite/core/browser/install/templates/senaite-overview.pt:134
 msgid "Create a new SENAITE site"
 msgstr "Vytvoření nové stránky SENAITE"
@@ -1394,6 +1428,14 @@ msgstr "Vytvořit nového uživatele"
 #: bika/lims/content/artemplate.py:91
 msgid "Create a new sample of this type"
 msgstr "Vytvořte nový vzorek tohoto typu"
+
+#: senaite/core/browser/samples/view.py:676
+msgid "Create a new worksheet for the selected samples"
+msgstr ""
+
+#: bika/lims/browser/worksheet/templates/worksheets.pt:31
+msgid "Create new worksheet"
+msgstr ""
 
 #: senaite/core/profiles/default/workflows/senaite_sample_workflow/definition.xml
 msgid "Create partitions"
@@ -1418,12 +1460,15 @@ msgstr "Vytvořil:"
 msgid "Created on"
 msgstr "Vytvořeno dne"
 
+#: senaite/core/browser/modals/sample.py:46
+msgid "Created worksheet %s"
+msgstr ""
+
 #: bika/lims/browser/partition_magic.py:113
 msgid "Created {} partitions: {}"
 msgstr "Vytvořeno {} oddělků: {}"
 
-#: bika/lims/browser/reports/templates/productivity_dataentrydaybook.pt:97
-#: senaite/core/browser/samples/view.py:92
+#: senaite/core/browser/samples/view.py:96
 msgid "Creator"
 msgstr "Tvůrce"
 
@@ -1432,11 +1477,10 @@ msgstr "Tvůrce"
 msgid "Criteria"
 msgstr "Kritéria"
 
-#: bika/lims/content/bikasetup.py:217
+#: bika/lims/content/bikasetup.py:218
 msgid "Currency"
 msgstr "Měna"
 
-#: bika/lims/browser/referencesample.py:438
 #: senaite/core/profiles/default/workflows/senaite_referencesample_workflow/definition.xml
 msgid "Current"
 msgstr "Aktuální"
@@ -1449,8 +1493,8 @@ msgstr "Aktuální klíčové slovo '{}' použité ve výpočtu '{}'"
 msgid "Custom decimal mark"
 msgstr "Vlastní desetinná značka"
 
-#: bika/lims/browser/analyses/view.py:144
-#: bika/lims/browser/worksheet/views/analyses.py:88
+#: bika/lims/browser/analyses/view.py:147
+#: bika/lims/browser/worksheet/views/analyses.py:89
 msgid "DL"
 msgstr "DL"
 
@@ -1478,7 +1522,7 @@ msgstr "Volby datového rozhraní"
 msgid "Data entry day book"
 msgstr "Kniha vstupů dat"
 
-#: senaite/core/browser/form/adapters/data_import.py:50
+#: senaite/core/browser/form/adapters/data_import.py:53
 msgid "Data import successful"
 msgstr ""
 
@@ -1488,14 +1532,10 @@ msgstr ""
 msgid "Date"
 msgstr "Datum"
 
-#: bika/lims/browser/analyses/view.py:114
+#: bika/lims/browser/analyses/view.py:116
 #: bika/lims/browser/reports/productivity_dataentrydaybook.py:52
 msgid "Date Created"
 msgstr "Datum vytvoření"
-
-#: bika/lims/content/supplyorder.py:102
-msgid "Date Dispatched"
-msgstr "Datum odeslání"
 
 #: bika/lims/content/referencesample.py:144
 msgid "Date Disposed"
@@ -1521,8 +1561,7 @@ msgstr "Datum změnění"
 msgid "Date Opened"
 msgstr "Datum otevření"
 
-#: bika/lims/content/analysisrequest.py:593
-#: senaite/core/browser/samples/view.py:111
+#: senaite/core/browser/samples/view.py:115
 msgid "Date Preserved"
 msgstr "Datum zachováno"
 
@@ -1530,19 +1569,15 @@ msgstr "Datum zachováno"
 msgid "Date Printed"
 msgstr "Datum tištění"
 
-#: bika/lims/browser/analysisrequest/templates/invoice_content.pt:142
-#: bika/lims/content/analysisrequest.py:1049
-#: senaite/core/browser/samples/view.py:127
+#: senaite/core/browser/samples/view.py:131
 msgid "Date Published"
 msgstr "Datum vydání"
 
-#: bika/lims/browser/analysisrequest/templates/invoice_content.pt:106
-#: bika/lims/browser/referencesample.py:420
-#: bika/lims/browser/reports/productivity_dailysamplesreceived.py:53
+#: senaite/core/browser/samples/view.py:121
 msgid "Date Received"
 msgstr "Datum doručení"
 
-#: senaite/core/browser/samples/view.py:97
+#: senaite/core/browser/samples/view.py:101
 msgid "Date Registered"
 msgstr "Datum registrace"
 
@@ -1552,17 +1587,15 @@ msgstr "Datum registrace"
 msgid "Date Requested"
 msgstr "Datum vyhotovení"
 
-#: bika/lims/content/analysisrequest.py:1036
+#: bika/lims/content/analysisrequest.py:1042
 msgid "Date Sample Received"
 msgstr "Datum přijetí vzorku"
 
-#: bika/lims/browser/referencesample.py:416
-#: bika/lims/browser/templates/referencesample_view.pt:68
-#: bika/lims/content/analysisrequest.py:455
+#: senaite/core/browser/samples/view.py:109
 msgid "Date Sampled"
 msgstr "Datum odběru"
 
-#: senaite/core/browser/samples/view.py:123
+#: senaite/core/browser/samples/view.py:127
 msgid "Date Verified"
 msgstr "Datum ověřeno"
 
@@ -1628,7 +1661,7 @@ msgstr "Deaktivovat"
 msgid "Decimal mark to use in the reports from this Client."
 msgstr "Desetinné znaménko, které se použije v přehledech od tohoto klienta."
 
-#: bika/lims/content/analysisrequest.py:911
+#: bika/lims/content/analysisrequest.py:917
 #: bika/lims/content/analysisservice.py:168
 #: bika/lims/controlpanel/bika_sampletypes.py:100
 msgid "Default Container"
@@ -1655,35 +1688,23 @@ msgstr "Výchozí přístroj"
 msgid "Default Method"
 msgstr "Výchozí metoda"
 
-#: senaite/impress/controlpanel.py:50
-msgid "Default Orientation"
-msgstr ""
-
-#: senaite/impress/controlpanel.py:42
-msgid "Default Paper Format"
-msgstr ""
-
 #: bika/lims/content/analysisservice.py:147
 msgid "Default Preservation"
 msgstr "Výchozí uchování"
-
-#: senaite/impress/controlpanel.py:34
-msgid "Default Template"
-msgstr ""
 
 #: bika/lims/content/client.py:108
 msgid "Default categories"
 msgstr "Výchozí kategorie"
 
-#: bika/lims/content/analysisrequest.py:912
+#: bika/lims/content/analysisrequest.py:918
 msgid "Default container for new sample partitions"
 msgstr "Výchozí kontejner pro nové ukázkové oddíly"
 
-#: bika/lims/content/bikasetup.py:853
+#: bika/lims/content/bikasetup.py:854
 msgid "Default count of Sample to add."
 msgstr "Výchozí počet vzorků k přidání."
 
-#: bika/lims/content/bikasetup.py:263
+#: bika/lims/content/bikasetup.py:264
 #: bika/lims/content/client.py:147
 msgid "Default decimal mark"
 msgstr "Výchozí desetinné znaménko"
@@ -1696,7 +1717,7 @@ msgstr "Výchozí nástroj používaný pro analýzy tohoto typu"
 msgid "Default large sticker"
 msgstr "Výchozí velký štítek"
 
-#: bika/lims/content/bikasetup.py:423
+#: bika/lims/content/bikasetup.py:424
 msgid "Default layout in worksheet view"
 msgstr "Výchozí rozvržení v zobrazení pracovního listu"
 
@@ -1708,11 +1729,11 @@ msgstr "Výchozí metoda používaná pro analýzy tohoto typu"
 msgid "Default result"
 msgstr ""
 
-#: bika/lims/validators.py:1441
+#: bika/lims/validators.py:1454
 msgid "Default result is not numeric"
 msgstr ""
 
-#: bika/lims/validators.py:1434
+#: bika/lims/validators.py:1447
 msgid "Default result must be one of the following result options: {}"
 msgstr ""
 
@@ -1720,15 +1741,15 @@ msgstr ""
 msgid "Default result to display on result entry"
 msgstr ""
 
-#: bika/lims/content/bikasetup.py:570
+#: bika/lims/content/bikasetup.py:571
 msgid "Default sample retention period"
 msgstr "Standardní čas zdržení"
 
-#: bika/lims/content/bikasetup.py:274
+#: bika/lims/content/bikasetup.py:275
 msgid "Default scientific notation format for reports"
 msgstr "Výchozí formát vědeckého zápisu pro zprávy"
 
-#: bika/lims/content/bikasetup.py:412
+#: bika/lims/content/bikasetup.py:413
 msgid "Default scientific notation format for results"
 msgstr "Výchozí formát vědeckého zápisu výsledků"
 
@@ -1740,16 +1761,16 @@ msgstr "Výchozí malý štítek"
 msgid "Default timezone"
 msgstr "Výchozí časové pásmo"
 
-#: bika/lims/content/bikasetup.py:555
+#: bika/lims/content/bikasetup.py:556
 msgid "Default turnaround time for analyses."
 msgstr "Výchozí časové cykly pro analýzy"
 
-#: bika/lims/browser/fields/interimfieldsfield.py:45
+#: bika/lims/browser/fields/interimfieldsfield.py:57
 #: bika/lims/content/analysisservice.py:226
 msgid "Default value"
 msgstr "Implicitní hodnota"
 
-#: bika/lims/content/bikasetup.py:854
+#: bika/lims/content/bikasetup.py:855
 msgid "Default value of the 'Sample count' when users click 'ADD' button to create new Samples"
 msgstr "Výchozí hodnota „Počet vzorků“, když uživatelé kliknou na tlačítko „PŘIDAT“ a vytvoří se nové vzorky"
 
@@ -1803,9 +1824,9 @@ msgstr "Oddělení"
 msgid "Dependent Analyses"
 msgstr "Závislé analýzy"
 
-#: bika/lims/browser/batchfolder.py:70
-#: bika/lims/browser/client/views/analysisprofiles.py:57
-#: bika/lims/browser/client/views/artemplates.py:56
+#: senaite/core/behaviors/clientshareable.py:89
+#: senaite/core/browser/controlpanel/instrumentlocations.py:62
+#: senaite/core/browser/controlpanel/interpretationtemplates.py:58
 msgid "Description"
 msgstr "Popis"
 
@@ -1833,23 +1854,22 @@ msgstr "Popis police"
 msgid "Description of the site"
 msgstr "Popis místa"
 
+msgid "Deselect all"
+msgstr ""
+
 #: senaite/core/profiles/default/workflows/senaite_sample_workflow/definition.xml
 msgid "Detach"
 msgstr "Odpojit"
 
-#: senaite/impress/controlpanel.py:75
-msgid "Developer Mode"
-msgstr ""
-
-#: bika/lims/content/analysisrequest.py:830
+#: bika/lims/content/analysisrequest.py:836
 msgid "Deviation between the sample and how it was sampled"
 msgstr "Odchylka mezi vzorkem a tím, jak byl odebrán"
 
-#: bika/lims/config.py:135
+#: bika/lims/config.py:136
 msgid "Disable multi-verification for the same user"
 msgstr "Zakázat vícenásobné ověření stejného uživatele"
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:590
+#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:596
 #: bika/lims/browser/analysisrequest/templates/invoice_content.pt:207
 msgid "Discount"
 msgstr "Sleva"
@@ -1867,24 +1887,24 @@ msgstr "Odeslat"
 msgid "Dispatch samples"
 msgstr "Expediční vzorky"
 
-#: senaite/core/browser/samples/view.py:333
+#: senaite/core/browser/samples/view.py:337
 #: senaite/core/profiles/default/workflows/senaite_sample_workflow/definition.xml
 msgid "Dispatched"
 msgstr "Odesláno"
 
 # bika.lims.bikalisting.js
 msgid "Display Columns"
-msgstr "Zobrazit sloupce"
+msgstr ""
 
 #: bika/lims/content/abstractbaseanalysis.py:547
 msgid "Display Value"
 msgstr "Zobrazená hodhota"
 
-#: bika/lims/validators.py:678
+#: bika/lims/validators.py:686
 msgid "Display Value is required"
 msgstr "Je vyžadováno zobrazení hodnoty"
 
-#: bika/lims/validators.py:690
+#: bika/lims/validators.py:698
 msgid "Display Value must be unique"
 msgstr "Hodnota zobrazení musí být jedinečná"
 
@@ -1892,7 +1912,7 @@ msgstr "Hodnota zobrazení musí být jedinečná"
 msgid "Display a Detection Limit selector"
 msgstr "Zobrazit selekční limit detekce"
 
-#: bika/lims/content/bikasetup.py:518
+#: bika/lims/content/bikasetup.py:519
 msgid "Display sample partitions to clients"
 msgstr "Zobrazení vzorových oddílů klientům"
 
@@ -1900,14 +1920,12 @@ msgstr "Zobrazení vzorových oddílů klientům"
 msgid "Dispose"
 msgstr "Zlikvidovat"
 
-#: bika/lims/browser/referencesample.py:448
 #: senaite/core/profiles/default/workflows/senaite_referencesample_workflow/definition.xml
 msgid "Disposed"
 msgstr "Zlikvidován"
 
-#: bika/lims/browser/clientfolder.py:90
-#: bika/lims/skins/bika/bika_widgets/addresswidget.pt:89
-#: senaite/core/browser/samples/view.py:153
+#: senaite/core/browser/samples/view.py:157
+#: senaite/core/z3cform/widgets/address.py:224
 msgid "District"
 msgstr "Okres"
 
@@ -1964,13 +1982,11 @@ msgstr "Stáhnout  PDF"
 msgid "Download selected reports"
 msgstr "Stáhnout vybrané zprávy"
 
-#: senaite/core/browser/samples/view.py:281
+#: senaite/core/browser/samples/view.py:285
 msgid "Due"
 msgstr "Vypršeno"
 
-#: bika/lims/browser/analyses/view.py:177
-#: bika/lims/browser/referencesample.py:179
-#: bika/lims/browser/worksheet/views/add_analyses.py:101
+#: senaite/core/browser/samples/view.py:124
 msgid "Due Date"
 msgstr "Datum vypršení"
 
@@ -1978,7 +1994,7 @@ msgstr "Datum vypršení"
 msgid "Dup Var"
 msgstr "Dup Var"
 
-#: bika/lims/browser/worksheet/views/analyses.py:491
+#: bika/lims/browser/worksheet/views/analyses.py:496
 #: bika/lims/config.py:69
 #: bika/lims/controlpanel/bika_analysisservices.py:257
 msgid "Duplicate"
@@ -1988,7 +2004,7 @@ msgstr "Duplikát"
 msgid "Duplicate Analysis"
 msgstr "Duplikát analýzy"
 
-#: bika/lims/content/worksheettemplate.py:63
+#: bika/lims/content/worksheettemplate.py:62
 msgid "Duplicate Of"
 msgstr "Duplikát"
 
@@ -2000,7 +2016,7 @@ msgstr "Duplicitní analýzy QC"
 msgid "Duplicate Variation %"
 msgstr "Duplicitní varianta %"
 
-#: bika/lims/validators.py:474
+#: bika/lims/validators.py:477
 msgid "Duplicate keys in choices field"
 msgstr "Duplicitní klíče v poli volby"
 
@@ -2059,11 +2075,11 @@ msgstr "E-mailová adresa"
 msgid "Email Log"
 msgstr "Protokol e-mailů"
 
-#: bika/lims/content/bikasetup.py:628
+#: bika/lims/content/bikasetup.py:629
 msgid "Email body for Sample Invalidation notifications"
 msgstr "Tělo e-mailu pro oznámení o zneplatnění vzorku"
 
-#: bika/lims/content/bikasetup.py:592
+#: bika/lims/content/bikasetup.py:593
 msgid "Email body for Sample Rejection notifications"
 msgstr "Tělo e-mailu pro oznámení o odmítnutí vzorku"
 
@@ -2075,35 +2091,35 @@ msgstr "E-mail byl zrušen"
 msgid "Email notification"
 msgstr "Upozornění e-mailem"
 
-#: bika/lims/content/bikasetup.py:617
+#: bika/lims/content/bikasetup.py:618
 msgid "Email notification on Sample invalidation"
 msgstr "E-mailové oznámení o zneplatnění vzorku"
 
-#: bika/lims/content/bikasetup.py:582
+#: bika/lims/content/bikasetup.py:583
 msgid "Email notification on Sample rejection"
 msgstr "E-mailové oznámení o odmítnutí vzorku"
 
-#: bika/lims/validators.py:469
+#: bika/lims/validators.py:472
 msgid "Empty keys are not supported"
 msgstr "Prázdné klíče nejsou podporovány"
 
-#: bika/lims/content/worksheettemplate.py:145
+#: bika/lims/content/worksheettemplate.py:144
 msgid "Enable Multiple Use of Instrument in Worksheets."
 msgstr "Povolit vícenásobné použití přístroje v pracovních listech."
 
-#: bika/lims/content/bikasetup.py:531
+#: bika/lims/content/bikasetup.py:532
 msgid "Enable Sample Preservation"
 msgstr "Povolit uchování vzorků"
 
-#: bika/lims/content/bikasetup.py:306
+#: bika/lims/content/bikasetup.py:307
 msgid "Enable Sample Specifications"
 msgstr "Povolit specifikace vzorku"
 
-#: bika/lims/content/bikasetup.py:484
+#: bika/lims/content/bikasetup.py:485
 msgid "Enable Sampling"
 msgstr "Povolit odběr vzorků"
 
-#: bika/lims/content/bikasetup.py:493
+#: bika/lims/content/bikasetup.py:494
 msgid "Enable Sampling Scheduling"
 msgstr "Povolit plánování vzorkování"
 
@@ -2111,11 +2127,11 @@ msgstr "Povolit plánování vzorkování"
 msgid "Enable sampling workflow for the created sample"
 msgstr "Povolit pracovní postup odběru vzorků pro vytvořený vzorek"
 
-#: bika/lims/content/bikasetup.py:472
+#: bika/lims/content/bikasetup.py:473
 msgid "Enable the Results Report Printing workflow"
 msgstr "Povolte pracovní postup Tisk sestavy výsledků"
 
-#: bika/lims/content/bikasetup.py:841
+#: bika/lims/content/bikasetup.py:842
 msgid "Enable the rejection workflow"
 msgstr "Povolit pracovní postup odmítnutí"
 
@@ -2153,11 +2169,11 @@ msgstr "Zadejte procentuální hodnotu, např. 14.0"
 msgid "Enter percentage value eg. 14.0. This percentage is applied on the Analysis Profile only, overriding the systems VAT"
 msgstr "Zadejte procentuální hodnotu, např. 14.0. Toto procento se použije pouze na analytický profil a převede systémovou DPH"
 
-#: bika/lims/content/bikasetup.py:252
+#: bika/lims/content/bikasetup.py:253
 msgid "Enter percentage value eg. 14.0. This percentage is applied system wide but can be overwrittem on individual items"
 msgstr "Zadejte procentuální hodnotu, např. 14.0. Toto procento je použito v celém systému, ale může být přepsáno na jednotlivé položky"
 
-#: bika/lims/content/analysisrequest.py:1081
+#: bika/lims/content/analysisrequest.py:1087
 msgid "Enter percentage value eg. 33.0"
 msgstr "Zadejte procentuální hodnotu, např. 33,0"
 
@@ -2181,7 +2197,7 @@ msgstr "Sem zadejte podrobnosti o akreditaci služeb vaší laboratoře. K dispo
 msgid "Entity"
 msgstr "Entita"
 
-#: bika/lims/content/analysisrequest.py:890
+#: bika/lims/content/analysisrequest.py:896
 msgid "Environmental conditions"
 msgstr "Ekologické předpoklady"
 
@@ -2209,8 +2225,7 @@ msgstr ""
 msgid "Example content"
 msgstr "Příklad obsahu"
 
-#: bika/lims/browser/analysisrequest/templates/analysisrequest_view.pt:27
-#: senaite/core/browser/samples/view.py:557
+#: senaite/core/browser/samples/view.py:561
 msgid "Exclude from invoice"
 msgstr "Vyloučit z faktury"
 
@@ -2220,8 +2235,7 @@ msgstr "Vyloučit z faktury"
 msgid "Expected Result"
 msgstr "Očekávaný výsledek"
 
-#: bika/lims/content/analysisrequest.py:511
-#: senaite/core/browser/samples/view.py:101
+#: senaite/core/browser/samples/view.py:105
 msgid "Expected Sampling Date"
 msgstr "Očekávané datum vzorkování"
 
@@ -2233,7 +2247,6 @@ msgstr "Očekávané hodnoty"
 msgid "Expire"
 msgstr "Vyprší platnost"
 
-#: bika/lims/browser/referencesample.py:443
 #: senaite/core/profiles/default/workflows/senaite_referencesample_workflow/definition.xml
 msgid "Expired"
 msgstr "Platnost vypršela"
@@ -2248,7 +2261,7 @@ msgstr "Datum vypršení platnosti"
 msgid "Exponential format precision"
 msgstr "Přesnost exponenciálního formátu"
 
-#: bika/lims/content/bikasetup.py:318
+#: bika/lims/content/bikasetup.py:319
 msgid "Exponential format threshold"
 msgstr "Exponenciální prahová hodnota formátu"
 
@@ -2279,7 +2292,7 @@ msgid "Female"
 msgstr "Žena"
 
 #: bika/lims/browser/templates/analysisservice_info.pt:103
-#: bika/lims/browser/worksheet/templates/results.pt:152
+#: bika/lims/browser/worksheet/templates/results.pt:191
 #: bika/lims/config.py:51
 msgid "Field"
 msgstr "Pole"
@@ -2288,8 +2301,6 @@ msgstr "Pole"
 msgid "Field '{}' is required"
 msgstr "Pole  '{}'  je vyžadováno"
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:464
-#: bika/lims/config.py:46
 #: senaite/core/browser/viewlets/sampleanalyses.py:63
 msgid "Field Analyses"
 msgstr "Analýzy v terénu"
@@ -2298,7 +2309,7 @@ msgstr "Analýzy v terénu"
 msgid "Field Preservation"
 msgstr "Pole Uchování"
 
-#: bika/lims/browser/fields/interimfieldsfield.py:44
+#: bika/lims/browser/fields/interimfieldsfield.py:56
 msgid "Field Title"
 msgstr "Pole Název"
 
@@ -2308,7 +2319,7 @@ msgstr "Pole Název"
 msgid "File"
 msgstr "Soubor"
 
-#: bika/lims/browser/templates/analysisreport_info.pt:193
+#: bika/lims/browser/templates/analysisreport_info.pt:194
 msgid "File Deleted"
 msgstr "Soubor smazán"
 
@@ -2345,7 +2356,7 @@ msgstr ""
 msgid "For each interface of this instrument,                       you can define a folder where                       the system should look for the results files while                       automatically importing results. Having a folder                       for each Instrument and inside that folder creating                       different folders for each of its Interfaces                       can be a good approach. You can use Interface codes                       to be sure that folder names are unique."
 msgstr "Pro každé rozhraní tohoto přístroje můžete definovat složku, kde by systém měl hledat soubory výsledků při automatickém importu výsledků. Dobrým přístupem může být složka pro každý přístroj a uvnitř složky, která vytvoří různé složky pro každé ze svých rozhraní. Pomocí kódů rozhraní si můžete být jisti, že názvy složek jsou jedinečné."
 
-#: bika/lims/content/bikasetup.py:776
+#: bika/lims/content/bikasetup.py:777
 msgid "Formatting Configuration"
 msgstr "Konfigurace formátování"
 
@@ -2354,7 +2365,7 @@ msgstr "Konfigurace formátování"
 msgid "Formula"
 msgstr "Vzorec"
 
-#: bika/lims/browser/widgets/analysisspecificationwidget.py:201
+#: bika/lims/browser/widgets/analysisspecificationwidget.py:200
 msgid "Found Dynamic Analysis Specification for '{}' in '{}'"
 msgstr "Nalezena specifikace dynamické analýzy pro '{}' v '{}'"
 
@@ -2362,9 +2373,7 @@ msgstr "Nalezena specifikace dynamické analýzy pro '{}' v '{}'"
 msgid "Friday"
 msgstr "Pátek"
 
-#: bika/lims/browser/publish/templates/email.pt:47
-#: bika/lims/content/instrumentcalibration.py:89
-#: bika/lims/content/instrumentmaintenancetask.py:66
+#: senaite/core/browser/dashboard/templates/dashboard.pt:528
 msgid "From"
 msgstr "Od"
 
@@ -2391,9 +2400,17 @@ msgstr "Celé jméno"
 msgid "Function"
 msgstr "Funkce"
 
-#: senaite/core/browser/samples/view.py:554
+#: senaite/core/browser/samples/view.py:558
 msgid "Future dated sample"
 msgstr "Vzorek datovaný v budoucnosti"
+
+#: senaite/core/browser/viewlets/templates/resultsinterpretation.pt:99
+msgid "General"
+msgstr ""
+
+#: senaite/core/browser/viewlets/templates/resultsinterpretation.pt:26
+msgid "General Department"
+msgstr ""
 
 #: bika/lims/browser/reports/templates/administration.pt:118
 #: bika/lims/browser/reports/templates/productivity.pt:118
@@ -2408,10 +2425,6 @@ msgstr ""
 msgid "Generates an ID with the IDServer"
 msgstr "Generuje ID pomocí IDServeru"
 
-#: bika/lims/browser/worksheet/templates/add_analyses.pt:49
-msgid "Go to worksheet template setup"
-msgstr "Jít na nastavení šablony pracovního listu"
-
 #: senaite/core/browser/install/templates/senaite-overview.pt:44
 msgid "Go to your instance"
 msgstr "Přejděte do své instance"
@@ -2420,7 +2433,7 @@ msgstr "Přejděte do své instance"
 msgid "Greeting title eg. Mr, Mrs, Dr"
 msgstr "Oslovující titul např. Pan, Paní, Dr."
 
-#: bika/lims/content/bikasetup.py:298
+#: bika/lims/content/bikasetup.py:299
 msgid "Group analysis services by category in the LIMS tables, helpful when the list is long"
 msgstr "Služby skupinové analýzy podle kategorií v tabulkách LIMS, užitečné, když je seznam dlouhý"
 
@@ -2433,27 +2446,25 @@ msgstr "Skupina vytvořená"
 msgid "Grouping period"
 msgstr "Skupinové období"
 
-#: bika/lims/browser/analysisrequest/templates/analysisrequest_view.pt:22
-#: bika/lims/browser/referencesample.py:517
-#: bika/lims/browser/templates/referencesample_view.pt:16
+#: senaite/core/browser/samples/view.py:564
 msgid "Hazardous"
 msgstr "Nebezpečný"
 
-#: bika/lims/browser/analyses/view.py:181
+#: bika/lims/browser/analyses/view.py:184
 #: bika/lims/browser/analysisrequest/manage_analyses.py:81
 #: bika/lims/browser/widgets/analysisprofileanalyseswidget.py:89
 msgid "Hidden"
 msgstr "skryto"
 
-#: bika/lims/browser/fields/interimfieldsfield.py:49
+#: bika/lims/browser/fields/interimfieldsfield.py:63
 msgid "Hidden Field"
 msgstr "Skryté pole"
 
-#: bika/lims/config.py:139
+#: bika/lims/config.py:140
 msgid "High"
 msgstr "Vysoký"
 
-#: bika/lims/config.py:138
+#: bika/lims/config.py:139
 msgid "Highest"
 msgstr "Nejvyšší"
 
@@ -2475,7 +2486,7 @@ msgstr "IBN"
 msgid "ID"
 msgstr "ID"
 
-#: bika/lims/content/bikasetup.py:832
+#: bika/lims/content/bikasetup.py:833
 msgid "ID Server Values"
 msgstr "Hodnoty ID serveru"
 
@@ -2495,7 +2506,7 @@ msgstr "Pokud je zaškrtnuto, zobrazí se v zobrazeních výsledků výsledky ve
 msgid "If checked, the instrument will be unavailable until the next valid calibration was performed. This checkbox will automatically be unchecked."
 msgstr "Pokud je zaškrtnuto, nebude přístroj k dispozici, dokud nebude provedena další platná kalibrace. Toto zaškrtávací políčko bude automaticky zrušeno."
 
-#: bika/lims/content/bikasetup.py:332
+#: bika/lims/content/bikasetup.py:333
 msgid "If enabled, a free text field will be displayed close to each analysis in results entry view"
 msgstr "Pokud je tato možnost povolena, zobrazí se v zobrazení vstupu výsledků vedle každé analýzy pole volného textu"
 
@@ -2503,7 +2514,7 @@ msgstr "Pokud je tato možnost povolena, zobrazí se v zobrazení vstupu výsled
 msgid "If enabled, a user who submitted a result for this analysis will also be able to verify it. This setting take effect for those users with a role assigned that allows them to verify results (by default, managers, labmanagers and verifiers). The option set here has priority over the option set in Bika Setup"
 msgstr "Pokud je tato možnost povolena, bude ji moci ověřit také uživatel, který zadal výsledek této analýzy. Toto nastavení se projeví u uživatelů s přiřazenou rolí, která jim umožňuje ověřit výsledky (ve výchozím nastavení správci, správci laboratoří a ověřovatelé). Zde nastavená možnost má přednost před možností nastavenou v nastavení Bika"
 
-#: bika/lims/content/bikasetup.py:358
+#: bika/lims/content/bikasetup.py:359
 msgid "If enabled, a user who submitted a result will also be able to verify it. This setting only take effect for those users with a role assigned that allows them to verify results (by default, managers, labmanagers and verifiers).This setting can be overrided for a given Analysis in Analysis Service edit view. By default, disabled."
 msgstr "Pokud je tato možnost povolena, bude ji moci ověřit také uživatel, který zadal výsledek. Toto nastavení se projeví pouze u uživatelů s přiřazenou rolí, která jim umožňuje ověřovat výsledky (ve výchozím nastavení jsou správci, správci laboratoří a ověřovatelé). Toto nastavení lze přepsat pro dané zobrazení analýzy v úpravě služby analýzy. Ve výchozím nastavení je zakázáno."
 
@@ -2539,19 +2550,19 @@ msgstr "Pokud systém nenajde žádnou shodu (AnalysisRequest, Sample, Reference
 msgid "If this container is pre-preserved, then the preservation method could be selected here."
 msgstr "Pokud je tento kontejner předem chráněn, pak lze zde zvolit způsob uchování."
 
-#: bika/lims/content/worksheettemplate.py:146
+#: bika/lims/content/worksheettemplate.py:145
 msgid "If unchecked, Lab Managers won't be able to assign the same Instrument more than one Analyses while creating a Worksheet."
 msgstr "Pokud není zaškrtnuto, nebudou moci správci laboratoře  při vytváření listu přiřazovat stejný přístroj více, než k jedné analýze."
 
-#: bika/lims/content/bikasetup.py:195
+#: bika/lims/content/bikasetup.py:196
 msgid "If unchecked, analysts and lab clerks will be able to manage Worksheets, too. If the users have restricted access only to those worksheets for which they are assigned, this option will be checked and readonly."
 msgstr "Pokud nebude zaškrtnuto, budou analytici a laboratorní úředníci schopni spravovat i pracovní listy. Pokud mají uživatelé omezený přístup pouze k těm listům, ke kterým jsou přiřazeni, bude tato volba zkontrolována a přečtena."
 
-#: bika/lims/content/bikasetup.py:172
+#: bika/lims/content/bikasetup.py:173
 msgid "If unchecked, analysts will have access to all worksheets."
 msgstr "Pokud není zaškrtnuto, budou mít analytici přístup ke všem pracovním listům."
 
-#: bika/lims/content/bikasetup.py:182
+#: bika/lims/content/bikasetup.py:183
 msgid "If unchecked, users will only be able to submit results for the analyses they are assigned to, and the submission of results for unassigned analyses won't be permitted. This setting does not apply to users with role Lab Manager"
 msgstr "Pokud není zaškrtnuto, uživatelé budou moci předkládat výsledky pouze pro analýzy, ke kterým jsou přiřazeni, a odesílání výsledků pro nepřiřazené analýzy nebude povoleno. Toto nastavení se nevztahuje na uživatele s rolí Správce laboratoře"
 
@@ -2584,13 +2595,13 @@ msgstr "Importovaný soubor"
 msgid "In-lab calibration procedure"
 msgstr "Postup kalibrace v laboratoři"
 
-#: bika/lims/browser/client/views/analysisprofiles.py:69
-#: bika/lims/browser/client/views/artemplates.py:66
-#: bika/lims/browser/client/views/contacts.py:84
+#: senaite/core/browser/controlpanel/instrumentlocations.py:76
+#: senaite/core/browser/controlpanel/interpretationtemplates.py:71
+#: senaite/core/browser/controlpanel/samplecontainers.py:67
 msgid "Inactive"
 msgstr "Neaktivní"
 
-#: bika/lims/content/bikasetup.py:207
+#: bika/lims/content/bikasetup.py:208
 msgid "Include and display pricing information"
 msgstr "Zahrnout a zobrazit informace o cenách"
 
@@ -2598,15 +2609,15 @@ msgstr "Zahrnout a zobrazit informace o cenách"
 msgid "Include descriptions"
 msgstr "Včetně popisů"
 
-#: bika/lims/validators.py:1201
+#: bika/lims/validators.py:1214
 msgid "Incorrect IBAN number: %s"
 msgstr "Nesprávné číslo IBAN: %s"
 
-#: bika/lims/validators.py:1160
+#: bika/lims/validators.py:1173
 msgid "Incorrect NIB number: %s"
 msgstr "Nesprávné číslo NIB: %s"
 
-#: bika/lims/content/analysisrequest.py:1340
+#: bika/lims/content/analysisrequest.py:1346
 msgid "Indicates if the last SampleReport is printed,"
 msgstr "Označuje, zda je vytištěna poslední Zpráva o vzorku,"
 
@@ -2660,7 +2671,7 @@ msgstr "Pokyny pro pravidelné laboratorní kalibrační rutiny určené pro ana
 msgid "Instructions for regular preventive and maintenance routines intended for analysts"
 msgstr "Pokyny pro pravidelné preventivní a udržovací postupy určené analytikům"
 
-#: bika/lims/browser/analyses/view.py:127
+#: bika/lims/browser/analyses/view.py:130
 #: bika/lims/browser/referencesample.py:163
 #: bika/lims/browser/reports/productivity_analysestats_overtime.py:162
 msgid "Instrument"
@@ -2682,7 +2693,6 @@ msgstr "Soubory nástrojů"
 msgid "Instrument Import"
 msgstr "Import přístroje"
 
-#: bika/lims/content/instrument.py:289
 #: senaite/core/profiles/default/types/InstrumentLocation.xml
 msgid "Instrument Location"
 msgstr "Umístění přístroje"
@@ -2729,7 +2739,7 @@ msgstr "Přístroj odstaven až do provedení nových kalibračních testů:"
 msgid "Instrument exporter not found"
 msgstr "Exporter přístroje nebyl nalezen"
 
-#: bika/lims/browser/workflow/analysis.py:130
+#: bika/lims/browser/workflow/analysis.py:139
 msgid "Instrument failed reference test"
 msgstr "Referenční test přístroje selhal"
 
@@ -2737,7 +2747,7 @@ msgstr "Referenční test přístroje selhal"
 msgid "Instrument has no data interface selected"
 msgstr "Přístroj nemá vybrané datové rozhraní"
 
-#: senaite/core/browser/form/adapters/data_import.py:74
+#: senaite/core/browser/form/adapters/data_import.py:77
 msgid "Instrument import finished"
 msgstr ""
 
@@ -2807,9 +2817,7 @@ msgstr "Interní kalibrační testy"
 msgid "Internal Certificate"
 msgstr "Interní certifikát"
 
-#: bika/lims/browser/templates/partition_magic.pt:135
-#: bika/lims/content/analysisrequest.py:1352
-#: senaite/core/browser/samples/view.py:563
+#: senaite/core/browser/samples/view.py:567
 msgid "Internal use"
 msgstr "Vnitřní použití"
 
@@ -2830,9 +2838,9 @@ msgstr "Šablony interpretace"
 msgid "Interval"
 msgstr "Interval"
 
-#: bika/lims/browser/analyses/view.py:223
 #: senaite/core/browser/dashboard/dashboard.py:603
-#: senaite/core/browser/samples/view.py:355
+#: senaite/core/browser/samples/view.py:359
+#: senaite/core/profiles/default/workflows/senaite_sample_workflow/definition.xml
 msgid "Invalid"
 msgstr "Neplatné"
 
@@ -2840,11 +2848,11 @@ msgstr "Neplatné"
 msgid "Invalid specifications file detected. Please upload an Excel spreadsheet with at least the following columns defined: '{}', "
 msgstr "Byl zjištěn neplatný soubor specifikací. Nahrajte tabulku Excel s definovanými alespoň následujícími sloupci: '{}',"
 
-#: bika/lims/validators.py:1380
+#: bika/lims/validators.py:1393
 msgid "Invalid value: Please enter a value without spaces."
 msgstr "Neplatná hodnota: Zadejte hodnotu bez mezer."
 
-#: bika/lims/validators.py:531
+#: bika/lims/validators.py:539
 msgid "Invalid wildcards found: ${wildcards}"
 msgstr "Byly nalezeny neplatné zástupné znaky:  ${wildcards}"
 
@@ -2862,7 +2870,7 @@ msgstr "Faktura"
 msgid "Invoice Date"
 msgstr "Datum fakturace"
 
-#: bika/lims/content/analysisrequest.py:947
+#: bika/lims/content/analysisrequest.py:953
 msgid "Invoice Exclude"
 msgstr "Kromě faktury"
 
@@ -2882,15 +2890,15 @@ msgstr "Faktura komu"
 msgid "Invoice {} created"
 msgstr "Faktura  {} vytvořena"
 
-#: senaite/core/exportimport/setupdata/__init__.py:2317
+#: senaite/core/exportimport/setupdata/__init__.py:2314
 msgid "InvoiceBatch has no End Date"
 msgstr "InvoiceBatch nemá žádné datum ukončení"
 
-#: senaite/core/exportimport/setupdata/__init__.py:2314
+#: senaite/core/exportimport/setupdata/__init__.py:2311
 msgid "InvoiceBatch has no Start Date"
 msgstr "Dávka faktury nemá datum zahájení"
 
-#: senaite/core/exportimport/setupdata/__init__.py:2311
+#: senaite/core/exportimport/setupdata/__init__.py:2308
 msgid "InvoiceBatch has no Title"
 msgstr "InvoiceBatch nemá titul"
 
@@ -2904,12 +2912,11 @@ msgstr "Pracovní pozice"
 msgid "Job title"
 msgstr "Pracovní pozice"
 
-#: bika/lims/content/instrument.py:256
 #: senaite/core/browser/idserver/templates/numbergenerator.pt:35
 msgid "Key"
 msgstr "Klíč"
 
-#: bika/lims/browser/fields/interimfieldsfield.py:43
+#: bika/lims/browser/fields/interimfieldsfield.py:55
 #: bika/lims/browser/templates/analysisservice_info.pt:80
 #: bika/lims/browser/widgets/analysisprofileanalyseswidget.py:76
 msgid "Keyword"
@@ -2924,7 +2931,7 @@ msgid "Keyword required"
 msgstr "Vyžadované klíčové slovo"
 
 #: senaite/core/browser/viewlets/templates/attachments.pt:69
-#: senaite/core/browser/viewlets/templates/worksheet_attachments.pt:41
+#: senaite/core/browser/viewlets/templates/worksheet_attachments.pt:42
 msgid "Keywords"
 msgstr "Klíčová slova"
 
@@ -2934,7 +2941,7 @@ msgstr "Klíčová slova"
 msgid "Lab"
 msgstr "Laboratoř"
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:468
+#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:474
 #: bika/lims/config.py:47
 msgid "Lab Analyses"
 msgstr "Laboratorní analýzy"
@@ -2980,11 +2987,11 @@ msgstr "Laboratoř"
 msgid "Laboratory Accredited"
 msgstr "Laboratorní akreditace"
 
-#: bika/lims/content/bikasetup.py:543
+#: bika/lims/content/bikasetup.py:544
 msgid "Laboratory Workdays"
 msgstr "Laboratorní pracovní dny"
 
-#: bika/lims/content/bikasetup.py:457
+#: bika/lims/content/bikasetup.py:458
 msgid "Landing Page"
 msgstr "Vstupní stránka"
 
@@ -2996,7 +3003,7 @@ msgstr "Jazyk"
 msgid "Large Sticker"
 msgstr "Velký štítek"
 
-#: bika/lims/content/bikasetup.py:695
+#: bika/lims/content/bikasetup.py:696
 msgid "Large sticker"
 msgstr "Velká nálepka"
 
@@ -3008,17 +3015,16 @@ msgstr "Poslední protokoly automatického importu"
 msgid "Last Login Time"
 msgstr "Čas posledního přihlášení"
 
-#: bika/lims/browser/reports/productivity_analysestats.py:137
-#: senaite/core/browser/samples/view.py:411
+#: senaite/core/browser/samples/view.py:415
 msgid "Late"
 msgstr "Poslední"
 
-#: senaite/core/browser/samples/view.py:549
+#: senaite/core/browser/samples/view.py:553
 msgid "Late Analyses"
 msgstr "Pozdější  analýzy"
 
-#: bika/lims/browser/analyses/view.py:808
-#: bika/lims/browser/worksheet/views/add_analyses.py:213
+#: bika/lims/browser/analyses/view.py:837
+#: bika/lims/browser/worksheet/views/add_analyses.py:233
 msgid "Late Analysis"
 msgstr "Poslední analýza"
 
@@ -3026,9 +3032,13 @@ msgstr "Poslední analýza"
 msgid "Latitude"
 msgstr "Zeměpisná šířka"
 
-#: bika/lims/browser/worksheet/templates/results.pt:85
+#: bika/lims/browser/worksheet/templates/results.pt:104
 msgid "Layout"
 msgstr "Rozvrh strany"
+
+#: bika/lims/browser/worksheet/views/results.py:68
+msgid "Layout view '{}' not found. Set '{}' as layout view."
+msgstr ""
 
 #: bika/lims/browser/worksheet/templates/print/ar_by_column.pt:153
 #: bika/lims/browser/worksheet/templates/print/ar_by_row.pt:120
@@ -3102,11 +3112,11 @@ msgstr "Typ místa"
 msgid "Location where sample is collected"
 msgstr "Místo, kde se odebírá vzorek"
 
-#: bika/lims/content/analysisrequest.py:757
+#: bika/lims/content/analysisrequest.py:762
 msgid "Location where sample is kept"
 msgstr "Místo, kde je vzorek uchován"
 
-#: bika/lims/content/analysisrequest.py:734
+#: bika/lims/content/analysisrequest.py:739
 msgid "Location where sample was taken"
 msgstr "Místo, kde byl odebrán vzorek"
 
@@ -3134,7 +3144,7 @@ msgstr "Zeměpisná délka"
 msgid "Lot Number"
 msgstr "Číslo šarže"
 
-#: bika/lims/config.py:141
+#: bika/lims/config.py:142
 msgid "Low"
 msgstr "Nízko"
 
@@ -3142,7 +3152,7 @@ msgstr "Nízko"
 msgid "Lower Detection Limit (LDL)"
 msgstr "Dolní detekční limit (LDL)"
 
-#: bika/lims/config.py:142
+#: bika/lims/config.py:143
 msgid "Lowest"
 msgstr "Nejnižší"
 
@@ -3177,7 +3187,7 @@ msgstr "Samec"
 msgid "Manage Analyses"
 msgstr "Spravovat analýzy"
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:372
+#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:378
 msgid "Manage Form Fields"
 msgstr "Správa polí formuláře"
 
@@ -3218,7 +3228,7 @@ msgstr "Email správce"
 msgid "Manager Phone"
 msgstr "Telefon správce"
 
-#: bika/lims/browser/analyses/view.py:892
+#: bika/lims/browser/analyses/view.py:943
 msgid "Manual"
 msgstr "Ručně"
 
@@ -3246,7 +3256,7 @@ msgstr "Výrobce"
 msgid "Manufacturers"
 msgstr "Výrobci"
 
-#: bika/lims/content/analysisrequest.py:1353
+#: bika/lims/content/analysisrequest.py:1359
 msgid "Mark the sample for internal use only. This means it is only accessible to lab personnel and not to clients."
 msgstr "Vzorek označte pouze pro interní použití. To znamená, že je přístupný pouze pracovníkům laboratoře a nikoli klientům."
 
@@ -3261,15 +3271,19 @@ msgid "Max Time"
 msgstr "Max čas"
 
 #: bika/lims/browser/fields/resultrangefield.py:35
-#: bika/lims/browser/widgets/analysisspecificationwidget.py:101
+#: bika/lims/browser/widgets/analysisspecificationwidget.py:100
 msgid "Max operator"
 msgstr "Max operátor"
 
 #: bika/lims/browser/analysisrequest/manage_analyses.py:92
 #: bika/lims/browser/fields/resultrangefield.py:38
-#: bika/lims/browser/widgets/analysisspecificationwidget.py:108
+#: bika/lims/browser/widgets/analysisspecificationwidget.py:107
 msgid "Max warn"
 msgstr "Max warn"
+
+#: senaite/core/content/samplecontainer.py:55
+msgid "Maximum possible size or volume of samples"
+msgstr ""
 
 #: bika/lims/content/container.py:58
 msgid "Maximum possible size or volume of samples."
@@ -3283,7 +3297,7 @@ msgstr "Maximální doba potřebná k dokončení analýzy. Po uplynutí této d
 msgid "Maximum turn-around time"
 msgstr "Maximální doba cyklu"
 
-#: bika/lims/config.py:140
+#: bika/lims/config.py:141
 msgid "Medium"
 msgstr "Střední"
 
@@ -3295,8 +3309,8 @@ msgstr "Seznamte se s komunitou, projděte si kód a získejte podporu na adrese
 msgid "Member Discount"
 msgstr "Členská sleva"
 
-#: bika/lims/content/analysisrequest.py:1080
-#: bika/lims/content/bikasetup.py:239
+#: bika/lims/content/analysisrequest.py:1086
+#: bika/lims/content/bikasetup.py:240
 msgid "Member discount %"
 msgstr "Členská sleva %"
 
@@ -3312,7 +3326,7 @@ msgstr "Člen zaregistrován a propojen s aktuálním kontaktem."
 msgid "Message sent to {}, "
 msgstr "Zpráva odeslána na {},"
 
-#: bika/lims/browser/analyses/view.py:122
+#: bika/lims/browser/analyses/view.py:124
 #: bika/lims/browser/methodfolder.py:58
 #: bika/lims/browser/referencesample.py:159
 msgid "Method"
@@ -3347,17 +3361,16 @@ msgid "Min"
 msgstr "Min"
 
 #: bika/lims/browser/fields/resultrangefield.py:33
-#: bika/lims/browser/widgets/analysisspecificationwidget.py:94
+#: bika/lims/browser/widgets/analysisspecificationwidget.py:93
 msgid "Min operator"
 msgstr "Min operátor"
 
 #: bika/lims/browser/analysisrequest/manage_analyses.py:88
 #: bika/lims/browser/fields/resultrangefield.py:37
-#: bika/lims/browser/widgets/analysisspecificationwidget.py:91
+#: bika/lims/browser/widgets/analysisspecificationwidget.py:90
 msgid "Min warn"
 msgstr "Min varování"
 
-#: bika/lims/browser/worksheet/views/folder.py:180
 #: senaite/core/browser/dashboard/dashboard.py:358
 msgid "Mine"
 msgstr "těžit"
@@ -3371,7 +3384,7 @@ msgstr "Minimálně 5 znaků"
 msgid "Minimum Volume"
 msgstr "Minimální objem"
 
-#: bika/lims/content/bikasetup.py:285
+#: bika/lims/content/bikasetup.py:286
 msgid "Minimum number of results for QC stats calculations"
 msgstr "Minimální počet výsledků pro výpočty statistik QC"
 
@@ -3419,18 +3432,20 @@ msgstr "Více"
 msgid "Multi Catalog Behavior for Dexterity Contents"
 msgstr "Chování více katalogů pro Dexterity Contents"
 
-#: bika/lims/content/bikasetup.py:387
+#: bika/lims/content/bikasetup.py:388
 msgid "Multi Verification type"
 msgstr "Typ vícenásobného ověření"
 
-#: bika/lims/browser/analyses/view.py:1193
+#: bika/lims/browser/analyses/view.py:1273
 msgid "Multi-verification required"
 msgstr "Vyžaduje se vícenásobné ověření"
 
+#: bika/lims/browser/fields/interimfieldsfield.py:104
 #: bika/lims/content/abstractbaseanalysis.py:567
 msgid "Multiple choices"
 msgstr "Více možností"
 
+#: bika/lims/browser/fields/interimfieldsfield.py:103
 #: bika/lims/content/abstractbaseanalysis.py:565
 msgid "Multiple selection"
 msgstr "Vícenásobný výběr"
@@ -3438,6 +3453,14 @@ msgstr "Vícenásobný výběr"
 #: bika/lims/content/abstractbaseanalysis.py:566
 msgid "Multiple selection (with duplicates)"
 msgstr "Vícenásobný výběr (s duplicitami)"
+
+#: bika/lims/browser/fields/interimfieldsfield.py:105
+msgid "Multiple values"
+msgstr ""
+
+#: bika/lims/validators.py:485
+msgid "Multiple values control type is not supported for choices"
+msgstr ""
 
 #: senaite/core/profiles/default/actions.xml
 msgid "My organization"
@@ -3447,9 +3470,7 @@ msgstr "Moje organizace"
 msgid "NIB"
 msgstr "NIB"
 
-#: bika/lims/browser/clientfolder.py:72
-#: bika/lims/browser/department/labcontacts.py:49
-#: bika/lims/browser/templates/analysisservice_info.pt:33
+#: senaite/core/browser/viewlets/templates/attachments.pt:65
 msgid "Name"
 msgstr "Jméno"
 
@@ -3457,9 +3478,7 @@ msgstr "Jméno"
 msgid "New ranges won't be applied to neither new nor current analyses. Re-assign the Specification if you want to apply latest changes."
 msgstr "Nové rozsahy nebudou použity na nové ani současné analýzy. Pokud chcete použít nejnovější změny, přiřaďte specifikaci znovu."
 
-#: bika/lims/browser/clientfolder.py:180
-#: bika/lims/browser/header_table.py:160
-#: bika/lims/content/abstractbaseanalysis.py:879
+#: senaite/core/browser/controlpanel/samplecontainers.py:110
 msgid "No"
 msgstr "Ne"
 
@@ -3470,6 +3489,10 @@ msgstr "Nejsou definovány žádné analytické služby"
 #: bika/lims/browser/publish/templates/email.pt:70
 msgid "No Email Address"
 msgstr "Chybí e-mailová adresa"
+
+#: senaite/core/browser/form/adapters/worksheettemplate.py:49
+msgid "No Instrument"
+msgstr ""
 
 #: senaite/core/browser/form/adapters/analysisservice.py:43
 msgid "No Method selected for this Service"
@@ -3496,6 +3519,10 @@ msgstr "Nelze vytvořit žádné vzorky."
 msgid "No Samples matched your query"
 msgstr "Vašemu databázovému dotazu neodpovídají žádné vzorky"
 
+#: bika/lims/browser/batch/batchbook.py:175
+msgid "No Subgroup"
+msgstr ""
+
 #: bika/lims/browser/workflow/__init__.py:115
 msgid "No action defined."
 msgstr "Nebyla definována žádná akce."
@@ -3509,11 +3536,11 @@ msgstr "Pro uživatele ${user} nebyly nalezeny žádné akce"
 msgid "No analyses matched your query"
 msgstr "Databázovému dotazu neodpovídaly žádné analýzy"
 
-#: bika/lims/browser/worksheet/views/add_worksheet.py:80
+#: bika/lims/browser/worksheet/views/add_worksheet.py:75
 msgid "No analyses were added"
 msgstr "Nebyly přidány žádné analýzy"
 
-#: bika/lims/browser/worksheet/views/add_analyses.py:138
+#: bika/lims/browser/worksheet/views/add_analyses.py:154
 msgid "No analyses were added to this worksheet."
 msgstr "K tomuto listu nebyly přidány žádné analýzy."
 
@@ -3534,7 +3561,7 @@ msgstr "Nebyla vybrána žádná analytická služba"
 msgid "No analysis services were selected."
 msgstr "Nebyly vybrány žádné analytické služby."
 
-#: bika/lims/browser/workflow/analysis.py:115
+#: bika/lims/browser/workflow/analysis.py:124
 #: bika/lims/browser/workflow/analysisrequest.py:117
 #: bika/lims/browser/workflow/worksheet.py:33
 msgid "No changes made"
@@ -3567,15 +3594,15 @@ msgstr "Žádný soubor nevybrán"
 msgid "No historical actions matched your query"
 msgstr "Dotazu neodpovídaly žádné historické akce"
 
-#: senaite/core/browser/form/adapters/data_import.py:59
+#: senaite/core/browser/form/adapters/data_import.py:62
 msgid "No importer not found for interface '{}'"
 msgstr ""
 
-#: bika/lims/content/worksheettemplate.py:205
+#: bika/lims/content/worksheettemplate.py:194
 msgid "No instrument"
 msgstr "Žádné přístroje"
 
-#: senaite/core/browser/form/adapters/data_import.py:104
+#: senaite/core/browser/form/adapters/data_import.py:107
 msgid "No instrument import interfaces available for {}"
 msgstr ""
 
@@ -3632,13 +3659,12 @@ msgstr "Pro propojeného uživatele nebyl nalezen žádný uživatelský profil.
 msgid "No valid contact"
 msgstr "Žádný platný kontakt"
 
-#: bika/lims/validators.py:461
+#: bika/lims/validators.py:464
 msgid "No valid format in choices field. Supported format is: <value-0>:<text>|<value-1>:<text>|<value-n>:<text>"
 msgstr "Žádný platný formát v poli volby. Podporovaný formát je:<value-0>:<text>|<value-1>:<text>|<value-n>:<text>"
 
-#: bika/lims/browser/analyses/view.py:419
-#: bika/lims/content/analysisservice.py:486
-#: bika/lims/content/bikasetup.py:147
+#: senaite/core/browser/form/adapters/analysisservice.py:67
+#: senaite/core/browser/form/adapters/labcontact.py:23
 msgid "None"
 msgstr "Nic"
 
@@ -3646,11 +3672,15 @@ msgstr "Nic"
 msgid "Not all contacts are equal for the selected Reports. Please manually select recipients for this email."
 msgstr "Ne všechny kontakty jsou pro vybrané zprávy stejné. Vyberte ručně příjemce pro tento e-mail."
 
-#: bika/lims/browser/worksheet/templates/results.pt:72
+#: senaite/core/browser/modals/analysis.py:87
+msgid "Not allowed to update conditions: {}"
+msgstr ""
+
+#: bika/lims/browser/worksheet/templates/results.pt:86
 msgid "Not defined"
 msgstr "Není určeno"
 
-#: senaite/core/browser/samples/view.py:525
+#: senaite/core/browser/samples/view.py:529
 msgid "Not printed yet"
 msgstr "Dosud nevytištěno"
 
@@ -3659,8 +3689,8 @@ msgstr "Dosud nevytištěno"
 msgid "Not set"
 msgstr "Nenastaveno"
 
-#: bika/lims/content/worksheet.py:305
-#: bika/lims/content/worksheettemplate.py:227
+#: bika/lims/content/worksheet.py:306
+#: bika/lims/content/worksheettemplate.py:246
 msgid "Not specified"
 msgstr "Nespecifikováno"
 
@@ -3680,7 +3710,7 @@ msgstr "Počet sloupců"
 msgid "Number"
 msgstr ""
 
-#: senaite/core/browser/samples/view.py:203
+#: senaite/core/browser/samples/view.py:207
 msgid "Number of Analyses"
 msgstr "Počet analýz"
 
@@ -3719,7 +3749,7 @@ msgid "Number of analysis requested and published per department and expresed as
 msgstr "Počet požadovaných a zveřejněných analýz na oddělení a vyjádřený jako procento všech provedených analýz"
 
 #: bika/lims/browser/templates/stickers_preview.pt:195
-#: bika/lims/content/bikasetup.py:705
+#: bika/lims/content/bikasetup.py:706
 msgid "Number of copies"
 msgstr "Počet kopií"
 
@@ -3728,11 +3758,11 @@ msgid "Number of requests"
 msgstr "Počet žádostí"
 
 #: bika/lims/content/abstractbaseanalysis.py:643
-#: bika/lims/content/bikasetup.py:374
+#: bika/lims/content/bikasetup.py:375
 msgid "Number of required verifications"
 msgstr "Počet požadovaných ověření"
 
-#: bika/lims/content/bikasetup.py:375
+#: bika/lims/content/bikasetup.py:376
 msgid "Number of required verifications before a given result being considered as 'verified'. This setting can be overrided for any Analysis in Analysis Service edit view. By default, 1"
 msgstr "Počet požadovaných ověření před tím, než je daný výsledek považován za „ověřený“. Toto nastavení lze přepsat pro jakékoli analýzy v zobrazení úprav služby pro analýzu. Ve výchozím nastavení 1"
 
@@ -3748,21 +3778,20 @@ msgstr "Jakmile je vzorek uchován, musí být v této lhůtě zlikvidován. Pok
 msgid "Only Excel files supported"
 msgstr "Podporovány jsou pouze soubory Excel"
 
-#: bika/lims/content/bikasetup.py:194
+#: bika/lims/content/bikasetup.py:195
 msgid "Only lab managers can create and manage worksheets"
 msgstr "Vytvářet a spravovat pracovní listy mohou pouze správci laboratoří"
 
-#: bika/lims/content/bikasetup.py:544
+#: bika/lims/content/bikasetup.py:545
 msgid "Only laboratory workdays are considered for the analysis turnaround time calculation. "
 msgstr "Pro výpočet časového cyklu analýzy se berou v úvahu pouze laboratorní pracovní dny."
 
-#: bika/lims/browser/worksheet/templates/results.pt:177
+#: bika/lims/browser/worksheet/templates/results.pt:216
 msgid "Only to empty or zero fields"
 msgstr "Pouze do prázdných nebo nulových polí"
 
-#: bika/lims/browser/batchfolder.py:96
-#: bika/lims/browser/instrument.py:94
-#: bika/lims/browser/worksheet/views/folder.py:132
+#: senaite/core/profiles/default/workflows/senaite_batch_workflow/definition.xml
+#: senaite/core/profiles/default/workflows/senaite_worksheet_workflow/definition.xml
 msgid "Open"
 msgstr "Otevřeno"
 
@@ -3774,17 +3803,9 @@ msgstr "Open Source Web based Laboratory Information Management System"
 msgid "Open email form to send the selected reports to the recipients. This will also publish the contained samples of the reports after the email was successfully sent."
 msgstr "Otevřete e-mailový formulář a odešlete vybrané zprávy příjemcům. Po úspěšném odeslání e-mailu se také zveřejní obsažené vzorky zpráv."
 
-#: bika/lims/browser/worksheet/views/add_analyses.py:83
+#: bika/lims/browser/worksheet/views/add_analyses.py:99
 msgid "Order"
 msgstr "Objednávka"
-
-#: bika/lims/content/supplyorder.py:89
-msgid "Order Date"
-msgstr "Datum objednávky"
-
-#: bika/lims/content/supplyorder.py:75
-msgid "Order Number"
-msgstr "Číslo objednávky"
 
 #: bika/lims/content/instrumentcertification.py:94
 msgid "Organization responsible of granting the calibration certificate"
@@ -3797,6 +3818,10 @@ msgstr "Orientace"
 #: bika/lims/skins/bika/bika_widgets/combobox.pt:92
 msgid "Other Value:"
 msgstr "Další hodnota:"
+
+#: senaite/core/z3cform/widgets/address.py:124
+msgid "Other address"
+msgstr ""
 
 #: bika/lims/browser/reports/templates/productivity.pt:429
 msgid "Other productivity reports"
@@ -3898,9 +3923,7 @@ msgstr "Soubor s obrázkem"
 msgid "Photo of the instrument"
 msgstr "Fotografie přístroje"
 
-#: bika/lims/browser/analysisrequest/templates/analysisrequest_retract_pdf.pt:84
-#: bika/lims/config.py:85
-#: bika/lims/content/organisation.py:83
+#: senaite/core/z3cform/widgets/address.py:120
 msgid "Physical address"
 msgstr "Fyzická adresa"
 
@@ -3916,7 +3939,7 @@ msgstr "Přidejte text e-mailu"
 msgid "Please click the update button after your changes."
 msgstr "Po provedení změn klikněte na tlačítko aktualizace."
 
-#: bika/lims/browser/header_table.py:85
+#: bika/lims/browser/header_table.py:84
 msgid "Please correct the indicated errors"
 msgstr "Opravte uvedené chyby"
 
@@ -3971,19 +3994,22 @@ msgstr "Typy Portálu"
 msgid "Position"
 msgstr "Pozice"
 
-#: bika/lims/content/organisation.py:96
-#: bika/lims/content/person.py:200
+#: senaite/core/z3cform/widgets/address.py:121
 msgid "Postal address"
 msgstr "Poštovní adresa"
 
-#: bika/lims/skins/bika/bika_widgets/addresswidget.pt:124
+#: senaite/core/z3cform/widgets/address.py:226
 msgid "Postal code"
 msgstr "PSČ"
 
-#: bika/lims/content/container.py:65
-#: bika/lims/controlpanel/bika_containers.py:85
+#: senaite/core/browser/controlpanel/samplecontainers.py:52
+#: senaite/core/content/samplecontainer.py:61
 msgid "Pre-preserved"
 msgstr "Předkonzervované"
+
+#: senaite/core/content/samplecontainer.py:76
+msgid "Pre-preserved containers must have a preservation selected"
+msgstr ""
 
 #: bika/lims/content/abstractbaseanalysis.py:118
 msgid "Precision as number of decimals"
@@ -4001,23 +4027,23 @@ msgstr "Předdefinované důvody odmítnutí"
 msgid "Predefined results"
 msgstr "Předdefinované výsledky"
 
-#: bika/lims/content/bikasetup.py:264
+#: bika/lims/content/bikasetup.py:265
 msgid "Preferred decimal mark for reports."
 msgstr "Upřednostňovaný desetinná znak pro zprávy."
 
-#: bika/lims/content/bikasetup.py:402
+#: bika/lims/content/bikasetup.py:403
 msgid "Preferred decimal mark for results"
 msgstr "Preferované desetinné znaménko pro výsledky"
 
-#: bika/lims/content/bikasetup.py:424
+#: bika/lims/content/bikasetup.py:425
 msgid "Preferred layout of the results entry table in the Worksheet view. Classic layout displays the Samples in rows and the analyses in columns. Transposed layout displays the Samples in columns and the analyses in rows."
 msgstr "Upřednostňované rozvržení tabulky pro zadání výsledků v zobrazení listu. Klasické rozvržení zobrazuje vzorky v řádcích a analýzy ve sloupcích. Transponované rozvržení zobrazuje vzorky ve sloupcích a analýzy v řádcích."
 
-#: bika/lims/content/bikasetup.py:275
+#: bika/lims/content/bikasetup.py:276
 msgid "Preferred scientific notation format for reports"
 msgstr "Preferovaný formát vědeckého zápisu pro zprávy"
 
-#: bika/lims/content/bikasetup.py:413
+#: bika/lims/content/bikasetup.py:414
 msgid "Preferred scientific notation format for results"
 msgstr "Preferovaný formát vědecké notace pro výsledky"
 
@@ -4037,15 +4063,17 @@ msgstr "Připravil"
 msgid "Prepublish"
 msgstr "Předběžné publikování"
 
-#: bika/lims/browser/fields/partitionsetupfield.py:115
-#: bika/lims/browser/templates/partition_magic.pt:185
-#: bika/lims/content/analysisrequest.py:575
+#: senaite/core/content/samplecontainer.py:90
 msgid "Preservation"
 msgstr "Uchování"
 
 #: bika/lims/content/preservation.py:44
 msgid "Preservation Category"
 msgstr "Kategorie uchování"
+
+#: senaite/core/content/samplecontainer.py:93
+msgid "Preservation method of this container"
+msgstr ""
 
 #: bika/lims/content/analysisservice.py:185
 msgid "Preservation per sample type"
@@ -4060,8 +4088,7 @@ msgstr "Uchování"
 msgid "Preserve"
 msgstr "Zachovat"
 
-#: bika/lims/content/analysisrequest.py:612
-#: senaite/core/browser/samples/view.py:194
+#: senaite/core/browser/samples/view.py:198
 msgid "Preserver"
 msgstr "Ochránce"
 
@@ -4117,15 +4144,17 @@ msgstr "Ceníky"
 msgid "Primary Sample"
 msgstr "Primární vzorek"
 
-#: bika/lims/browser/templates/instrument_referenceanalyses.pt:42
-#: bika/lims/browser/templates/referencesample_analyses.pt:37
-#: bika/lims/browser/templates/stickers_preview.pt:215
+#: senaite/core/browser/samples/view.py:659
 msgid "Print"
 msgstr "Tisk"
 
 #: bika/lims/profiles/default/types/AnalysisRequest.xml
 msgid "Print Invoice"
 msgstr "Tisk faktury"
+
+#: bika/lims/browser/worksheet/templates/results.pt:135
+msgid "Print Worksheet"
+msgstr ""
 
 #: bika/lims/browser/reports/templates/report_frame.pt:29
 #: bika/lims/browser/templates/batch_publish.pt:124
@@ -4136,12 +4165,11 @@ msgstr "Datum tisku:"
 msgid "Print pricelist"
 msgstr "Tisk ceníku"
 
-#: senaite/core/browser/samples/view.py:226
+#: senaite/core/browser/samples/view.py:230
 msgid "Print stickers"
 msgstr "Tisk štítků"
 
-#: bika/lims/content/analysisrequest.py:1339
-#: senaite/core/browser/samples/view.py:213
+#: senaite/core/browser/samples/view.py:217
 msgid "Printed"
 msgstr "Tištěno"
 
@@ -4150,7 +4178,7 @@ msgstr "Tištěno"
 msgid "Printed on"
 msgstr "Vytištěno na"
 
-#: bika/lims/content/analysisrequest.py:877
+#: bika/lims/content/analysisrequest.py:883
 msgid "Priority"
 msgstr "Priorita"
 
@@ -4162,9 +4190,7 @@ msgstr "Produktivita"
 msgid "Productivity Reports"
 msgstr "Zprávy o produktivitě"
 
-#: bika/lims/browser/reports/selection_macros/select_profile.pt:4
-#: bika/lims/controlpanel/bika_analysisprofiles.py:75
-#: bika/lims/controlpanel/bika_artemplates.py:74
+#: senaite/core/browser/samples/view.py:202
 msgid "Profile"
 msgstr "Profil"
 
@@ -4182,7 +4208,7 @@ msgid "Profile Keyword"
 msgstr "Klíčové slovo profilu"
 
 #: bika/lims/browser/batchfolder.py:62
-#: bika/lims/browser/worksheet/views/folder.py:92
+#: bika/lims/browser/worksheet/views/folder.py:96
 msgid "Progress"
 msgstr "Postup"
 
@@ -4190,8 +4216,7 @@ msgstr "Postup"
 msgid "Protocol ID"
 msgstr "Protocol ID"
 
-#: bika/lims/browser/clientfolder.py:86
-#: senaite/core/browser/samples/view.py:147
+#: senaite/core/browser/samples/view.py:151
 msgid "Province"
 msgstr "Provincie"
 
@@ -4199,19 +4224,18 @@ msgstr "Provincie"
 msgid "Public. Lag"
 msgstr "Prodleva zveřejnění"
 
-#: bika/lims/content/analysisrequest.py:708
+#: bika/lims/content/analysisrequest.py:713
 msgid "Publication Specification"
 msgstr "Publikace Specifikace"
 
-#: bika/lims/browser/publish/reports_listing.py:83
 #: senaite/core/profiles/default/workflows/senaite_analysis_workflow/definition.xml
 #: senaite/core/profiles/default/workflows/senaite_sample_workflow/definition.xml
 msgid "Publish"
 msgstr "Publikovat"
 
-#: bika/lims/browser/reports/administration_arsnotinvoiced.py:65
-#: bika/lims/browser/reports/productivity_analysesperservice.py:82
-#: bika/lims/browser/reports/templates/productivity_analysesperdepartment.pt:100
+#: senaite/core/browser/dashboard/dashboard.py:452
+#: senaite/core/browser/samples/view.py:327
+#: senaite/core/profiles/default/workflows/senaite_analysis_workflow/definition.xml
 msgid "Published"
 msgstr "Publikováno"
 
@@ -4235,7 +4259,6 @@ msgstr "Publikované výsledky"
 msgid "Published {}, "
 msgstr "Publikováno {},"
 
-#: bika/lims/browser/worksheet/views/folder.py:105
 #: senaite/core/browser/viewlets/sampleanalyses.py:70
 msgid "QC Analyses"
 msgstr "QC Analýzy"
@@ -4258,7 +4281,7 @@ msgstr "Čtvrtletně"
 msgid "Range Comment"
 msgstr "Komentář rozsahu"
 
-#: bika/lims/browser/widgets/analysisspecificationwidget.py:117
+#: bika/lims/browser/widgets/analysisspecificationwidget.py:116
 msgid "Range comment"
 msgstr "Komentář rozsahu"
 
@@ -4286,22 +4309,20 @@ msgstr "Znovu zadejte heslo. Ujistěte se, že hesla jsou identická."
 msgid "Reasons for rejection"
 msgstr "Důvody zamítnutí"
 
-#: bika/lims/browser/worksheet/views/folder.py:251
+#: bika/lims/browser/worksheet/views/folder.py:255
 msgid "Reassign"
 msgstr "Znovu přiřadit"
 
-#: bika/lims/browser/worksheet/views/analyses.py:387
+#: bika/lims/browser/worksheet/views/analyses.py:392
 msgid "Reassignable Slot"
 msgstr "Přiřazitelný slot"
 
-#: bika/lims/content/bikasetup.py:149
 #: senaite/core/profiles/default/workflows/senaite_sample_workflow/definition.xml
 msgid "Receive"
 msgstr "Přijmout"
 
-#: bika/lims/browser/reports/productivity_analysestats.py:76
-#: bika/lims/browser/reports/productivity_analysestats_overtime.py:172
-#: bika/lims/browser/reports/templates/productivity_dataentrydaybook.pt:87
+#: senaite/core/browser/samples/view.py:297
+#: senaite/core/profiles/default/workflows/senaite_sample_workflow/definition.xml
 msgid "Received"
 msgstr "Přijato"
 
@@ -4315,12 +4336,12 @@ msgstr "Čeká se na příjem"
 
 #: bika/lims/browser/publish/reports_listing.py:120
 #: bika/lims/browser/publish/templates/email.pt:56
-#: bika/lims/browser/templates/analysisreport_info.pt:142
+#: bika/lims/browser/templates/analysisreport_info.pt:143
 msgid "Recipients"
 msgstr "Příjemci"
 
 #: bika/lims/browser/templates/referencesample_sticker.pt:46
-#: bika/lims/content/worksheettemplate.py:61
+#: bika/lims/content/worksheettemplate.py:60
 msgid "Reference"
 msgstr "Reference"
 
@@ -4374,7 +4395,7 @@ msgstr "Hodnoty referenčních vzorků jsou nulové nebo „prázdné“"
 msgid "Referenced Samples in the PDF"
 msgstr "Odkazované vzorky v PDF"
 
-#: bika/lims/content/bikasetup.py:148
+#: bika/lims/content/bikasetup.py:149
 msgid "Register"
 msgstr "Registrovat"
 
@@ -4389,9 +4410,9 @@ msgstr "Registrován"
 msgid "Reinstate"
 msgstr "Obnovit"
 
-#: bika/lims/browser/analysisrequest/templates/reject_samples.pt:125
 #: senaite/core/profiles/default/workflows/senaite_analysis_workflow/definition.xml
 #: senaite/core/profiles/default/workflows/senaite_sample_workflow/definition.xml
+#: senaite/core/profiles/default/workflows/senaite_worksheet_workflow/definition.xml
 msgid "Reject"
 msgstr "Odmítnout"
 
@@ -4404,7 +4425,7 @@ msgid "Reject samples"
 msgstr "Odmítnout vzorky"
 
 #: senaite/core/browser/dashboard/dashboard.py:593
-#: senaite/core/browser/samples/view.py:374
+#: senaite/core/browser/samples/view.py:378
 #: senaite/core/profiles/default/workflows/senaite_analysis_workflow/definition.xml
 msgid "Rejected"
 msgstr "Odmítnuto"
@@ -4433,17 +4454,15 @@ msgstr "Důvody odmítnutí"
 msgid "Rejection workflow is not enabled"
 msgstr "Odmítnutí pracovního postupu není povolen"
 
-#: bika/lims/browser/analysisrequest/templates/analysisrequest_view.pt:63
-#: bika/lims/browser/worksheet/templates/results.pt:209
-#: bika/lims/content/analysisprofile.py:72
+#: senaite/core/browser/viewlets/remarks.py:13
 msgid "Remarks"
 msgstr "Poznámky"
 
-#: bika/lims/content/analysisrequest.py:1064
+#: bika/lims/content/analysisrequest.py:1070
 msgid "Remarks and comments for this request"
 msgstr "Poznámky a komentáře k této žádosti"
 
-#: bika/lims/browser/worksheet/views/analyses.py:586
+#: bika/lims/browser/worksheet/views/analyses.py:591
 msgid "Remarks of {}"
 msgstr "Poznámky z {}"
 
@@ -4491,7 +4510,7 @@ msgstr "Opravit"
 msgid "Repeat every"
 msgstr "Opakovat každý"
 
-#: bika/lims/browser/fields/interimfieldsfield.py:48
+#: bika/lims/browser/fields/interimfieldsfield.py:62
 #: bika/lims/content/report.py:38
 #: bika/lims/profiles/default/types/Report.xml
 msgid "Report"
@@ -4548,8 +4567,6 @@ msgstr "Typ Zprávy"
 msgid "Report upload"
 msgstr "Nahrát Zprávu"
 
-#: bika/lims/browser/reports/__init__.py:116
-#: bika/lims/profiles/default/types/ReportFolder.xml
 #: senaite/core/profiles/default/actions.xml
 msgid "Reports"
 msgstr "Zprávy"
@@ -4558,7 +4575,7 @@ msgstr "Zprávy"
 msgid "Republish"
 msgstr "Znovu publikovat"
 
-#: senaite/core/browser/samples/view.py:532
+#: senaite/core/browser/samples/view.py:536
 msgid "Republished after last print"
 msgstr "Znovu publikováno po posledním tisku"
 
@@ -4573,7 +4590,7 @@ msgstr "Požadavek"
 msgid "Request ID"
 msgstr "ID požadavku"
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:306
+#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:312
 msgid "Request new analyses"
 msgstr "Vyžádat nové analýzy"
 
@@ -4597,7 +4614,7 @@ msgid "Reset"
 msgstr "Reset"
 
 #: bika/lims/browser/publish/templates/email.pt:83
-#: bika/lims/browser/templates/analysisreport_info.pt:153
+#: bika/lims/browser/templates/analysisreport_info.pt:154
 msgid "Responsibles"
 msgstr "Odpovědnosti"
 
@@ -4609,13 +4626,13 @@ msgstr "Obnovit"
 msgid "Restrict categories"
 msgstr "Omezení kategorií"
 
-#: bika/lims/content/worksheettemplate.py:106
+#: bika/lims/content/worksheettemplate.py:105
 msgid "Restrict the available analysis services and instrumentsto those with the selected method. In order to apply this change to the services list, you should save the change first."
 msgstr "Omezte dostupné analytické služby a nástroje pomocí vybraných metod. Chcete-li tuto změnu použít v seznamu služeb, měli byste ji nejprve uložit."
 
-#: bika/lims/browser/analyses/view.py:150
+#: bika/lims/browser/analyses/view.py:153
 #: bika/lims/browser/referencesample.py:167
-#: bika/lims/browser/worksheet/views/analyses.py:94
+#: bika/lims/browser/worksheet/views/analyses.py:95
 msgid "Result"
 msgstr "Výsledek"
 
@@ -4623,11 +4640,11 @@ msgstr "Výsledek"
 msgid "Result Value"
 msgstr "Výsledná hodnota"
 
-#: bika/lims/validators.py:645
+#: bika/lims/validators.py:653
 msgid "Result Value must be a number"
 msgstr "Výsledek Hodnota musí být číslo"
 
-#: bika/lims/validators.py:660
+#: bika/lims/validators.py:668
 msgid "Result Value must be unique"
 msgstr "Hodnota výsledku musí být jedinečná"
 
@@ -4635,19 +4652,19 @@ msgstr "Hodnota výsledku musí být jedinečná"
 msgid "Result files folders"
 msgstr "Složky výsledků"
 
-#: bika/lims/browser/analyses/view.py:1134
+#: bika/lims/browser/analyses/view.py:1214
 msgid "Result in shoulder range"
 msgstr "Výsledek v rozpětí"
 
-#: bika/lims/browser/analyses/view.py:1131
+#: bika/lims/browser/analyses/view.py:1211
 msgid "Result out of range"
 msgstr "Výsledek mimo rozsah"
 
-#: bika/lims/browser/analyses/view.py:1153
+#: bika/lims/browser/analyses/view.py:1233
 msgid "Result range is different from Specification: {}"
 msgstr "Rozsah výsledků se liší od specifikace: {}"
 
-#: bika/lims/content/bikasetup.py:319
+#: bika/lims/content/bikasetup.py:320
 msgid "Result values with at least this number of significant digits are displayed in scientific notation using the letter 'e' to indicate the exponent.  The precision can be configured in individual Analysis Services."
 msgstr "Výsledné hodnoty s alespoň tímto počtem platných číslic jsou zobrazeny ve vědeckém zápisu pomocí písmene „e“ pro označení exponentu. Přesnost lze nakonfigurovat v jednotlivých analytických službách."
 
@@ -4659,16 +4676,15 @@ msgstr "Výsledné proměnné"
 msgid "Results"
 msgstr "Výsledek"
 
-#: bika/lims/content/analysisrequest.py:1305
+#: bika/lims/content/analysisrequest.py:1311
 msgid "Results Interpretation"
 msgstr "Interpretace výsledků"
 
-#: bika/lims/browser/analysisrequest/templates/analysisrequest_view.pt:32
-#: senaite/core/browser/samples/view.py:544
+#: senaite/core/browser/samples/view.py:548
 msgid "Results have been withdrawn"
 msgstr "Výsledky byly staženy"
 
-#: bika/lims/browser/analysisrequest/templates/analysisrequest_view.pt:85
+#: senaite/core/browser/viewlets/resultsinterpretation.py:21
 msgid "Results interpretation"
 msgstr "Interpretace výsledků"
 
@@ -4676,7 +4692,7 @@ msgstr "Interpretace výsledků"
 msgid "Results pending"
 msgstr "Výsledky čekají na vyřízení"
 
-#: bika/lims/content/analysisrequest.py:627
+#: bika/lims/content/analysisrequest.py:632
 #: bika/lims/content/preservation.py:49
 #: bika/lims/content/sampletype.py:118
 msgid "Retention Period"
@@ -4686,9 +4702,9 @@ msgstr "Retenční období"
 msgid "Retest"
 msgstr "Opakovaně testovat"
 
-#: bika/lims/browser/analyses/view.py:163
+#: bika/lims/browser/analyses/view.py:166
 #: bika/lims/browser/referencesample.py:183
-#: bika/lims/browser/worksheet/views/analyses.py:98
+#: bika/lims/browser/worksheet/views/analyses.py:99
 msgid "Retested"
 msgstr "Znovu testováno"
 
@@ -4734,25 +4750,21 @@ msgstr "Role"
 msgid "Rollback"
 msgstr "Zpět k předešlému stavu"
 
-#: bika/lims/browser/worksheet/views/folder.py:107
+#: bika/lims/browser/worksheet/views/folder.py:111
 msgid "Routine Analyses"
 msgstr "Rutinní analýzy"
 
-#: senaite/core/configure.zcml:41
+#: senaite/core/configure.zcml:43
 msgid "SENAITE CORE"
 msgstr "SENAITE CORE"
 
-#: senaite/core/configure.zcml:41
+#: senaite/core/configure.zcml:43
 msgid "SENAITE CORE Add-on"
 msgstr "Přídavný modul SENAITE CORE"
 
 #: bika/lims/profiles.zcml:15
 msgid "SENAITE Core 1.x (do not install)"
 msgstr "SENAITE Core 1.x (neinstalovat)"
-
-#: senaite/impress/controlpanel.py:85
-msgid "SENAITE IMPRESS Settings"
-msgstr ""
 
 #: senaite/core/browser/frontpage/configure.zcml:23
 msgid "SENAITE LIMS front-page"
@@ -4778,9 +4790,7 @@ msgstr "SWIFT kód."
 msgid "Salutation"
 msgstr "Oslovení"
 
-#: bika/lims/browser/analysisrequest/templates/analysisrequest_view.pt:16
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:379
-#: bika/lims/browser/batch/batchbook.py:64
+#: senaite/core/profiles/default/workflows/senaite_sample_workflow/definition.xml
 msgid "Sample"
 msgstr "Vzorek"
 
@@ -4798,9 +4808,16 @@ msgstr "Ukázkový stav"
 msgid "Sample Conditions"
 msgstr "Vzorové podmínky"
 
-#: bika/lims/browser/analysisrequest/templates/analysisrequest_retract_pdf.pt:108
-#: bika/lims/browser/analysisrequest/templates/invoice_content.pt:84
-#: bika/lims/browser/reports/templates/productivity_dailysamplesreceived.pt:54
+#: senaite/core/profiles/default/types/SampleContainer.xml
+msgid "Sample Container"
+msgstr ""
+
+#: senaite/core/browser/controlpanel/samplecontainers.py:30
+#: senaite/core/profiles/default/types/SampleContainers.xml
+msgid "Sample Containers"
+msgstr ""
+
+#: senaite/core/browser/samples/view.py:87
 msgid "Sample ID"
 msgstr "ID vzorku"
 
@@ -4819,9 +4836,7 @@ msgstr "Matice vzorků"
 msgid "Sample Partitions"
 msgstr "Oddělky vzorků"
 
-#: bika/lims/browser/analysisrequest/templates/invoice_content.pt:124
-#: bika/lims/browser/batch/batchbook.py:74
-#: bika/lims/content/analysisrequest.py:733
+#: senaite/core/browser/samples/view.py:180
 msgid "Sample Point"
 msgstr "Vzorkovací bod"
 
@@ -4831,7 +4846,7 @@ msgstr "Vzorkovací bod"
 msgid "Sample Points"
 msgstr "Body vzorků"
 
-#: bika/lims/content/analysisrequest.py:637
+#: bika/lims/content/analysisrequest.py:642
 msgid "Sample Rejection"
 msgstr "Odmítnutí vzorku"
 
@@ -4845,9 +4860,7 @@ msgstr "Šablona vzorku"
 msgid "Sample Templates"
 msgstr "Šablony vzorku"
 
-#: bika/lims/browser/analysisrequest/templates/invoice_content.pt:75
-#: bika/lims/browser/batch/batchbook.py:70
-#: bika/lims/browser/fields/partitionsetupfield.py:113
+#: senaite/core/browser/samples/view.py:176
 msgid "Sample Type"
 msgstr "Typ vzorku"
 
@@ -4865,7 +4878,7 @@ msgstr "Typy vzorků"
 msgid "Sample collected by the laboratory"
 msgstr "Vzorek odebraný laboratoří"
 
-#: bika/lims/content/analysisrequest.py:853
+#: bika/lims/content/analysisrequest.py:859
 msgid "Sample condition"
 msgstr "stav vzorku"
 
@@ -4903,13 +4916,12 @@ msgstr "Vzorek s oddělky"
 msgid "SampleMatrix"
 msgstr "SampleMatrix"
 
-#: bika/lims/content/analysisrequest.py:676
+#: bika/lims/content/analysisrequest.py:681
 #: bika/lims/content/artemplate.py:215
 msgid "SampleType"
 msgstr "Typ vzorku"
 
-#: bika/lims/content/analysisrequest.py:476
-#: senaite/core/browser/samples/view.py:191
+#: senaite/core/browser/samples/view.py:195
 msgid "Sampler"
 msgstr "Vzorkovač"
 
@@ -4921,9 +4933,9 @@ msgstr "Vzorkovač pro plánovaný odběr vzorků"
 msgid "Sampler required for sample %s"
 msgstr ""
 
-#: bika/lims/browser/worksheet/views/folder.py:103
-#: bika/lims/profiles/default/types/Batch.xml
-#: bika/lims/profiles/default/types/Client.xml
+#: senaite/core/browser/dashboard/dashboard.py:478
+#: senaite/core/browser/samples/view.py:60
+#: senaite/core/profiles/default/types/Samples.xml
 msgid "Samples"
 msgstr "Vzorky"
 
@@ -5004,9 +5016,7 @@ msgstr "Vzorky s nevyřízenými výsledky"
 msgid "Sampling Date"
 msgstr "Datum vzorkování"
 
-#: bika/lims/content/analysisrequest.py:829
-#: bika/lims/controlpanel/bika_samplingdeviations.py:68
-#: bika/lims/profiles/default/types/SamplingDeviation.xml
+#: senaite/core/browser/samples/view.py:190
 msgid "Sampling Deviation"
 msgstr "Odchylka odběru vzorků"
 
@@ -5027,9 +5037,7 @@ msgstr "Odběr vzorků je naplánován"
 msgid "Saturday"
 msgstr "Sobota"
 
-#: bika/lims/browser/analysisrequest/manage_analyses.py:116
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:649
-#: bika/lims/browser/analysisrequest/templates/ar_add_manage.pt:119
+#: senaite/core/browser/viewlets/templates/resultsinterpretation.pt:156
 msgid "Save"
 msgstr "Uložit"
 
@@ -5045,7 +5053,7 @@ msgstr "Plán"
 msgid "Schedule sampling"
 msgstr "Plánování odběru vzorků"
 
-#: senaite/core/browser/samples/view.py:271
+#: senaite/core/browser/samples/view.py:275
 #: senaite/core/profiles/default/workflows/senaite_sample_workflow/definition.xml
 msgid "Scheduled sampling"
 msgstr "Plánovaný odběr vzorků"
@@ -5070,6 +5078,11 @@ msgstr "Sekundy"
 msgid "Security Seal Intact Y/N"
 msgstr "Bezpečnostní pečeť neporušená Ano / Ne"
 
+#: senaite/core/browser/controlpanel/samplecontainers.py:55
+#: senaite/core/content/samplecontainer.py:98
+msgid "Security seal intact"
+msgstr ""
+
 #: senaite/core/browser/idserver/templates/numbergenerator.pt:58
 msgid "Seed"
 msgstr "Založit"
@@ -5082,7 +5095,7 @@ msgstr "Seeding key {} až {}"
 msgid "Select"
 msgstr ""
 
-#: bika/lims/content/bikasetup.py:661
+#: bika/lims/content/bikasetup.py:662
 msgid "Select 'Register' if you want stickers to be automatically printed when new Samples or sample records are created. Select 'Receive' to print stickers when Samples or Samples are received. Select 'None' to disable automatic printing"
 msgstr "Vyberte „Registrovat“, pokud chcete, aby se štítky automaticky vytvářely při vytváření nových vzorků nebo záznamů vzorků. Vyberte 'Přijmout' pro tisk štítků po přijetí vzorků nebo záznamů vzorků. Výběrem „Žádný“ deaktivujete automatický tisk"
 
@@ -5102,6 +5115,10 @@ msgstr "Vyberte manažera z dostupného personálu nakonfigurovaného v položce
 msgid "Select a sample to create a secondary Sample"
 msgstr "Vybrat vzorek a vytvořit sekundární vzorek"
 
+# senaite.core.browser.modals.templates.create_worksheet.pt
+msgid "Select all"
+msgstr ""
+
 #: bika/lims/content/instrument.py:208
 msgid "Select an Export interface for this instrument."
 msgstr "Vybrat rozhraní exportu pro tento přístroj."
@@ -5114,7 +5131,7 @@ msgstr "Vyberte rozhraní importu pro tento přístroj."
 msgid "Select analyses to include in this template"
 msgstr "Vybrat analýzy, které chcete zahrnout do této šablony"
 
-#: bika/lims/browser/worksheet/templates/worksheets.pt:33
+#: bika/lims/browser/worksheet/templates/worksheets.pt:41
 msgid "Select analyst"
 msgstr "Vyberte analytika"
 
@@ -5142,20 +5159,19 @@ msgstr "Vyberte, zda mají být popisy zahrnuty"
 msgid "Select if the results for tests of this type of analysis can be set by using an instrument. If disabled, no instruments will be available for tests of this type of analysis in manage results view, even though the method selected for the test has instruments assigned."
 msgstr "Vyberte, zda lze výsledky testů tohoto typu analýzy nastavit pomocí přístroje. Pokud je zakázáno, nebudou k dispozici žádné přístroje pro testování tohoto typu analýzy v zobrazení výsledků řízení, přestože metoda vybraná pro test má přiřazené přístroje."
 
-#: bika/lims/browser/worksheet/templates/worksheets.pt:61
+#: bika/lims/browser/worksheet/templates/worksheets.pt:71
 msgid "Select instrument"
 msgstr "Vybrat přístroj"
 
-#: bika/lims/browser/worksheet/templates/add_analyses.pt:31
-#: bika/lims/browser/worksheet/templates/worksheets.pt:48
+#: senaite/core/browser/viewlets/templates/resultsinterpretation.pt:76
 msgid "Select template"
 msgstr "Vyberte šablonu"
 
-#: bika/lims/content/bikasetup.py:230
+#: bika/lims/content/bikasetup.py:231
 msgid "Select the country the site will show by default"
 msgstr "Vyberte zemi, ve které se bude web ve výchozím nastavení zobrazovat"
 
-#: bika/lims/content/bikasetup.py:218
+#: bika/lims/content/bikasetup.py:219
 msgid "Select the currency the site will use to display prices."
 msgstr "Vyberte měnu, kterou bude web používat k zobrazení cen."
 
@@ -5167,7 +5183,7 @@ msgstr "Vyberte výchozí kontejner, který bude použit pro tuto analytickou sl
 msgid "Select the default landing page. This is used when a Client user logs into the system, or when a client is selected from the client folder listing."
 msgstr "Vyberte výchozí vstupní stránku. To se používá, když se klient přihlásí do systému nebo když je klient vybrán ze seznamu klientských složek."
 
-#: bika/lims/content/worksheettemplate.py:127
+#: bika/lims/content/worksheettemplate.py:126
 msgid "Select the preferred instrument"
 msgstr "Vybrat preferovaný přístroj"
 
@@ -5175,58 +5191,59 @@ msgstr "Vybrat preferovaný přístroj"
 msgid "Select the types that this ID is used to identify."
 msgstr "Vyberte typy, které se toto ID používá k identifikaci."
 
-#: bika/lims/content/bikasetup.py:618
+#: bika/lims/content/bikasetup.py:619
 msgid "Select this to activate automatic notifications via email to the Client and Lab Managers when a Sample is invalidated."
 msgstr "Vyberte tuto možnost, chcete-li aktivovat automatická oznámení prostřednictvím e-mailu klientovi a vedoucím laboratoře v případě zneplatnění vzorku."
 
-#: bika/lims/content/bikasetup.py:583
+#: bika/lims/content/bikasetup.py:584
 msgid "Select this to activate automatic notifications via email to the Client when a Sample is rejected."
 msgstr "Vyberte tuto možnost, chcete-li aktivovat automatická upozornění prostřednictvím e-mailu klientovi, když je vzorek odmítnut."
 
-#: bika/lims/content/bikasetup.py:439
+#: bika/lims/content/bikasetup.py:440
 msgid "Select this to activate the dashboard as a default front page."
 msgstr "Tuto možnost vyberte, chcete-li aktivovat řídicí panel jako výchozí přední stránku."
 
-#: bika/lims/content/bikasetup.py:842
+#: bika/lims/content/bikasetup.py:843
 msgid "Select this to activate the rejection workflow for Samples. A 'Reject' option will be displayed in the actions menu."
 msgstr "Vyberte tuto možnost, chcete-li aktivovat pracovní postup odmítnutí pro vzorky. V nabídce akcí se zobrazí možnost „Odmítnout“."
 
-#: bika/lims/content/bikasetup.py:485
+#: bika/lims/content/bikasetup.py:486
 msgid "Select this to activate the sample collection workflow steps."
 msgstr "Vyberte tuto možnost, chcete-li aktivovat kroky pracovního postupu kolekce vzorků."
 
-#: bika/lims/content/bikasetup.py:494
+#: bika/lims/content/bikasetup.py:495
 msgid "Select this to allow a Sampling Coordinator to schedule a sampling. This functionality only takes effect when 'Sampling workflow' is active"
 msgstr "Vyberte tuto možnost, aby koordinátor odběru vzorků mohl naplánovat odběr vzorků. Tato funkce se projeví pouze v případě, že je aktivní „Pracovní postup odběru vzorků“"
 
-#: bika/lims/content/bikasetup.py:473
+#: bika/lims/content/bikasetup.py:474
 msgid "Select this to allow the user to set an additional 'Printed' status to those Analysis Requests tha have been Published. Disabled by default."
 msgstr "Vyberte tuto možnost, chcete-li uživateli umožnit nastavit další stav „Tištěný“ na ty požadavky na analýzu, které byly zveřejněny. Ve výchozím nastavení zakázáno."
 
-#: bika/lims/content/bikasetup.py:506
+#: bika/lims/content/bikasetup.py:507
 msgid "Select to receive the samples automatically when created by lab personnel and sampling workflow is disabled. Samples created by client contacts won't be received automatically"
 msgstr "Zvolte, chcete-li vzorky automaticky přijímat, když jsou vytvořeny pracovníky laboratoře a pracovní tok odběru vzorků je zakázán. Vzorky vytvořené přes kontakty klienta nebudou automaticky přijímány"
 
-#: bika/lims/content/bikasetup.py:519
+#: bika/lims/content/bikasetup.py:520
 msgid "Select to show sample partitions to client contacts. If deactivated, partitions won't be included in listings and no info message with links to the primary sample will be displayed to client contacts."
 msgstr "Vyberte, zda chcete klientským kontaktům zobrazit ukázkové oddíly. Pokud je tato možnost deaktivována, nebudou oddíly zahrnuty do výpisů a klientským kontaktům se nebude zobrazovat informační zpráva s odkazy na primární vzorek."
 
-#: bika/lims/content/worksheettemplate.py:88
+#: bika/lims/content/worksheettemplate.py:87
 msgid "Select which Analyses should be included on the Worksheet"
 msgstr "Vyberte, které analýzy se mají na pracovním listu zahrnout"
 
-#: bika/lims/content/bikasetup.py:696
+#: bika/lims/content/bikasetup.py:697
 msgid "Select which sticker should be used as the 'large' sticker by default"
 msgstr "Vyberte, který štítek by měl být ve výchozím nastavení použit jako „velký“"
 
-#: bika/lims/content/bikasetup.py:685
+#: bika/lims/content/bikasetup.py:686
 msgid "Select which sticker should be used as the 'small' sticker by default"
 msgstr "Vyberte, který štítek by měl být ve výchozím nastavení použit jako „malý“ štítek"
 
-#: bika/lims/content/bikasetup.py:674
+#: bika/lims/content/bikasetup.py:675
 msgid "Select which sticker to print when automatic sticker printing is enabled"
 msgstr "Vyberte, který štítek se má tisknout, když je povolen automatický tisk štítku"
 
+#: bika/lims/browser/fields/interimfieldsfield.py:102
 #: bika/lims/content/abstractbaseanalysis.py:564
 msgid "Selection list"
 msgstr "Výběrový seznam"
@@ -5247,7 +5264,7 @@ msgstr "Odeslat analytické zprávy e-mailem"
 msgid "Send an email notification to client contact"
 msgstr "Pošlete e-mailové oznámení kontaktu klienta"
 
-#: bika/lims/browser/templates/analysisreport_info.pt:131
+#: bika/lims/browser/templates/analysisreport_info.pt:132
 msgid "Sender"
 msgstr "Odesílatel"
 
@@ -5266,7 +5283,7 @@ msgstr "Seriové číslo"
 msgid "Service"
 msgstr "Služba"
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:535
+#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:541
 msgid "Service cannot be deselected. Please click the info button for further details"
 msgstr "Službu nelze zrušit. Kliknutím na tlačítko info získáte další podrobnosti"
 
@@ -5278,19 +5295,23 @@ msgstr "Služby"
 msgid "Set"
 msgstr "Nastavit"
 
-#: bika/lims/browser/worksheet/views/analyses.py:130
+#: senaite/core/browser/modals/templates/set_analysis_conditions.pt:95
+msgid "Set Conditions"
+msgstr ""
+
+#: bika/lims/browser/worksheet/views/analyses.py:131
 msgid "Set remarks"
 msgstr "Poznámky k sadě"
 
-#: bika/lims/browser/worksheet/views/analyses.py:134
+#: bika/lims/browser/worksheet/views/analyses.py:135
 msgid "Set remarks for selected analyses"
 msgstr "Nastavení poznámek pro vybrané analýzy"
 
-#: bika/lims/content/analysisrequest.py:638
+#: bika/lims/content/analysisrequest.py:643
 msgid "Set the Sample Rejection workflow and the reasons"
 msgstr "Nastavte pracovní postup Odmítnutí vzorku a důvody"
 
-#: bika/lims/content/bikasetup.py:706
+#: bika/lims/content/bikasetup.py:707
 msgid "Set the default number of copies to be printed for each sticker"
 msgstr "Nastavte výchozí počet kopií, které se mají vytisknout pro každou nálepku"
 
@@ -5298,15 +5319,15 @@ msgstr "Nastavte výchozí počet kopií, které se mají vytisknout pro každou
 msgid "Set the maintenance task as closed."
 msgstr "Nastavte úkol údržby jako uzavřený."
 
-#: bika/lims/content/analysisrequest.py:709
+#: bika/lims/content/analysisrequest.py:714
 msgid "Set the specification to be used before publishing a Sample."
 msgstr "Nastavit specifikaci, která bude použita před publikováním vzorku."
 
-#: bika/lims/content/bikasetup.py:601
+#: bika/lims/content/bikasetup.py:602
 msgid "Set the text for the body of the email to be sent to the Sample's client contact if the option 'Email notification on Sample rejection' is enabled. You can use reserved keywords: $sample_id, $sample_link, $reasons, $lab_address"
 msgstr "Pokud je aktivována možnost „Oznámení e-mailem o odmítnutí vzorku“, nastavte text pro e-mail, který má být zaslán klientskému kontaktu vzorku. Můžete použít vyhrazená klíčová slova: $sample_id, $sample_link, $reasons, $lab_address"
 
-#: bika/lims/content/bikasetup.py:642
+#: bika/lims/content/bikasetup.py:643
 msgid "Set the text for the body of the email to be sent, , if option 'Email notification on Sample 'invalidation' enabled,  to the Sample's client contact. You can use reserved keywords: $sample_id, $sample_link, $retest_id, $retest_link, $lab_address"
 msgstr "Nastavte text pro tělo e-mailu, který má být odeslán, pokud je povolena možnost „Oznámení e-mailem o neplatnosti vzorku“, kontaktu klienta s ukázkou. Můžete použít vyhrazená klíčová slova: $sample_id, $sample_link, $retest_id, $retest_link, $lab_address"
 
@@ -5344,7 +5365,7 @@ msgstr "Zkrácený popis metody"
 msgid "Short title"
 msgstr "Krátký název"
 
-#: bika/lims/content/analysisrequest.py:948
+#: bika/lims/content/analysisrequest.py:954
 msgid "Should the analyses be excluded from the invoice?"
 msgstr "Měly by být analýzy z faktury vyloučeny?"
 
@@ -5382,9 +5403,7 @@ msgstr "Popis webu"
 msgid "Site Title"
 msgstr "Název webu"
 
-#: bika/lims/browser/client/views/attachments.py:53
-#: bika/lims/browser/reports/__init__.py:130
-#: bika/lims/browser/reports/productivity_analysesattachments.py:88
+#: senaite/core/browser/viewlets/templates/attachments.pt:67
 msgid "Size"
 msgstr "Velikost"
 
@@ -5392,17 +5411,17 @@ msgstr "Velikost"
 msgid "Small Sticker"
 msgstr "Malý štítek"
 
-#: bika/lims/content/bikasetup.py:684
+#: bika/lims/content/bikasetup.py:685
 msgid "Small sticker"
 msgstr "Malý štítek"
 
-#: bika/lims/browser/worksheet/views/results.py:187
+#: bika/lims/browser/worksheet/views/results.py:190
 msgid "Some analyses use out-of-date or uncalibrated instruments. Results edition not allowed"
 msgstr "Některé analýzy používají zastaralé nebo nekalibrované přístroje. Vydání výsledků není umožněno"
 
 #: bika/lims/content/abstractbaseanalysis.py:81
 #: bika/lims/content/analysiscategory.py:79
-#: bika/lims/content/subgroup.py:33
+#: bika/lims/content/subgroup.py:38
 msgid "Sort Key"
 msgstr "Třídit klíč"
 
@@ -5410,8 +5429,8 @@ msgstr "Třídit klíč"
 msgid "Source"
 msgstr "Zdroj"
 
-#: bika/lims/browser/analyses/view.py:156
-#: bika/lims/browser/worksheet/views/analyses.py:102
+#: bika/lims/browser/analyses/view.py:159
+#: bika/lims/browser/worksheet/views/analyses.py:103
 msgid "Specification"
 msgstr "Specifikace"
 
@@ -5427,7 +5446,7 @@ msgstr "Rozsahy specifikací se od přiřazení změnily"
 msgid "Specifications"
 msgstr "Specifikace"
 
-#: bika/lims/content/worksheettemplate.py:67
+#: bika/lims/content/worksheettemplate.py:66
 msgid "Specify the size of the Worksheet, e.g. corresponding to a specific instrument's tray size. Then select an Analysis 'type' per Worksheet position.Where QC samples are selected, also select which Reference Sample should be used.If a duplicate analysis is selected, indicate which sample position it should be a duplicate of"
 msgstr "Určete velikost pracovního listu, např. odpovídající velikosti zásobníku pro konkrétní přístroj. Poté vyberte „typ“ analýzy pro každou pozici pracovního listu. Pokud jsou vybrány vzorky QC, také vyberte, který referenční vzorek by měl být použit. Pokud je vybrána duplicitní analýza, uveďte, která pozice vzorku by měla být duplikátem"
 
@@ -5443,13 +5462,12 @@ msgstr "Datum zahájení"
 msgid "Start date must be before End Date"
 msgstr "Datum zahájení musí být před datem ukončení"
 
-#: bika/lims/browser/batch/batchbook.py:87
-#: bika/lims/browser/batchfolder.py:84
-#: bika/lims/browser/referencesample.py:188
+#: senaite/core/browser/samples/view.py:222
+#: senaite/core/z3cform/widgets/address.py:223
 msgid "State"
 msgstr "Stav"
 
-#: bika/lims/browser/analyses/view.py:141
+#: bika/lims/browser/analyses/view.py:144
 #: bika/lims/browser/reports/productivity_analysesperclient.py:146
 #: bika/lims/browser/reports/productivity_analysespersampletype.py:87
 msgid "Status"
@@ -5461,7 +5479,7 @@ msgstr "Stav"
 msgid "Sticker"
 msgstr "Štítek"
 
-#: bika/lims/content/bikasetup.py:673
+#: bika/lims/content/bikasetup.py:674
 msgid "Sticker templates"
 msgstr "Šablony nálepek"
 
@@ -5471,9 +5489,7 @@ msgstr "Šablony nálepek"
 msgid "Stickers preview"
 msgstr "Náhled štítků"
 
-#: bika/lims/content/analysisrequest.py:756
-#: bika/lims/controlpanel/bika_storagelocations.py:72
-#: bika/lims/profiles/default/types/StorageLocation.xml
+#: senaite/core/browser/samples/view.py:185
 msgid "Storage Location"
 msgstr "Umístění úložiště"
 
@@ -5503,18 +5519,18 @@ msgstr "Podskupina"
 msgid "Sub-groups"
 msgstr "Podskupiny"
 
-#: bika/lims/content/subgroup.py:34
+#: bika/lims/content/subgroup.py:39
 msgid "Subgroups are sorted with this key in group views"
 msgstr "Podskupiny jsou tříděny podle tohoto klíče do skupinových pohledů"
 
 #: bika/lims/browser/publish/templates/email.pt:110
-#: bika/lims/browser/templates/analysisreport_info.pt:164
+#: bika/lims/browser/templates/analysisreport_info.pt:165
 msgid "Subject"
 msgstr "Subjekt"
 
-#: bika/lims/browser/batch/batchbook.py:253
 #: senaite/core/exportimport/import.pt:118
 #: senaite/core/profiles/default/workflows/senaite_analysis_workflow/definition.xml
+#: senaite/core/profiles/default/workflows/senaite_duplicateanalysis_workflow/definition.xml
 msgid "Submit"
 msgstr "Odeslat"
 
@@ -5522,15 +5538,15 @@ msgstr "Odeslat"
 msgid "Submit a valid Open XML (.XLSX) file containing setup records to continue."
 msgstr "Chcete-li pokračovat, odešlete platný soubor Open XML (.XLSX) obsahující záznamy o nastavení."
 
-#: bika/lims/browser/analyses/view.py:1178
+#: bika/lims/browser/analyses/view.py:1258
 msgid "Submitted and verified by the same user: {}"
 msgstr "Odesláno a ověřeno stejným uživatelem: {}"
 
-#: bika/lims/browser/analyses/view.py:174
+#: bika/lims/browser/analyses/view.py:177
 msgid "Submitter"
 msgstr "Zadavatel"
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:605
+#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:611
 #: bika/lims/browser/analysisrequest/templates/invoice_content.pt:198
 #: bika/lims/browser/reports/templates/productivity_analysesperdepartment.pt:122
 msgid "Subtotal"
@@ -5549,7 +5565,7 @@ msgid "Supervisor of the Lab"
 msgstr "Vedoucí laboratoře"
 
 #: bika/lims/browser/referencesample.py:401
-#: bika/lims/browser/worksheet/views/analyses.py:528
+#: bika/lims/browser/worksheet/views/analyses.py:533
 #: bika/lims/content/instrument.py:114
 msgid "Supplier"
 msgstr "Dodavatel"
@@ -5575,7 +5591,6 @@ msgstr "Příjmení"
 msgid "Switch to Frontpage"
 msgstr "Přepnout na Úvodní stranu"
 
-#: bika/lims/browser/templates/senaite-frontpage.pt:6
 #: senaite/core/browser/frontpage/templates/frontpage.pt:6
 msgid "Switch to dashboard"
 msgstr "Přepnout na ovládací panel"
@@ -5588,7 +5603,7 @@ msgstr "Přepnout na úvodní stránku"
 msgid "System Dashboard"
 msgstr "Systémový panel"
 
-#: bika/lims/content/abstractbaseanalysis.py:880
+#: bika/lims/content/abstractbaseanalysis.py:887
 msgid "System default"
 msgstr "Systémově výchozí"
 
@@ -5614,9 +5629,8 @@ msgstr "Daně"
 msgid "Technical description and instructions intended for analysts"
 msgstr "Technický popis a pokyny určené analytikům"
 
-#: bika/lims/browser/templates/analysisreport_info.pt:33
-#: bika/lims/browser/templates/stickers_preview.pt:179
-#: bika/lims/browser/worksheet/views/folder.py:100
+#: senaite/core/browser/samples/view.py:212
+#: senaite/core/browser/viewlets/templates/resultsinterpretation.pt:69
 msgid "Template"
 msgstr "Šablona"
 
@@ -5629,7 +5643,7 @@ msgid "Test Result"
 msgstr "Výsledek testu"
 
 #: bika/lims/browser/publish/templates/email.pt:116
-#: bika/lims/browser/templates/analysisreport_info.pt:173
+#: bika/lims/browser/templates/analysisreport_info.pt:174
 #: bika/lims/content/analysisservice.py:258
 msgid "Text"
 msgstr "Text"
@@ -5691,23 +5705,27 @@ msgstr "Přiřazený klient této žádosti"
 msgid "The attachments linked to samples and analyses"
 msgstr "Přílohy spojené se vzorky a analýzami"
 
+#: bika/lims/browser/batch/batchbook.py:38
+msgid "The batch book allows to introduce analysis results for all samples in this batch. Please note that submitting the results for verification is only possible within samples or worksheets, because additional information like e.g. the instrument or the method need to be set additionally."
+msgstr ""
+
 #: bika/lims/content/abstractbaseanalysis.py:392
 msgid "The category the analysis service belongs to"
 msgstr "Kategorie, do které analytická služba patří"
 
-#: bika/lims/content/analysisrequest.py:812
+#: bika/lims/content/analysisrequest.py:818
 msgid "The client side identifier of the sample"
 msgstr "Identifikátor vzorku klienta"
 
-#: bika/lims/content/analysisrequest.py:779
+#: bika/lims/content/analysisrequest.py:784
 msgid "The client side order number for this request"
 msgstr "Číslo objednávky na straně klienta pro tento požadavek"
 
-#: bika/lims/content/analysisrequest.py:796
+#: bika/lims/content/analysisrequest.py:801
 msgid "The client side reference for this request"
 msgstr "Reference na straně klienta pro tento požadavek"
 
-#: bika/lims/content/analysisrequest.py:854
+#: bika/lims/content/analysisrequest.py:860
 msgid "The condition of the sample"
 msgstr "Stav vzorku"
 
@@ -5719,11 +5737,11 @@ msgstr "Kontakty používané v kopii pro e-mailová oznámení"
 msgid "The date the instrument was installed"
 msgstr "Datum instalace přístroje"
 
-#: bika/lims/content/analysisrequest.py:594
+#: bika/lims/content/analysisrequest.py:599
 msgid "The date when the sample was preserved"
 msgstr "Datum, kdy byl vzorek uchován"
 
-#: bika/lims/content/analysisrequest.py:1039
+#: bika/lims/content/analysisrequest.py:1045
 msgid "The date when the sample was received"
 msgstr "Datum, kdy byl vzorek přijat"
 
@@ -5747,11 +5765,11 @@ msgstr "Výchozí typ kontejneru. Nové oddělky vzorků jsou automaticky přiř
 msgid "The default timezone setting of the portal. Users will be able to set their own timezone, if available timezones are defined in the date and time settings."
 msgstr "Výchozí nastavení časového pásma portálu. Uživatelé si budou moci nastavit vlastní časové pásmo, pokud jsou v nastavení data a času definována dostupná časová pásma."
 
-#: bika/lims/content/bikasetup.py:240
+#: bika/lims/content/bikasetup.py:241
 msgid "The discount percentage entered here, is applied to the prices for clients flagged as 'members', normally co-operative members or associates deserving of this discount"
 msgstr "Zde zadané procento slevy se vztahuje na ceny pro klienty označené jako „členové“, běžně spolupracující členové nebo spolupracovníci, kteří si tuto slevu zaslouží"
 
-#: bika/lims/content/analysisrequest.py:891
+#: bika/lims/content/analysisrequest.py:897
 msgid "The environmental condition during sampling"
 msgstr "Stav prostředí během odběru vzorků"
 
@@ -5762,10 +5780,6 @@ msgstr "Z tohoto vzorku byly vytvořeny následující oddělky:"
 #: senaite/core/browser/samples/templates/dispatch_samples.pt:47
 msgid "The following sample(s) will be dispatched"
 msgstr "Budou odeslány tyto vzorky (odeslán tento vzorek)"
-
-#: senaite/impress/controlpanel.py:68
-msgid "The footer text will be rendered on every PDF page and may contain arbitrary HTML"
-msgstr ""
 
 #: bika/lims/content/samplepoint.py:76
 msgid "The height or depth at which the sample has to be taken"
@@ -5797,7 +5811,7 @@ msgstr "Laboratorní oddělení"
 msgid "The laboratory departments"
 msgstr "Laboratorní oddělení"
 
-#: bika/lims/content/bikasetup.py:458
+#: bika/lims/content/bikasetup.py:459
 msgid "The landing page is shown for non-authenticated users if the Dashboard is not selected as the default front page. If no landing page is selected, the default frontpage is displayed."
 msgstr "Pokud není jako výchozí úvodní stránka vybrán panel Dashboard, zobrazí se tato úvodní stránka neautentifikovaným uživatelům. Pokud není vybrána žádná vstupní stránka, zobrazí se výchozí titulní stránka."
 
@@ -5825,11 +5839,11 @@ msgstr "Počet požadovaných analýz na analytickou službu"
 msgid "The number of analyses requested per sample type"
 msgstr "Počet požadovaných analýz ku typu vzorku"
 
-#: bika/lims/content/bikasetup.py:571
+#: bika/lims/content/bikasetup.py:572
 msgid "The number of days before a sample expires and cannot be analysed any more. This setting can be overwritten per individual sample type in the sample types setup"
 msgstr "Počet dní před vypršením platnosti vzorku a již nelze analyzovat. Toto nastavení lze přepsat na jednotlivé typy vzorků v nastavení typů vzorků"
 
-#: bika/lims/content/bikasetup.py:161
+#: bika/lims/content/bikasetup.py:162
 msgid "The number of minutes before a user is automatically logged off. 0 disables automatic log-off"
 msgstr "Počet minut před automatickým odhlášením uživatele. 0 deaktivuje automatické odhlášení"
 
@@ -5858,7 +5872,7 @@ msgstr "Osoba u dodavatele, která úlohu provedla"
 msgid "The person at the supplier who prepared the certificate"
 msgstr "Osoba u dodavatele, která připravila certifikát"
 
-#: bika/lims/content/analysisrequest.py:613
+#: bika/lims/content/analysisrequest.py:618
 msgid "The person who preserved the sample"
 msgstr "Osoba, která uchovala vzorek"
 
@@ -5998,7 +6012,7 @@ msgstr "Toto je sekundární vzorek"
 msgid "This is a detached partition from Sample"
 msgstr "Toto je oddělený oddělek od vzorku"
 
-#: bika/lims/content/bikasetup.py:556
+#: bika/lims/content/bikasetup.py:557
 msgid "This is the default maximum time allowed for performing analyses.  It is only used for analyses where the analysis service does not specify a turnaround time. Only laboratory workdays are considered."
 msgstr "Toto je výchozí maximální čas povolený pro provádění analýz. Používá se pouze pro analýzy, kde analytická služba nestanoví časový cyklus. Zohledňují se pouze laboratorní pracovní dny."
 
@@ -6014,11 +6028,11 @@ msgstr "Tato konfigurace webu je zastaralá a je třeba ji aktualizovat:"
 msgid "This value is reported at the bottom of all published results"
 msgstr "Tato hodnota je uvedena v dolní části všech publikovaných výsledků"
 
-#: bika/lims/browser/worksheet/tools.py:77
+#: bika/lims/browser/worksheet/tools.py:82
 msgid "This worksheet has been created to replace the rejected worksheet at ${ws_id}"
 msgstr "Tento list byl vytvořen, aby nahradil odmítnutý list na ${ws_id}"
 
-#: bika/lims/browser/worksheet/tools.py:70
+#: bika/lims/browser/worksheet/tools.py:75
 msgid "This worksheet has been rejected.  The replacement worksheet is ${ws_id}"
 msgstr "Tento pracovní list byl odmítnut. Náhradní pracovní list je ${ws_id}"
 
@@ -6034,9 +6048,9 @@ msgstr "Čas"
 msgid "Tip. Attached documents will not be loaded unless they are present in the instance."
 msgstr "Tip: Připojené dokumenty nebudou načteny, pokud nejsou v instanci."
 
-#: bika/lims/browser/batchfolder.py:59
-#: bika/lims/browser/client/views/analysisprofiles.py:54
-#: bika/lims/browser/client/views/artemplates.py:53
+#: senaite/core/behaviors/clientshareable.py:84
+#: senaite/core/browser/controlpanel/interpretationtemplates.py:55
+#: senaite/core/browser/widgets/referencewidget.py:53
 msgid "Title"
 msgstr "Název"
 
@@ -6062,11 +6076,11 @@ msgstr "Název webu"
 msgid "To"
 msgstr "do"
 
-#: senaite/core/browser/samples/view.py:261
+#: senaite/core/browser/samples/view.py:265
 msgid "To Be Preserved"
 msgstr "K zachování"
 
-#: senaite/core/browser/samples/view.py:252
+#: senaite/core/browser/samples/view.py:256
 msgid "To Be Sampled"
 msgstr "K odběru vzorků"
 
@@ -6088,9 +6102,9 @@ msgstr "K tisku"
 msgid "To be sampled"
 msgstr "K odběru vzorků"
 
-#: bika/lims/browser/worksheet/views/folder.py:142
 #: senaite/core/browser/dashboard/dashboard.py:438
-#: senaite/core/browser/samples/view.py:303
+#: senaite/core/browser/samples/view.py:307
+#: senaite/core/profiles/default/workflows/senaite_analysis_workflow/definition.xml
 msgid "To be verified"
 msgstr "Bude ověřeno"
 
@@ -6098,7 +6112,7 @@ msgstr "Bude ověřeno"
 msgid "To test the calculation, enter values here for all calculation parameters.  This includes Interim fields defined above, as well as any services that this calculation depends on to calculate results."
 msgstr "Chcete-li provést výpočet, zadejte zde hodnoty pro všechny parametry výpočtu. To zahrnuje výše uvedená dočasná pole, jakož i veškeré služby, na kterých závisí tento výpočet výsledků."
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:633
+#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:639
 #: bika/lims/browser/analysisrequest/templates/invoice_content.pt:226
 #: bika/lims/browser/reports/productivity_analysesattachments.py:132
 msgid "Total"
@@ -6145,15 +6159,18 @@ msgstr "Úterý"
 msgid "Turnaround time (h)"
 msgstr "Čas cyklu (h)"
 
-#: bika/lims/browser/reports/templates/administration_usershistory.pt:75
-#: bika/lims/controlpanel/bika_instruments.py:75
 #: senaite/core/browser/viewlets/templates/attachments.pt:66
+#: senaite/core/browser/viewlets/templates/worksheet_attachments.pt:39
 msgid "Type"
 msgstr "Typ"
 
 #: bika/lims/content/abstractbaseanalysis.py:577
 msgid "Type of control to be displayed on result entry when predefined results are set"
 msgstr "Typ ovládacího prvku, který se má zobrazit při zadávání výsledků, když jsou nastaveny předdefinované výsledky"
+
+#: bika/lims/browser/fields/interimfieldsfield.py:67
+msgid "Type of control to be displayed on value entry when choices are set"
+msgstr ""
 
 #: bika/lims/content/multifile.py:74
 msgid "Type of document (e.g. user manual, instrument specifications, image, ...)"
@@ -6163,11 +6180,15 @@ msgstr "Typ dokumentu (např. Uživatelská příručka, specifikace přístroje
 msgid "Type of location"
 msgstr "Typ místa"
 
+#: senaite/core/content/samplecontainer.py:49
+msgid "Type of the container"
+msgstr ""
+
 #: senaite/core/browser/controlpanel/templates/setupview.pt:27
 msgid "Type to filter ..."
 msgstr "Zadejte filtrování..."
 
-#: bika/lims/browser/worksheet/views/printview.py:148
+#: bika/lims/browser/worksheet/views/printview.py:149
 msgid "Unable to load the template"
 msgstr "Šablonu nelze načíst"
 
@@ -6201,12 +6222,12 @@ msgid "Unique Department ID that identifies the department"
 msgstr "Jedinečné ID oddělení, které identifikuje oddělení"
 
 #: bika/lims/browser/analysisrequest/manage_analyses.py:78
-#: bika/lims/browser/fields/interimfieldsfield.py:47
+#: bika/lims/browser/fields/interimfieldsfield.py:61
 #: bika/lims/browser/templates/analysisservice_info.pt:88
 msgid "Unit"
 msgstr "Jednotka"
 
-#: bika/lims/validators.py:1188
+#: bika/lims/validators.py:1201
 msgid "Unknown IBAN country %s"
 msgstr "Neznámý IBAN země %s"
 
@@ -6236,7 +6257,7 @@ msgstr "Nerozpoznaný formát souboru ${fileformat}"
 msgid "Unrecognized file format ${format}"
 msgstr "Nerozpoznaný formát souboru ${format}"
 
-#: senaite/core/browser/samples/view.py:397
+#: senaite/core/browser/samples/view.py:401
 msgid "Unsassigned"
 msgstr "Nepřiřazeno"
 
@@ -6260,9 +6281,13 @@ msgstr "Horní detekční limit (UDL)"
 msgid "Use Analysis Profile Price"
 msgstr "Použít cenu analýzy profilu"
 
-#: bika/lims/content/bikasetup.py:438
+#: bika/lims/content/bikasetup.py:439
 msgid "Use Dashboard as default front page"
 msgstr "Jako výchozí vstupní stránku použijte Ovládací panel"
+
+#: senaite/core/browser/viewlets/templates/resultsinterpretation.pt:84
+msgid "Use Template"
+msgstr ""
 
 #: bika/lims/content/analysisservice.py:89
 msgid "Use the Default Calculation of Method"
@@ -6304,11 +6329,11 @@ msgstr "Uživatelské jméno"
 msgid "Users history"
 msgstr "Historie uživatelů"
 
-#: bika/lims/content/bikasetup.py:286
+#: bika/lims/content/bikasetup.py:287
 msgid "Using too few data points does not make statistical sense. Set an acceptable minimum number of results before QC statistics will be calculated and plotted"
 msgstr "Použití příliš malého počtu datových dat nedává statistický smysl. Před přijetím a vynesením statistik QC nastavte přijatelný minimální počet výsledků"
 
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:619
+#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:625
 #: bika/lims/browser/analysisrequest/templates/invoice_content.pt:167
 #: bika/lims/content/analysisprofile.py:134
 msgid "VAT"
@@ -6316,7 +6341,7 @@ msgstr "DPH"
 
 #: bika/lims/content/abstractbaseanalysis.py:433
 #: bika/lims/content/analysisprofile.py:122
-#: bika/lims/content/bikasetup.py:251
+#: bika/lims/content/bikasetup.py:252
 msgid "VAT %"
 msgstr "DPH %"
 
@@ -6328,7 +6353,7 @@ msgstr "výše DPH"
 msgid "VAT number"
 msgstr "DIČ číslo"
 
-#: bika/lims/browser/analyses/view.py:201
+#: bika/lims/browser/analyses/view.py:204
 msgid "Valid"
 msgstr "Ověřený"
 
@@ -6370,67 +6395,67 @@ msgstr "Ověření se nezdařilo: '${title}': duplicitní název"
 msgid "Validation failed: '${value}' is not unique"
 msgstr "Ověření se nezdařilo: '${value}' není unikátní"
 
-#: bika/lims/validators.py:1517
+#: bika/lims/validators.py:1530
 msgid "Validation failed: '{}' is not numeric"
 msgstr ""
 
-#: bika/lims/validators.py:627
+#: bika/lims/validators.py:635
 msgid "Validation failed: Bearing must be E/W"
 msgstr "Ověření se nezdařilo: Orientace musí být Východ / Západ"
 
-#: bika/lims/validators.py:608
+#: bika/lims/validators.py:616
 msgid "Validation failed: Bearing must be N/S"
 msgstr "Ověření se nezdařilo: Orientace musí být Sever / Jih"
 
-#: bika/lims/validators.py:1406
+#: bika/lims/validators.py:1419
 msgid "Validation failed: Could not import module '%s'"
 msgstr "Ověření se nezdařilo: Nelze importovat modul '%s'"
 
-#: bika/lims/validators.py:964
+#: bika/lims/validators.py:977
 msgid "Validation failed: Error percentage must be between 0 and 100"
 msgstr "Ověření se nezdařilo: Procento chyb musí být mezi 0 a 100"
 
-#: bika/lims/validators.py:980
+#: bika/lims/validators.py:993
 msgid "Validation failed: Error value must be 0 or greater"
 msgstr "Ověření se nezdařilo: Hodnota chyby musí být 0 nebo větší"
 
-#: bika/lims/validators.py:957
+#: bika/lims/validators.py:970
 msgid "Validation failed: Error values must be numeric"
 msgstr "Ověření se nezdařilo: Hodnoty chyb musí být číselné"
 
-#: bika/lims/validators.py:507
+#: bika/lims/validators.py:515
 msgid "Validation failed: Keyword '${keyword}' is invalid"
 msgstr "Ověření se nezdařilo: Klíčové slovo '${keyword}' je neplatné"
 
-#: bika/lims/validators.py:972
+#: bika/lims/validators.py:985
 msgid "Validation failed: Max values must be greater than Min values"
 msgstr "Ověření se nezdařilo: Maximální hodnoty musí být větší než Minimální"
 
-#: bika/lims/validators.py:942
+#: bika/lims/validators.py:955
 msgid "Validation failed: Max values must be numeric"
 msgstr "Ověření se nezdařilo: Maximální hodnoty musí být číselné"
 
-#: bika/lims/validators.py:935
+#: bika/lims/validators.py:948
 msgid "Validation failed: Min values must be numeric"
 msgstr "Ověření se nezdařilo: Min. hodnoty musí být číselné"
 
-#: bika/lims/validators.py:1503
+#: bika/lims/validators.py:1516
 msgid "Validation failed: Please set a default value when defining a required checkbox condition."
 msgstr ""
 
-#: bika/lims/validators.py:1497
+#: bika/lims/validators.py:1510
 msgid "Validation failed: Please use the character '|' to separate the available options in 'Choices' subfield"
 msgstr ""
 
-#: bika/lims/validators.py:773
+#: bika/lims/validators.py:781
 msgid "Validation failed: PrePreserved containers must have a preservation selected."
 msgstr "Ověření se nezdařilo: U předem uchovaných kontejnerů musí být vybráno uchování."
 
-#: bika/lims/validators.py:731
+#: bika/lims/validators.py:739
 msgid "Validation failed: The selection requires the following categories to be selected: ${categories}"
 msgstr "Ověření se nezdařilo: Výběr vyžaduje, aby byly vybrány následující kategorie: ${categories}"
 
-#: bika/lims/validators.py:1012
+#: bika/lims/validators.py:1025
 msgid "Validation failed: Values must be numbers"
 msgstr "Ověření se nezdařilo: Hodnoty musí být čísla"
 
@@ -6438,31 +6463,31 @@ msgstr "Ověření se nezdařilo: Hodnoty musí být čísla"
 msgid "Validation failed: column title '${title}' must have keyword '${keyword}'"
 msgstr "Ověření se nezdařilo: název sloupce '${title}' musí mít klíčové slovo '${keyword}'"
 
-#: bika/lims/validators.py:618
+#: bika/lims/validators.py:626
 msgid "Validation failed: degrees is 180; minutes must be zero"
 msgstr "Ověření selhalo: stupně jsou 180; minuty musí být nula"
 
-#: bika/lims/validators.py:623
+#: bika/lims/validators.py:631
 msgid "Validation failed: degrees is 180; seconds must be zero"
 msgstr "Ověření selhalo: stupně jsou 180; sekundy musí být nula"
 
-#: bika/lims/validators.py:599
+#: bika/lims/validators.py:607
 msgid "Validation failed: degrees is 90; minutes must be zero"
 msgstr "Ověření se nezdařilo: stupňů je 90; minuty musí být nula"
 
-#: bika/lims/validators.py:604
+#: bika/lims/validators.py:612
 msgid "Validation failed: degrees is 90; seconds must be zero"
 msgstr "Ověření se nezdařilo: stupňů je 90; sekund musí být nula"
 
-#: bika/lims/validators.py:613
+#: bika/lims/validators.py:621
 msgid "Validation failed: degrees must be 0 - 180"
 msgstr "Ověření se nezdařilo: stupně musí být 0 - 180"
 
-#: bika/lims/validators.py:594
+#: bika/lims/validators.py:602
 msgid "Validation failed: degrees must be 0 - 90"
 msgstr "Ověření se nezdařilo: stupně musí být 0 - 90"
 
-#: bika/lims/validators.py:567
+#: bika/lims/validators.py:575
 msgid "Validation failed: degrees must be numeric"
 msgstr "Ověření se nezdařilo: stupně musí být číselné"
 
@@ -6479,27 +6504,27 @@ msgstr "Ověření se nezdařilo: klíčové slovo obsahuje neplatné znaky"
 msgid "Validation failed: keyword is required"
 msgstr "Ověření se nezdařilo: je vyžadováno klíčové slovo"
 
-#: bika/lims/validators.py:583
+#: bika/lims/validators.py:591
 msgid "Validation failed: minutes must be 0 - 59"
 msgstr "Ověření se nezdařilo: minuty musí být 0 - 59"
 
-#: bika/lims/validators.py:573
+#: bika/lims/validators.py:581
 msgid "Validation failed: minutes must be numeric"
 msgstr "Ověření se nezdařilo: minuty musí být číselné"
 
-#: bika/lims/validators.py:1098
+#: bika/lims/validators.py:1111
 msgid "Validation failed: percent values must be between 0 and 100"
 msgstr "Ověření se nezdařilo: procentní hodnoty musí být mezi 0 a 100"
 
-#: bika/lims/validators.py:1094
+#: bika/lims/validators.py:1107
 msgid "Validation failed: percent values must be numbers"
 msgstr "Ověření se nezdařilo: procentuální hodnoty musí být čísla"
 
-#: bika/lims/validators.py:587
+#: bika/lims/validators.py:595
 msgid "Validation failed: seconds must be 0 - 59"
 msgstr "Ověření selhalo: sekundy musí být 0 - 59"
 
-#: bika/lims/validators.py:579
+#: bika/lims/validators.py:587
 msgid "Validation failed: seconds must be numeric"
 msgstr "Ověření se nezdařilo: sekundy musí být číselné"
 
@@ -6508,23 +6533,23 @@ msgstr "Ověření se nezdařilo: sekundy musí být číselné"
 msgid "Validation failed: title is required"
 msgstr "Ověření se nezdařilo: název je vyžadován"
 
-#: bika/lims/validators.py:1508
+#: bika/lims/validators.py:1521
 msgid "Validation failed: value for Choices subfield is only required for when the control type of choice is 'Select'"
 msgstr ""
 
-#: bika/lims/validators.py:1490
+#: bika/lims/validators.py:1503
 msgid "Validation failed: value for Choices subfield is required when the control type of choice is 'Select'"
 msgstr ""
 
-#: bika/lims/validators.py:1324
+#: bika/lims/validators.py:1337
 msgid "Validation failed: value must be between 0 and 1000"
 msgstr "Ověření se nezdařilo: hodnota musí být mezi 0 a 1000"
 
-#: bika/lims/validators.py:1320
+#: bika/lims/validators.py:1333
 msgid "Validation failed: value must be float"
 msgstr "Ověření se nezdařilo: hodnota musí být plovoucí"
 
-#: bika/lims/validators.py:1039
+#: bika/lims/validators.py:1052
 msgid "Validation for '{}' failed"
 msgstr "Ověření pro '{}' se nezdařilo"
 
@@ -6541,19 +6566,19 @@ msgstr "Ověřování"
 msgid "Validator"
 msgstr "Ověřovatel"
 
-#: bika/lims/browser/worksheet/templates/results.pt:167
+#: bika/lims/browser/worksheet/templates/results.pt:206
 #: bika/lims/content/calculation.py:137
 #: bika/lims/content/instrument.py:257
 msgid "Value"
 msgstr "Hodnota"
 
-#: bika/lims/content/abstractanalysis.py:148
+#: bika/lims/content/abstractanalysis.py:150
 msgid "Values can be entered here which will override the defaults specified in the Calculation Interim Fields."
 msgstr "Zde lze zadat hodnoty, které přepíší výchozí hodnoty zadané v mezipolohách výpočtu."
 
-#: bika/lims/browser/worksheet/views/folder.py:152
 #: senaite/core/browser/dashboard/dashboard.py:445
-#: senaite/core/browser/samples/view.py:313
+#: senaite/core/browser/samples/view.py:317
+#: senaite/core/profiles/default/workflows/senaite_analysis_workflow/definition.xml
 msgid "Verified"
 msgstr "Ověřeno"
 
@@ -6633,7 +6658,7 @@ msgstr "Welcome to"
 msgid "Welcome to SENAITE"
 msgstr "Vítejte v SENAITE"
 
-#: bika/lims/content/bikasetup.py:344
+#: bika/lims/content/bikasetup.py:345
 msgid "When enabled, the sample is automatically verified as soon as all results are verified. Otherwise, users with enough privileges have to manually verify the sample afterwards. Default: enabled"
 msgstr "Je-li tato funkce povolena, vzorek se automaticky ověří, jakmile jsou ověřeny všechny výsledky. V opačném případě musí uživatelé s dostatečnými právy vzorek následně ověřit ručně. Výchozí nastavení: povoleno"
 
@@ -6645,7 +6670,7 @@ msgstr "Když je nastaveno, systém použije cenovou nabídku analytického prof
 msgid "When the results of duplicate analyses on worksheets, carried out on the same sample, differ with more than this percentage, an alert is raised"
 msgstr "Pokud se výsledky duplicitních analýz na pracovních listech provedených na stejném vzorku liší více, než tímto procentem, vznikne varování"
 
-#: bika/lims/validators.py:521
+#: bika/lims/validators.py:529
 msgid "Wildcards for interims are not allowed: ${wildcards}"
 msgstr "Zástupné znaky pro interimy nejsou povoleny: ${wildcards}"
 
@@ -6674,7 +6699,7 @@ msgstr "Stav pracovního postupu"
 msgid "Worksheet"
 msgstr "Pracovní list"
 
-#: bika/lims/content/worksheettemplate.py:66
+#: bika/lims/content/worksheettemplate.py:65
 msgid "Worksheet Layout"
 msgstr "Rozložení pracovního listu"
 
@@ -6687,13 +6712,11 @@ msgstr "Šablona pracovního listu"
 msgid "Worksheet Templates"
 msgstr "Šablony pracovního listu"
 
-#: bika/lims/browser/worksheet/views/folder.py:55
-#: bika/lims/profiles/default/types/WorksheetFolder.xml
 #: senaite/core/browser/dashboard/dashboard.py:529
 msgid "Worksheets"
 msgstr "Pracovní listy"
 
-#: bika/lims/validators.py:1195
+#: bika/lims/validators.py:1208
 msgid "Wrong IBAN length by %s: %sshort by %i"
 msgstr "Špatná délka IBAN podle %s : %s zkratka po %i"
 
@@ -6701,9 +6724,7 @@ msgstr "Špatná délka IBAN podle %s : %s zkratka po %i"
 msgid "Yearly"
 msgstr "Ročně"
 
-#: bika/lims/browser/clientfolder.py:180
-#: bika/lims/browser/header_table.py:160
-#: bika/lims/content/abstractbaseanalysis.py:879
+#: senaite/core/browser/controlpanel/samplecontainers.py:108
 msgid "Yes"
 msgstr "Ano"
 
@@ -6715,7 +6736,7 @@ msgstr "Můžete přidat další stránku SENAITE:"
 msgid "You can use the browse button to select and upload a new attachment."
 msgstr "Pomocí tlačítka Procházet můžete vybrat a nahrát novou přílohu."
 
-#: bika/lims/browser/worksheet/tools.py:37
+#: bika/lims/browser/worksheet/tools.py:42
 msgid "You do not have sufficient privileges to view the worksheet ${worksheet_title}."
 msgstr "Nemáte dostatečná oprávnění k zobrazení pracovního listu ${worksheet_title}."
 
@@ -6773,7 +6794,7 @@ msgstr "denně"
 #. ${b} ${d}, ${Y} ${I}:${M} ${p}
 #: ./TranslationServiceTool.py
 msgid "date_format_long"
-msgstr "date_format_long"
+msgstr ""
 
 #. Default: "${Y}-${m}-${d}"
 #. The variables used here are the same as used in the strftime formating.
@@ -6784,14 +6805,13 @@ msgstr "date_format_long"
 #. ${b} ${d}, ${Y}
 #: ./TranslationServiceTool.py
 msgid "date_format_short"
-msgstr "date_format_short"
+msgstr ""
 
 #. Date format used with the datepicker jqueryui plugin.
 #. Please only use 'dd', 'mm', 'yy', '-', '/', '.' in this string.
-#. Default: "mm/dd/yy"
-#, fuzzy
+#. Default: "yy-mm-dd"
 msgid "date_format_short_datepicker"
-msgstr "date_format_short_datepicker"
+msgstr ""
 
 #: bika/lims/controlpanel/bika_analysisservices.py:320
 msgid "days"
@@ -6910,7 +6930,7 @@ msgstr "this_sample_has_been_dispatched_by"
 #. ${I}:${M} ${p}
 #: ./TranslationServiceTool.py
 msgid "time_format"
-msgstr "time_format"
+msgstr ""
 
 #. Default: "This site was built using the Plone Open Source CMS/WCM."
 #: senaite/core/browser/viewlets/templates/colophon.pt:12
@@ -6923,9 +6943,7 @@ msgid "title_copyright"
 msgstr "title_copyright"
 
 #. Default: "Required"
-#: bika/lims/browser/analysisrequest/templates/ar_add2.pt:400
-#: bika/lims/browser/analysisrequest/templates/ar_add_manage.pt:80
-#: bika/lims/browser/templates/header_table.pt:57
+#: senaite/core/browser/modals/templates/set_analysis_conditions.pt:38
 msgid "title_required"
 msgstr "title_required"
 
@@ -6941,7 +6959,7 @@ msgstr "dokud"
 msgid "updated every 2 hours"
 msgstr "aktualizováno každé 2 hodiny"
 
-#: bika/lims/browser/analyses/view.py:1195
+#: bika/lims/browser/analyses/view.py:1275
 msgid "verification(s) pending"
 msgstr "čeká (se) na ověření"
 
@@ -6953,7 +6971,7 @@ msgstr "týdně"
 msgid "yearly"
 msgstr "ročně"
 
-#: bika/lims/browser/analyses/view.py:479
+#: bika/lims/browser/analyses/view.py:499
 msgid "{} (Out of date)"
 msgstr "{} (zastaralé)"
 

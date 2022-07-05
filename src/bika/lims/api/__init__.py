@@ -18,23 +18,23 @@
 # Copyright 2018-2021 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-import re
-from collections import OrderedDict
-from datetime import datetime
-from datetime import timedelta
-from itertools import groupby
-
-import six
-
 import Missing
+import re
+import six
 from AccessControl.PermissionRole import rolesForPermissionOn
 from Acquisition import aq_base
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from bika.lims import logger
 from bika.lims.interfaces import IClient
 from bika.lims.interfaces import IContact
 from bika.lims.interfaces import ILabContact
+from collections import OrderedDict
+from datetime import datetime
 from DateTime import DateTime
+from datetime import timedelta
 from DateTime.interfaces import DateTimeError
+from itertools import groupby
 from plone import api as ploneapi
 from plone.api.exc import InvalidParameterError
 from plone.app.layout.viewlets.content import ContentHistoryView
@@ -56,11 +56,14 @@ from Products.CMFPlone.utils import safe_unicode
 from Products.PlonePAS.tools.memberdata import MemberData
 from Products.ZCatalog.interfaces import ICatalogBrain
 from zope import globalrequest
+from zope.annotation.interfaces import IAttributeAnnotatable
 from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.component.interfaces import IFactory
 from zope.event import notify
+from zope.interface import directlyProvides
 from zope.lifecycleevent import ObjectCreatedEvent
+from zope.publisher.browser import TestRequest
 from zope.schema import getFieldsInOrder
 from zope.security.interfaces import Unauthorized
 
@@ -1024,6 +1027,14 @@ def get_request():
     return globalrequest.getRequest()
 
 
+def get_test_request():
+    """Get the TestRequest object
+    """
+    request = TestRequest()
+    directlyProvides(request, IAttributeAnnotatable)
+    return request
+
+
 def get_group(group_or_groupname):
     """Return Plone Group
 
@@ -1454,3 +1465,41 @@ def text_to_html(text, wrap="p", encoding="utf8"):
             tag=wrap, html=html)
     # return encoded html
     return html.encode(encoding)
+
+
+def to_utf8(string, default=_marker):
+    """Encode string to UTF8
+
+    :param string: String to be encoded to UTF8
+    :returns: UTF8 encoded string
+    """
+    if not isinstance(string, six.string_types):
+        if default is _marker:
+            fail("Expected string type, got '%s'" % type(string))
+        return default
+    return safe_unicode(string).encode("utf8")
+
+
+def is_temporary(obj):
+    """Returns whether the given object is temporary or not
+
+    :param obj: the object to evaluate
+    :returns: True if the object is temporary
+    """
+    if UID_RX.match(obj.id):
+        return True
+
+    parent = aq_parent(aq_inner(obj))
+    if not parent:
+        return True
+
+    if UID_RX.match(parent.id):
+        return True
+
+    if is_at_content(obj):
+        # Checks to see if we are created inside the portal_factory. We don't
+        # rely here on AT's isFactoryContained because the function is patched
+        meta_type = getattr(aq_base(parent), "meta_type", "")
+        return meta_type == "TempFolder"
+
+    return False

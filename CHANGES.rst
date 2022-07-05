@@ -29,6 +29,111 @@ Changelog
 2.1.0 (2022-01-05)
 ------------------
 
+
+2.3.0 (unreleased)
+------------------
+
+- #2043 Fix printed time does not get updated on re-Print
+- #2033 Fix blurry Barcode and QRCode in stickers
+- #2032 Fix add-on stickers not displayed in sample type admitted stickers
+- #2031 Make the "Other reasons" text area from rejection view wider
+- #2030 Fix Email address is not displayed in clients listing
+- #2029 Fix AttributeError in Manufacturer's Instruments view
+- #2025 Display full name of analyst and submitter in analyses listing
+- #2025 Fix analyst unchanged in analyses listing after worksheet reassignment
+- #2028 Fix Definition is not displayed in Reference Samples listing
+- #2027 Fix Manufacturer is not displayed in Reference Samples listing
+- #2026 Fix LabManager and LabClerk cannot add preservations
+- #2024 Cannot create partitions from samples in received status
+- #2023 Render hyperlinks for reference widget targets in view/edit mode
+- #2022 Replace Worksheet's Analysis ReferenceField by UIDReferenceField
+- #2021 Reduced logging when creating samples
+- #2017 Added `api.is_temporary` function for both DX and AT types
+- #2019 Performance: Avoid profile analyses assignment for temporary samples
+- #2015 Performance: Avoid to catalog temporary objects
+- #2013 Fix ValueError in uidreferencefield when context is not a IBehavior
+- #2012 Remove stale supply order code
+- #2011 Removed dependency to Products.TextIndexNG3
+- #2010 Fix TypeError in Analyses Listing View
+
+
+2.2.0 (2022-06-11)
+------------------
+
+- #2009 Fix missing keyword in analysis profile view
+- #2007 Fix `ConstraintNotSatisfied` error on language field import
+- #2008 Import demo data in tests with Generic Setup
+- #2002 Allow string results for calculation dependencies
+- #2004 Added behavior to allow sharing objects across clients users
+- #2001 Fix Traceback when rendering UIDReferenceWidget with limited privileges
+- #1999 Allow multi-choice/multiselect interim fields in calculations
+- #1998 Fix analisys hidden status erases when submit through worksheet 
+- #1997 Fix conditions not set when adding analyses via "Manage Analyses" view
+- #1995 Dynamic assingment of "Owner" role for Client Contacts
+- #1994 Support for dynamic assignment of Local Roles for context and principal
+- #1992 Fix Generic Setup XML export/import adapters for Dexterity fields
+- #1993 Avoid line wrapping in login form for small screens
+- #1990 Fix items not filtered by Worksheet Template's method in Add analyses
+- #1991 Update default worksheet layout 
+- #1887 Fix instruments not filtered by method in Worksheet Template edit view
+- #1977 Add custom worksheet layout feature
+- #1988 Multivalue support for interim fields
+- #1987 Fix: ProfileKey shown in Profiles table
+- #1981 Support for interim fields with empty values
+- #1979 Multiselect/Multichoice support for interim fields
+- #1980 Fix: Absent value for Unit field causes error
+- #1978 Unify field sizes in sample view
+- #1975 Fix IndexError in Unit formatter
+- #1973 Fix AjaxEditForm does not work for default edit form of Dexterity types
+- #1970 Better error messages in sample add form
+- #1960 AddressField and AddressWidget with React component for DX types
+- #1968 Fix default roles for client field in samples
+- #1962 Allow to create worksheet from samples
+- #1966 Fix to set analysis results in batchbooks
+- #1965 Disallow client users to create sample partitions
+- #1964 Fix add samples URL in batch context for Clients
+- #1963 Hide custom set-remarks transition when global remarks are disabled in setup
+- #1961 Added `geo` api  that relies on `pycountry` for retrieval of countries
+- #1911 Converted Container to Dexterity Contents
+- #1931 Removed archetypes.schemaextender from senaite.core
+- #1953 Allow custom id formatting regardless of portal type
+- #1952 Open analysis specification ranges
+- #1951 Hide method and instrument columns in analysis listing when not required
+- #1947 Fix worksheet attachments viewlet
+- #1946 Fix conditions issue in Reference Analyses display view
+- #1944 Add handler for "content_status_modify"-like requests
+- #1943 Support UIDs from interim fields as input values for calculations
+- #1942 Fix tab styling in email log popup
+- #1941 Fixed error with sampler mail
+- #1938 Converted sample interpretation and remarks widgets into viewlets
+- #1937 Position the user to the analysis listing after an action is triggered
+- #1935 Allow to edit analysis (pre) conditions
+- #1936 Do not display capture date when no result or default result
+- #1933 Added SENAITE maintenance scripts
+- #1932 Fix cannot attach documents to individual analyses in Worksheet context
+- #1930 Ensure valid timezone in DX datetime field setter
+- #1927 Fix Analysis attachment is copied on retest
+- #1928 Added `on_change` hook for methods in analyses listings
+- #1925 Fix sample transition in listings
+- #1924 Fix Login screen shows message error while rendering plone.htmlhead.socialtags
+- #1923 Use native date input fields in reports
+- #1920 Fix indexed attributes not set when adding a new index with catalog API
+- #1918 Fix stale combobox items displayed when search query changed
+- #1917 Fix wrong context in reference widget lookups
+- #1916 Provide the request record to object info adapters in the sample add form
+- #1913 Ported PR #1865 for dexterity contents
+- #1915 Support list queries in dx reference widget
+- #1914 Provide context, widget and fieldname for callable base queries in AT reference widgets
+- #1912 Fixed typo in sample view
+- #1909 Allow to navigate and select with arrow keys in dexterity reference widget
+- #1908 Added searchable text querystring converter to catalog API
+- #1907 Fix datetime field/widget shows current date and time if empty
+- #1905 Fix empty field in sample add form when using edit accessor
+
+
+2.1.0 (2022-01-05)
+------------------
+
 - #1903 Added date and time field/widget for Dexterity contents
 - #1901 Ensure `get_tool` returns a tool when a name is set as the default param
 - #1900 Fix snapshot listing fails on orphan catalog entries

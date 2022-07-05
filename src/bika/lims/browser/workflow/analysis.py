@@ -38,6 +38,15 @@ class WorkflowActionSubmitAdapter(WorkflowActionGenericAdapter):
     """Adapter in charge of submission of analyses
     """
 
+    def __init__(self, context, request):
+        super(WorkflowActionSubmitAdapter, self).__init__(context, request)
+
+        form_id = self.request.get("form_id")
+        if form_id:
+            # Inject the form id as the anchor to make the browser to position
+            # down to the listing from which the action has been triggered
+            self.back_url = "{}#{}".format(self.back_url, form_id)
+
     def __call__(self, action, objects):
         # Store invalid instruments-ref.analyses
         invalid_instrument_refs = defaultdict(set)
@@ -99,8 +108,8 @@ class WorkflowActionSubmitAdapter(WorkflowActionGenericAdapter):
             analysis.setInterimFields(interims)
 
             # Save Hidden
-            hidden = self.get_form_value("Hidden", uid, "")
-            analysis.setHidden(hidden == "on")
+            hidden = self.get_form_value("Hidden", uid, default=analysis.getHidden())
+            analysis.setHidden(hidden in ("on", True))
 
             # Only set result if it differs from the actual value to preserve
             # the result capture date

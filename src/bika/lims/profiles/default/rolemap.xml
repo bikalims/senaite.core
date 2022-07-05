@@ -13,6 +13,11 @@
     <role name="SamplingCoordinator"/>
     <role name="Verifier"/>
 
+    <!-- Never assign this role by default to users. This role is assigned
+    locally to clients users with whom the current object has been shared with
+    -->
+    <role name="ClientGuest"/>
+
     <!-- PLONE ROLES -->
     <role name="Anonymous"/>
     <role name="Authenticated"/>
@@ -33,6 +38,7 @@
     <permission name="View" acquire="True">
       <role name="Analyst"/>
       <role name="Client"/>
+      <role name="ClientGuest"/>
       <role name="LabClerk"/>
       <role name="LabManager"/>
       <role name="Manager"/>
@@ -47,6 +53,7 @@
     <permission name="Access contents information" acquire="True">
       <role name="Analyst"/>
       <role name="Client"/>
+      <role name="ClientGuest"/>
       <role name="LabClerk"/>
       <role name="LabManager"/>
       <role name="Manager"/>
@@ -61,6 +68,7 @@
     <permission name="List folder contents" acquire="True">
       <role name="Analyst"/>
       <role name="Client"/>
+      <role name="ClientGuest"/>
       <role name="LabClerk"/>
       <role name="LabManager"/>
       <role name="Manager"/>
@@ -285,6 +293,12 @@
       <role name="Manager"/>
       <role name="Owner"/>
     </permission>
+    <permission name="senaite.core: Add Preservation" acquire="False">
+      <role name="LabClerk"/>
+      <role name="LabManager"/>
+      <role name="Manager"/>
+      <role name="Owner"/>
+    </permission>
     <permission name="senaite.core: Add Pricelist" acquire="False">
       <role name="LabClerk"/>
       <role name="LabManager"/>
@@ -343,13 +357,6 @@
       <role name="Manager"/>
       <role name="Owner"/>
     </permission>
-    <permission name="senaite.core: Add WorksheetTemplate" acquire="False">
-      <role name="LabClerk"/>
-      <role name="LabManager"/>
-      <role name="Manager"/>
-      <role name="Owner"/>
-    </permission>
-
 
     <!-- Transition permissions -->
     <permission name="senaite.core: Transition: Deactivate" acquire="False">
@@ -486,15 +493,10 @@
       <role name="LabManager"/>
       <role name="Manager"/>
     </permission>
-
-    <!-- Transition permissions (Worksheet) -->
-    <permission name="senaite.core: Transition: Reject Worksheet" acquire="False">
+    <permission name="senaite.core: Transition: Create Partitions" acquire="False">
       <role name="LabManager"/>
       <role name="Manager"/>
-    </permission>
-    <permission name="senaite.core: Transition: Remove Worksheet" acquire="False">
-      <role name="LabManager"/>
-      <role name="Manager"/>
+      <role name="LabClerk"/>
     </permission>
 
     <!-- Type-specific permissions -->
@@ -516,11 +518,6 @@
       <role name="LabManager"/>
       <role name="Manager"/>
     </permission>
-    <permission name="senaite.core: Worksheet: Add Attachment" acquire="False">
-      <role name="Analyst"/>
-      <role name="LabManager"/>
-      <role name="Manager"/>
-    </permission>
 
     <!-- Field permissions -->
     <!-- Field permissions (Analysis Request) -->
@@ -534,6 +531,7 @@
       <role name="LabClerk"/>
       <role name="LabManager"/>
       <role name="Manager"/>
+      <role name="Client"/>
     </permission>
     <permission name="senaite.core: Field: Edit Client Order Number" acquire="False">
       <role name="LabClerk"/>
@@ -734,6 +732,11 @@
       <role name="LabManager"/>
       <role name="Manager"/>
     </permission>
+    <permission name="senaite.core: Field: Edit Analysis Conditions" acquire="False">
+      <role name="Analyst"/>
+      <role name="LabManager"/>
+      <role name="Manager"/>
+    </permission>
 
     <!-- Behavioral permissions -->
     <permission name="senaite.core: Access JSON API" acquire="False">
@@ -797,11 +800,6 @@
         - cancelled:       -LabClerk, -Owner, -Sampler, -SamplingCoordinator
       -->
     </permission>
-    <permission name="senaite.core: Edit Worksheet" acquire="False">
-      <role name="Analyst"/>
-      <role name="LabManager"/>
-      <role name="Manager"/>
-    </permission>
     <permission name="senaite.core: Manage Bika" acquire="False">
       <role name="LabClerk"/>
       <role name="LabManager"/>
@@ -827,10 +825,6 @@
     <permission name="senaite.core: Manage Reference" acquire="False">
       <role name="Analyst"/>
       <role name="LabClerk"/>
-      <role name="LabManager"/>
-      <role name="Manager"/>
-    </permission>
-    <permission name="senaite.core: Manage Worksheets" acquire="False">
       <role name="LabManager"/>
       <role name="Manager"/>
     </permission>

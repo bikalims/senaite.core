@@ -532,6 +532,7 @@
       options.force_all = "false";
       field.combogrid(options);
       field.attr("search_query", "{}");
+      return field.trigger("blur");
     };
 
     AnalysisRequestAdd.prototype.set_reference_field = function(field, uid, title) {
@@ -1376,7 +1377,7 @@
         if (data['errors']) {
           msg = data.errors.message;
           if (msg !== "") {
-            msg = msg + "<br/>";
+            msg = _t("Sorry, an error occured 🙈<p class='code'>" + msg + "</p>");
           }
           for (fieldname in data.errors.fielderrors) {
             field = $("#" + fieldname);

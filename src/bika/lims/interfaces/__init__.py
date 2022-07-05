@@ -513,16 +513,6 @@ class ISuppliers(Interface):
     """
 
 
-class ISupplyOrder(Interface):
-    """Marker interface for a Supplier Order
-    """
-
-
-class ISupplyOrderFolder(Interface):
-    """Marker interface for Supply Order Folder
-    """
-
-
 class ISubGroups(Interface):
     """Sub-groups configuration folder
     """
@@ -551,6 +541,15 @@ class IWorksheetTemplates(Interface):
 class IWorksheetTemplate(Interface):
     """Marker interface for Worksheet Template
     """
+
+
+class IWorksheetLayouts(Interface):
+    """Marker interface for additional Worksheet layouts
+    """
+
+    def getLayouts(self):
+        """Returns tuples of layouts where key is the name of the view and value is name of layout
+        """
 
 
 class IBikaCatalog(Interface):
@@ -603,6 +602,17 @@ class IIdServerVariables(Interface):
 
     def get_variables(self, **kw):
         """Returns a dict with variables
+        """
+
+
+class IIdServerTypeID(Interface):
+    """Marker interface for type id resolution for ID Server
+    """
+
+    def get_type_id(self, **kw):
+        """Returns the type id for the context passed in the constructor, that
+        is used for custom ID formatting, regardless of the real portal type of
+        the context. Return None if no type id can be resolved by this adapter
         """
 
 
@@ -839,6 +849,8 @@ class IProxyField(Interface):
     """A field that proxies transparently to the field of another object.
     Mainly needed for AnalysisRequest fields that are actually stored on the
     Sample.
+
+    TODO: Remove after the field manager has been removed from `senaite.jsonapi`
     """
 
 
@@ -1142,3 +1154,8 @@ class IListingSearchableTextProvider(Interface):
     catalog index
     """
     pass
+
+
+class IBatchBookView(Interface):
+    """Marker interface for batchbook view
+    """

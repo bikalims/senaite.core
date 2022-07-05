@@ -36,6 +36,7 @@ from bika.lims.config import UDL
 from bika.lims.interfaces import IAnalysisRequest
 from bika.lims.interfaces import IFieldIcons
 from bika.lims.interfaces import IRoutineAnalysis
+from bika.lims.interfaces import IReferenceAnalysis
 from bika.lims.permissions import EditFieldResults
 from bika.lims.permissions import EditResults
 from bika.lims.permissions import FieldEditAnalysisHidden
@@ -233,11 +234,6 @@ class AnalysesView(ListingView):
              },
         ]
 
-        # This is used to display method and instrument columns if there is at
-        # least one analysis to be rendered that allows the assignment of
-        # method and/or instrument
-        self.show_methodinstr_columns = False
-
     def update(self):
         """Update hook
         """
@@ -377,11 +373,15 @@ class AnalysesView(ListingView):
         """
         # Check if permission is granted for the given analysis
         obj = self.get_object(analysis_brain)
+
+        if IReferenceAnalysis.providedBy(obj):
+            return False
+
         if not self.has_permission(FieldEditAnalysisConditions, obj):
             return False
 
         # Omit analysis does not have conditions set
-        if not obj.getConditions():
+        if not obj.getConditions(empties=True):
             return False
 
         return True
@@ -516,16 +516,6 @@ class AnalysesView(ListingView):
         vocab = [{"ResultValue": "", "ResultText": _("None")}] + vocab
 
         return vocab
-
-    @viewcache.memoize
-    def get_analysts(self):
-        analysts = getUsers(self.context, ['Manager', 'LabManager', 'Analyst'])
-        analysts = analysts.sortedByKey()
-        results = list()
-        for analyst_id, analyst_name in analysts.items():
-            results.append({'ResultValue': analyst_id,
-                            'ResultText': analyst_name})
-        return results
 
     def load_analysis_categories(self):
         # Getting analysis categories
@@ -768,12 +758,10 @@ class AnalysesView(ListingView):
         self.json_interim_fields = json.dumps(self.interim_fields)
         self.items = items
 
-        # Method and Instrument columns must be shown or hidden at the
-        # same time, because the value assigned to one causes
-        # a value reassignment to the other (one method can be performed
-        # by different instruments)
-        self.columns["Method"]["toggle"] = self.show_methodinstr_columns
-        self.columns["Instrument"]["toggle"] = self.show_methodinstr_columns
+        # Display method and instrument columns only if at least one of the
+        # analyses requires them to be displayed for selection
+        self.columns["Method"]["toggle"] = self.is_method_column_required()
+        self.columns["Instrument"]["toggle"] = self.is_instrument_column_required()
 
         return items
 
@@ -849,7 +837,9 @@ class AnalysesView(ListingView):
 
         item["Result"] = ""
 
-        if not self.has_permission(ViewResults, analysis_brain):
+        # TODO: The permission `ViewResults` is managed on the sample.
+        #       -> Change to a proper field permission!
+        if not self.has_permission(ViewResults, self.context):
             # If user has no permissions, don"t display the result but an icon
             img = get_image("to_follow.png", width="16px", height="16px")
             item["before"]["Result"] = img
@@ -900,6 +890,26 @@ class AnalysesView(ListingView):
             sciformat=int(self.scinot), decimalmark=self.dmk)
         item["formatted_result"] = formatted_result
 
+    def is_multi_interim(self, interim):
+        """Returns whether the interim stores a list of values instead of a
+        single value
+        """
+        result_type = interim.get("result_type", "")
+        return result_type.startswith("multi")
+
+    def to_list(self, value):
+        """Converts the value to a list
+        """
+        try:
+            val = json.loads(value)
+            if isinstance(val, (list, tuple, set)):
+                value = val
+        except (ValueError, TypeError):
+            pass
+        if not isinstance(value, (list, tuple, set)):
+            value = [value]
+        return value
+
     def _folder_item_calculation(self, analysis_brain, item):
         """Set the analysis' calculation and interims to the item passed in.
 
@@ -929,7 +939,6 @@ class AnalysesView(ListingView):
 
         # Copy to prevent to avoid persistent changes
         interim_fields = deepcopy(interim_fields)
-
         for interim_field in interim_fields:
             interim_keyword = interim_field.get('keyword', '')
             if not interim_keyword:
@@ -958,6 +967,9 @@ class AnalysesView(ListingView):
             # Does interim's results list needs to be rendered?
             choices = interim_field.get("choices")
             if choices:
+                # Process the value as a list
+                interim_value = self.to_list(interim_value)
+
                 # Get the {value:text} dict
                 choices = choices.split("|")
                 choices = dict(map(lambda ch: ch.strip().split(":"), choices))
@@ -969,7 +981,22 @@ class AnalysesView(ListingView):
                 item.setdefault("choices", {})[interim_keyword] = dl
 
                 # Set the text as the formatted value
-                text = choices.get(interim_value, "")
+                texts = [choices.get(v, "") for v in interim_value]
+                text = "<br/>".join(filter(None, texts))
+                interim_field["formatted_value"] = text
+
+                if not is_editable:
+                    # Display the text instead of the value
+                    interim_field["value"] = text
+
+                item[interim_keyword] = interim_field
+
+            elif self.is_multi_interim(interim_field):
+                # Process the value as a list
+                interim_value = self.to_list(interim_value)
+
+                # Set the text as the formatted value
+                text = "<br/>".join(filter(None, interim_value))
                 interim_field["formatted_value"] = text
 
                 if not is_editable:
@@ -989,20 +1016,17 @@ class AnalysesView(ListingView):
         """
         obj = self.get_object(analysis_brain)
         is_editable = self.is_analysis_edition_allowed(analysis_brain)
-        method = obj.getMethod()
-        method_title = method and api.get_title(method) or ""
-        item["Method"] = method_title or _("Manual")
         if is_editable:
             method_vocabulary = self.get_methods_vocabulary(analysis_brain)
-            if method_vocabulary:
-                item["Method"] = obj.getRawMethod()
-                item["choices"]["Method"] = method_vocabulary
-                item["allow_edit"].append("Method")
-                self.show_methodinstr_columns = True
-        elif method_title:
-            item["replace"]["Method"] = get_link(
-                api.get_url(method), method_title, tabindex="-1")
-            self.show_methodinstr_columns = True
+            item["Method"] = obj.getRawMethod()
+            item["choices"]["Method"] = method_vocabulary
+            item["allow_edit"].append("Method")
+        else:
+            item["Method"] = _("Manual")
+            method = obj.getMethod()
+            if method:
+                item["Method"] = api.get_title(method)
+                item["replace"]["Method"] = get_link_for(method, tabindex="-1")
 
     def _on_method_change(self, uid=None, value=None, item=None, **kw):
         """Update instrument and calculation when the method changes
@@ -1035,50 +1059,40 @@ class AnalysesView(ListingView):
 
         # Instrument can be assigned to this analysis
         is_editable = self.is_analysis_edition_allowed(analysis_brain)
-        self.show_methodinstr_columns = True
         instrument = self.get_instrument(analysis_brain)
 
         if is_editable:
             # Edition allowed
             voc = self.get_instruments_vocabulary(analysis_brain)
-            if voc:
-                # The service has at least one instrument available
-                item["Instrument"] = instrument.UID() if instrument else ""
-                item["choices"]["Instrument"] = voc
-                item["allow_edit"].append("Instrument")
-                return
+            item["Instrument"] = instrument.UID() if instrument else ""
+            item["choices"]["Instrument"] = voc
+            item["allow_edit"].append("Instrument")
 
-        if instrument:
+        elif instrument:
             # Edition not allowed
-            instrument_title = instrument and instrument.Title() or ""
-            instrument_link = get_link(instrument.absolute_url(),
-                                       instrument_title, tabindex="-1")
-            item["Instrument"] = instrument_title
+            item["Instrument"] = api.get_title(instrument)
+            instrument_link = get_link_for(instrument, tabindex="-1")
             item["replace"]["Instrument"] = instrument_link
-            return
+
         else:
             item["Instrument"] = _("Manual")
 
     def _folder_item_analyst(self, obj, item):
-        is_editable = self.is_analysis_edition_allowed(obj)
-        if not is_editable:
-            item['Analyst'] = obj.getAnalystName
-            return
-
-        # Analyst is editable
-        item['Analyst'] = obj.getAnalyst or api.get_current_user().id
-        item['choices']['Analyst'] = self.get_analysts()
+        obj = self.get_object(obj)
+        analyst = obj.getAnalyst()
+        item["Analyst"] = self.get_user_name(analyst)
 
     def _folder_item_submitted_by(self, obj, item):
-        submitted_by = obj.getSubmittedBy
-        if submitted_by:
-            user = self.get_user_by_id(submitted_by)
-            user_name = user and user.getProperty("fullname") or submitted_by
-            item['SubmittedBy'] = user_name
+        obj = self.get_object(obj)
+        submitted_by = obj.getSubmittedBy()
+        item["SubmittedBy"] = self.get_user_name(submitted_by)
 
     @viewcache.memoize
-    def get_user_by_id(self, user_id):
-        return api.get_user(user_id)
+    def get_user_name(self, user_id):
+        if not user_id:
+            return ""
+        user = api.get_user_properties(user_id)
+        return user and user.get("fullname") or user_id
 
     def _folder_item_attachments(self, obj, item):
         if not self.has_permission(ViewResults, obj):
@@ -1449,3 +1463,61 @@ class AnalysesView(ListingView):
             conditions = "<br/>".join(conditions)
             service = item["replace"].get("Service") or item["Service"]
             item["replace"]["Service"] = "{}<br/>{}".format(service, conditions)
+
+    def is_method_required(self, analysis):
+        """Returns whether the render of the selection list with methods is
+        required for the method passed-in, even if only option "None" is
+        displayed for selection
+        """
+        # Always return true if the analysis has a method assigned
+        obj = self.get_object(analysis)
+        method = obj.getMethod()
+        if method:
+            return True
+
+        methods = obj.getAllowedMethods()
+        return len(methods) > 0
+
+    def is_instrument_required(self, analysis):
+        """Returns whether the render of the selection list with instruments is
+        required for the analysis passed-in, even if only option "None" is
+        displayed for selection.
+        :param analysis: Brain or object that represents an analysis
+        """
+        # If method selection list is required, the instrument selection too
+        if self.is_method_required(analysis):
+            return True
+        
+        # Always return true if the analysis has an instrument assigned
+        if self.get_instrument(analysis):
+            return True
+
+        obj = self.get_object(analysis)
+        instruments = obj.getAllowedInstruments()
+        # There is no need to check for the instruments of the method assigned
+        # to # the analysis (if any), because the instruments rendered in the
+        # selection list are always a subset of the allowed instruments when
+        # a method is selected
+        return len(instruments) > 0
+
+    def is_method_column_required(self):
+        """Returns whether the method column has to be rendered or not.
+        Returns True if at least one of the analyses from the listing requires
+        the list for method selection to be rendered
+        """
+        for item in self.items:
+            obj = item.get("obj")
+            if self.is_method_required(obj):
+                return True
+        return False
+
+    def is_instrument_column_required(self):
+        """Returns whether the instrument column has to be rendered or not.
+        Returns True if at least one of the analyses from the listing requires
+        the list for instrument selection to be rendered
+        """
+        for item in self.items:
+            obj = item.get("obj")
+            if self.is_instrument_required(obj):
+                return True
+        return False

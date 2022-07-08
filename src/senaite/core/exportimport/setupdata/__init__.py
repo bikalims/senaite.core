@@ -1747,10 +1747,6 @@ class Analysis_Services(WorksheetImporter):
     def Import(self):
         self.load_interim_fields()
         folder = self.context.bika_setup.bika_analysisservices
-        catfolder = self.context.bika_setup.bika_analysiscategories
-        depfolder = self.context.bika_setup.bika_departments
-        confolder = self.context.bika_setup.bika_containers
-        presfolder = self.context.bika_setup.bika_preservations
         methfolder = self.context.methods
         inst_folder = self.context.bika_setup.bika_instruments
         calcfolder =self.context.bika_setup.bika_calculations
@@ -1770,14 +1766,10 @@ class Analysis_Services(WorksheetImporter):
                 'hours': self.to_int(row.get('MaxTimeAllowed_hours', 0), 0),
                 'minutes': self.to_int(row.get('MaxTimeAllowed_minutes', 0), 0),
             }
-            category = getobj(catfolder, 'AnalysisCategory',
-                              Title=row.get('AnalysisCategory_title'))
-            department = getobj(depfolder, 'Department',
-                                Title=row.get('Department_title'))
-            container = getobj(confolder, 'Container',
-                               Title=row.get('Container_title'))
-            preservation = getobj(presfolder, 'Preservation',
-                                  Title=row.get('Preservation_title'))
+            category = self.get_object(bsc, 'AnalysisCategory', row.get('AnalysisCategory_title'))
+            department = self.get_object(bsc, 'Department', row.get('Department_title'))
+            container = self.get_object(bsc, 'Container', row.get('Container_title'))
+            preservation = self.get_object(bsc, 'Preservation', row.get('Preservation_title'))
 
             # Analysis Service - Method considerations:
             # One Analysis Service can have 0 or n Methods associated (field
@@ -2026,7 +2018,6 @@ class AR_Templates(WorksheetImporter):
     def load_artemplate_partitions(self):
         sheetname = 'AR Template Partitions'
         worksheet = self.workbook[sheetname]
-        confolder = self.context.bika_setup.bika_containers
         presfolder = self.context.bika_setup.bika_preservations
         self.artemplate_partitions = {}
         bsc = getToolByName(self.context, 'senaite_catalog_setup')
@@ -2036,8 +2027,7 @@ class AR_Templates(WorksheetImporter):
             if row['ARTemplate'] not in self.artemplate_partitions.keys():
                 self.artemplate_partitions[row['ARTemplate']] = []
 
-            container = getobj(confolder, 'Container',
-                                Title=row.get('container'))
+            container = self.get_object(bsc, 'Container', row.get('Container_title'))
             preservation = getobj(presfolder, 'Preservation',
                                 Title=row.get('preservation'))
             self.artemplate_partitions[row['ARTemplate']].append({
@@ -2099,6 +2089,7 @@ class Reference_Definitions(WorksheetImporter):
     def load_reference_definition_results(self):
         sheetname = 'Reference Definition Results'
         worksheet = self.workbook[sheetname]
+        bsc = getToolByName(self.context, 'senaite_catalog_setup')
         if not worksheet:
             sheetname = 'Reference Definition Values'
             worksheet = self.workbook[sheetname]
@@ -2112,12 +2103,13 @@ class Reference_Definitions(WorksheetImporter):
                 self.results[row['ReferenceDefinition_title']] = []
             service = self.get_object(bsc, 'AnalysisService',
                     row.get('service'), **{"getKeyword": row.get("Keyword")})
-            self.results[
-                row['ReferenceDefinition_title']].append({
-                    'uid': service.UID(),
-                    'result': row['result'] if row['result'] else '0',
-                    'min': row['min'] if row['min'] else '0',
-                    'max': row['max'] if row['max'] else '0'})
+            if service:
+                self.results[
+                    row['ReferenceDefinition_title']].append({
+                        'uid': service.UID(),
+                        'result': row['result'] if row['result'] else '0',
+                        'min': row['min'] if row['min'] else '0',
+                        'max': row['max'] if row['max'] else '0'})
 
     def Import(self):
         self.load_reference_definition_results()
@@ -2172,10 +2164,11 @@ class Worksheet_Templates(WorksheetImporter):
         for i, row in enumerate(self.get_rows(3, worksheet=worksheet)):
             service = getobj(self.context.bika_setup.bika_analysisservices,
                              'AnalysisService', Title=row.get('service'))
-            if row['WorksheetTemplate_title'] not in self.wst_services.keys():
-                self.wst_services[row['WorksheetTemplate_title']] = []
-            self.wst_services[
-                row['WorksheetTemplate_title']].append(service.UID())
+            if service:
+                if row['WorksheetTemplate_title'] not in self.wst_services.keys():
+                    self.wst_services[row['WorksheetTemplate_title']] = []
+                self.wst_services[
+                    row['WorksheetTemplate_title']].append(service.UID())
 
     def Import(self):
         self.load_wst_services()

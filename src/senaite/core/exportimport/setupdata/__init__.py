@@ -1321,7 +1321,7 @@ class Sample_Points(WorksheetImporter):
                 obj.setSampleTypes([sampletype, ])
                 logger.warning(
                     "SamplePoint update " + title + "SampleType" + row.get('SampleType_title'))
-            notify(ObjectEditedEvent(obj))
+                notify(ObjectEditedEvent(samplepoint))
 
 
 class Sample_Point_Sample_Types(WorksheetImporter):

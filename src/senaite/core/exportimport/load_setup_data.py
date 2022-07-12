@@ -113,11 +113,17 @@ class LoadSetupData(BrowserView):
                     in list(getAdapters((self.context, ), ISetupDataImporter))]
         for sheetname in workbook.sheetnames:
             transaction.savepoint()
+            xxx = False
+            if sheetname == 'Sample Points':
+                xxx = True
+            if not xxx:
+                continue
             ad_name = sheetname.replace(" ", "_")
             if ad_name in [a[0] for a in adapters]:
                 adapter = [a[1] for a in adapters if a[0] == ad_name][0]
                 adapter(self, workbook, self.dataset_project, self.dataset_name)
                 adapters = [a for a in adapters if a[0] != ad_name]
+        adapters = [d for d in adapters if d[0]== 'Sample_Points']
         for name, adapter in adapters:
             transaction.savepoint()
             adapter(self, workbook, self.dataset_project, self.dataset_name)
@@ -138,6 +144,6 @@ class LoadSetupData(BrowserView):
         logger.info("Rebuilding senaite_catalog")
         bc = getToolByName(self.context, 'senaite_catalog')
         bc.clearFindAndRebuild()
-        logger.info("Rebuilding senaite_catalog_analysis")
-        bac = getToolByName(self.context, 'senaite_catalog_analysis')
-        bac.clearFindAndRebuild()
+        # logger.info("Rebuilding senaite_catalog_analysis")
+        # bac = getToolByName(self.context, 'senaite_catalog_analysis')
+        # bac.clearFindAndRebuild()

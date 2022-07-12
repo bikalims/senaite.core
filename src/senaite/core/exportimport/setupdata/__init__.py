@@ -23,7 +23,7 @@ import os.path
 import re
 
 import transaction
-from Products.Archetypes.event import ObjectInitializedEvent
+from Products.Archetypes.event import ObjectInitializedEvent, ObjectEditedEvent
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import _createObjectByType
 from Products.CMFPlone.utils import safe_unicode
@@ -1293,6 +1293,7 @@ class Sample_Points(WorksheetImporter):
         setup_folder = self.context.bika_setup.bika_samplepoints
         stfolder = self.context.bika_setup.bika_samplepoints
         cfolder = self.context.clients
+        bsc = getToolByName(self.context, 'senaite_catalog_setup')
         for i, row in enumerate(self.get_rows(3)):
             title = row['title']
             if not title:
@@ -1309,28 +1310,18 @@ class Sample_Points(WorksheetImporter):
             else:
                 folder = setup_folder
 
-            if getobj(folder, "SamplePoint", Title=title):
+            samplepoint = self.get_object(bsc, 'SamplePoint', title)
+            if not samplepoint:
+                logger.warning(
+                    "Sample Point NOT FOUND " + title)
                 continue
-
-            if row['Latitude']:
-                logger.log("Ignored SamplePoint Latitude", 'error')
-            if row['Longitude']:
-                logger.log("Ignored SamplePoint Longitude", 'error')
-
-            obj = _createObjectByType("SamplePoint", folder, tmpID())
-            obj.edit(
-                title=title,
-                description=row.get('description', ''),
-                Composite=self.to_bool(row['Composite']),
-                Elevation=row['Elevation'],
-            )
-            sampletype = getobj(stfolder, 'SampleType',
-                                Title=row.get('SampleType_title'))
+            sampletype = self.get_object(bsc, 'SampleType',
+                                         row.get('SampleType_title'))
             if sampletype:
                 obj.setSampleTypes([sampletype, ])
-            obj.unmarkCreationFlag()
-            renameAfterCreation(obj)
-            notify(ObjectInitializedEvent(obj))
+                logger.warning(
+                    "SamplePoint update " + title + "SampleType" + row.get('SampleType_title'))
+            notify(ObjectEditedEvent(obj))
 
 
 class Sample_Point_Sample_Types(WorksheetImporter):

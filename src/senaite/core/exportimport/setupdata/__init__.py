@@ -1298,6 +1298,7 @@ class Methods(WorksheetImporter):
         worksheet = self.workbook[sheetname]
         insfolder = self.context.bika_setup.bika_instruments
         self.instrument_methods = {}
+        bsc = getToolByName(self.context, 'senaite_catalog_setup')
         if not worksheet:
             return
         for i, row in enumerate(self.get_rows(3, worksheet=worksheet)):
@@ -1305,7 +1306,7 @@ class Methods(WorksheetImporter):
                 continue
             if row['Method_title'] not in self.instrument_methods.keys():
                 self.instrument_methods[row['Method_title']] = []
-            instrument = getobj(insfolder,
+            instrument = self.get_object(bsc,
                              'Instrument', title=row['Instrument_title'])
             if instrument:
                 self.instrument_methods[row['Method_title']].append(instrument)
@@ -1817,6 +1818,9 @@ class AR_Templates(WorksheetImporter):
             # XXX service_uid is not a uid
             service = self.get_object(bsc, 'AnalysisService',
                                       row.get('service_uid'))
+            if not service:
+                continue
+
             if row['ARTemplate'] not in self.artemplate_analyses.keys():
                 self.artemplate_analyses[row['ARTemplate']] = []
             self.artemplate_analyses[row['ARTemplate']].append(
@@ -1841,10 +1845,10 @@ class AR_Templates(WorksheetImporter):
                                            row.get('preservation'))
             self.artemplate_partitions[row['ARTemplate']].append({
                 'part_id': row['part_id'],
-                'Container': container.Title(),
-                'container_uid': container.UID(),
-                'Preservation': preservation.Title(),
-                'preservation_uid': preservation.UID()})
+                'Container': container.Title() if container else None,
+                'container_uid': container.UID() if container else None,
+                'Preservation': preservation.Title() if preservation else None,
+                'preservation_uid': preservation.UID()} if preservation else None)
 
     def Import(self):
         self.load_artemplate_analyses()
@@ -1908,6 +1912,8 @@ class Reference_Definitions(WorksheetImporter):
                 self.results[row['ReferenceDefinition_title']] = []
             service = self.get_object(bsc, 'AnalysisService',
                                       row.get('service'))
+            if not service:
+                continue
             self.results[
                 row['ReferenceDefinition_title']].append({
                     'uid': service.UID(),
@@ -1966,6 +1972,8 @@ class Worksheet_Templates(WorksheetImporter):
                                       row.get('service'))
             if row['WorksheetTemplate_title'] not in self.wst_services.keys():
                 self.wst_services[row['WorksheetTemplate_title']] = []
+            if not service:
+                continue
             self.wst_services[
                 row['WorksheetTemplate_title']].append(service.UID())
 

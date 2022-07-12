@@ -1318,7 +1318,7 @@ class Sample_Points(WorksheetImporter):
             sampletype = self.get_object(bsc, 'SampleType',
                                          row.get('SampleType_title'))
             if sampletype:
-                obj.setSampleTypes([sampletype, ])
+                samplepoint.setSampleTypes([sampletype, ])
                 logger.warning(
                     "SamplePoint update " + title + "SampleType" + row.get('SampleType_title'))
                 notify(ObjectEditedEvent(samplepoint))

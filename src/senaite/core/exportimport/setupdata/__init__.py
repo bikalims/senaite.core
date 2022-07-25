@@ -1323,20 +1323,22 @@ class Methods(WorksheetImporter):
                 instruments = self.instrument_methods.get(row['title'], [])
                 if instrument:
                     instruments.append(instrument)
-                instruments_uids = [inst.UID() for inst in instruments]
                 supplier = self.get_object(bsc, 'Supplier',Title=row.get('Subcontractor_title'))
 
+                if calculation:
+                    calculation = calculation.UID()
                 obj = _createObjectByType("Method", folder, tmpID())
                 obj.edit(
                     title=row['title'],
                     description=row.get('description', ''),
                     Instructions=row.get('Instructions', ''),
                     ManualEntryOfResults=row.get('ManualEntryOfResults', True),
+                    Calculations=[calculation],
                     Calculation=calculation,
                     MethodID=row.get('MethodID', ''),
                     Accredited=row.get('Accredited', True),
                     Supplier=supplier,
-                    Instruments=instruments_uids,
+                    Instruments=[inst.UID() for inst in instruments],
 
                 )
                 # Obtain all created methods
@@ -1658,6 +1660,8 @@ class Analysis_Services(WorksheetImporter):
             _calculation = deferredcalculation if deferredcalculation else \
                             (defaultmethod.getCalculation() if defaultmethod else None)
 
+            if _calculation:
+                _calculation = _calculation.UID()
             obj.edit(
                 title=row['title'],
                 ShortTitle=row.get('ShortTitle', row['title']),
@@ -1676,10 +1680,11 @@ class Analysis_Services(WorksheetImporter):
                 Price="%02f" % Float(row['Price']),
                 BulkPrice="%02f" % Float(row['BulkPrice']),
                 VAT="%02f" % Float(row['VAT']),
-                _Method=defaultmethod,
+                Method=defaultmethod,
                 Methods=methods,
                 ManualEntryOfResults=allowmanualentry,
                 InstrumentEntryOfResults=allowinstrentry,
+                Instrument=defaultinstrument,
                 Instruments=instruments,
                 Calculation=_calculation,
                 UseDefaultCalculation=usedefaultcalculation,

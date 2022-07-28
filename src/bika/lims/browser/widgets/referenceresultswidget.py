@@ -272,6 +272,10 @@ class ReferenceResultsWidget(TypesWidget):
         # Call listing hooks
         table.update()
         table.before_render()
+
+        if allow_edit is False:
+            return table.contents_table_view()
+
         return table.ajax_contents_table()
 
 

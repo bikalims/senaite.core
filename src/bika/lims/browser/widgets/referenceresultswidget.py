@@ -29,6 +29,7 @@ from bika.lims.utils import get_link
 from plone.memoize import view
 from Products.Archetypes.Registry import registerWidget
 from Products.Archetypes.Widget import TypesWidget
+from Products.CMFCore.utils import getToolByName
 
 
 class ReferenceResultsView(BikaListingView):
@@ -46,7 +47,7 @@ class ReferenceResultsView(BikaListingView):
             "sort_order": "ascending",
         }
         self.context_actions = {}
-
+        self.do_cats = self.context.bika_setup.getCategoriseAnalysisServices()
         self.show_select_column = True
         self.show_select_all_checkbox = True
         self.pagesize = 999999
@@ -121,8 +122,21 @@ class ReferenceResultsView(BikaListingView):
         return columns
 
     def folderitems(self):
+        """Sort by Categories
+        """
+        bsc = getToolByName(self.context, "senaite_catalog_setup")
+        self.an_cats = bsc(
+            portal_type="AnalysisCategory",
+            sort_on="sortable_title")
+        self.an_cats_order = dict([
+            (b.Title, "{:04}".format(a))
+            for a, b in enumerate(self.an_cats)])
         items = super(ReferenceResultsView, self).folderitems()
-        self.categories.sort()
+        if self.do_cats:
+            self.categories = map(lambda x: x,
+                                    sorted(self.categories, key=lambda x: x[1]))
+        else:
+            self.categories.sort()
         return items
 
     def folderitem(self, obj, item, index):

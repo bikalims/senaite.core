@@ -34,6 +34,7 @@ from plone.memoize import view
 from Products.Archetypes.Registry import registerWidget
 from Products.Archetypes.Widget import TypesWidget
 from zope.i18n.locales import locales
+from Products.CMFCore.utils import getToolByName
 
 
 class AnalysisProfileAnalysesView(BikaListingView):
@@ -46,12 +47,13 @@ class AnalysisProfileAnalysesView(BikaListingView):
         self.catalog = "senaite_catalog_setup"
         self.contentFilter = {
             "portal_type": "AnalysisService",
-            "sort_on": "category_sort_key",
+            "sort_on": "sortable_title",
             "sort_order": "ascending",
             "is_active": True,
         }
         self.context_actions = {}
 
+        self.do_cats = self.context.bika_setup.getCategoriseAnalysisServices()
         self.show_column_toggles = False
         self.show_select_column = True
         self.show_select_all_checkbox = False
@@ -188,7 +190,21 @@ class AnalysisProfileAnalysesView(BikaListingView):
         return columns
 
     def folderitems(self):
+        """Sort by Categories
+        """
+        bsc = getToolByName(self.context, "senaite_catalog_setup")
+        self.an_cats = bsc(
+            portal_type="AnalysisCategory",
+            sort_on="sortable_title")
+        self.an_cats_order = dict([
+            (b.Title, "{:04}".format(a))
+            for a, b in enumerate(self.an_cats)])
         items = super(AnalysisProfileAnalysesView, self).folderitems()
+        if self.do_cats:
+            self.categories = map(lambda x: x,
+                                    sorted(self.categories, key=lambda x: x[1]))
+        else:
+            self.categories.sort()
         return items
 
     def folderitem(self, obj, item, index):

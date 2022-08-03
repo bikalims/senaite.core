@@ -34,6 +34,7 @@ from plone.memoize import view
 from Products.Archetypes.Registry import registerWidget
 from Products.Archetypes.Widget import TypesWidget
 from zope.i18n.locales import locales
+from Products.CMFCore.utils import getToolByName
 
 
 class ARTemplateAnalysesView(BikaListingView):
@@ -52,6 +53,7 @@ class ARTemplateAnalysesView(BikaListingView):
         }
         self.context_actions = {}
 
+        self.do_cats = self.context.bika_setup.getCategoriseAnalysisServices()
         self.show_column_toggles = False
         self.show_select_column = True
         self.show_select_all_checkbox = False
@@ -197,9 +199,23 @@ class ARTemplateAnalysesView(BikaListingView):
         return columns
 
     def folderitems(self):
+        """Sort by Categories
+        """
+        bsc = getToolByName(self.context, "senaite_catalog_setup")
+        self.an_cats = bsc(
+            portal_type="AnalysisCategory",
+            sort_on="sortable_title")
+        self.an_cats_order = dict([
+            (b.Title, "{:04}".format(a))
+            for a, b in enumerate(self.an_cats)])
         items = super(ARTemplateAnalysesView, self).folderitems()
-        self.categories.sort()
+        if self.do_cats:
+            self.categories = map(lambda x: x,
+                                    sorted(self.categories, key=lambda x: x[1]))
+        else:
+            self.categories.sort()
         return items
+
 
     def folderitem(self, obj, item, index):
         """Service triggered each time an item is iterated in folderitems.

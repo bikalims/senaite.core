@@ -44,6 +44,8 @@ class AnalysisProfileAnalysesView(BikaListingView):
     def __init__(self, context, request):
         super(AnalysisProfileAnalysesView, self).__init__(context, request)
 
+        self.an_cats = None
+        self.an_cats_order = None
         self.catalog = "senaite_catalog_setup"
         self.contentFilter = {
             "portal_type": "AnalysisService",
@@ -53,7 +55,6 @@ class AnalysisProfileAnalysesView(BikaListingView):
         }
         self.context_actions = {}
 
-        self.do_cats = self.context.bika_setup.getCategoriseAnalysisServices()
         self.show_column_toggles = False
         self.show_select_column = True
         self.show_select_all_checkbox = False
@@ -200,8 +201,8 @@ class AnalysisProfileAnalysesView(BikaListingView):
             (b.Title, "{:04}".format(a))
             for a, b in enumerate(self.an_cats)])
         items = super(AnalysisProfileAnalysesView, self).folderitems()
-        if self.do_cats:
-            self.categories = map(lambda x: x,
+        if self.show_categories_enabled():
+            self.categories = map(lambda x: x[0],
                                     sorted(self.categories, key=lambda x: x[1]))
         else:
             self.categories.sort()
@@ -222,12 +223,14 @@ class AnalysisProfileAnalysesView(BikaListingView):
         uid = api.get_uid(obj)
         url = api.get_url(obj)
         title = api.get_title(obj)
+        cat = obj.getCategoryTitle()
+        cat_order = self.an_cats_order.get(cat)
 
         # get the category
         if self.show_categories_enabled():
             category = obj.getCategoryTitle()
-            if category not in self.categories:
-                self.categories.append(category)
+            if (category,cat_order) not in self.categories:
+                self.categories.append((category,cat_order))
             item["category"] = category
 
         config = self.configuration.get(uid, {})

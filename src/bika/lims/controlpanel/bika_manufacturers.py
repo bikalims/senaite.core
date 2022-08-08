@@ -45,6 +45,7 @@ class ManufacturersView(BikaListingView):
         self.contentFilter = {
             "portal_type": "Manufacturer",
             "sort_on": "sortable_title",
+            "sort_order": "ascending",
         }
 
         self.context_actions = {

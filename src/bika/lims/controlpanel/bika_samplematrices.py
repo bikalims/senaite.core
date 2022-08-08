@@ -44,6 +44,7 @@ class SampleMatricesView(BikaListingView):
         self.contentFilter = {
             "portal_type": "SampleMatrix",
             "sort_on": "sortable_title",
+            "sort_order": "ascending",
         }
 
         self.context_actions = {_('Add'): {

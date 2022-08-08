@@ -38,6 +38,7 @@ class ClientContactsView(BikaListingView):
         self.contentFilter = {
             'portal_type': 'Contact',
             'sort_on': 'sortable_title',
+            "sort_order": "ascending",
             'path': {
                 "query": "/".join(context.getPhysicalPath()),
                 "level": 0

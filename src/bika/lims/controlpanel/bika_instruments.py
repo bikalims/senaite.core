@@ -87,12 +87,16 @@ class InstrumentsView(BikaListingView):
                 "title": _("Expiry Date"),
                 "sortable": False,
                 "toggle": True}),
-            ("WeeksToExpire", {
-                "title": _("Weeks To Expire"),
-                "sortable": False,
-                "toggle": False}),
             ("Methods", {
                 "title": _("Methods"),
+                "sortable": False,
+                "toggle": True}),
+            ("ImportInterface", {
+                "title": _("Import Interface"),
+                "sortable": False,
+                "toggle": True}),
+            ("ExportInterface", {
+                "title": _("Export Interface"),
                 "sortable": False,
                 "toggle": True}),
         ))
@@ -167,14 +171,6 @@ class InstrumentsView(BikaListingView):
             item["ExpiryDate"] = expiry_date.asdatetime().strftime(
                 self.date_format_short)
 
-        if obj.isOutOfDate():
-            item["WeeksToExpire"] = _("Out of date")
-        else:
-            weeks, days = obj.getWeeksToExpire()
-            weeks_to_expire = _("{} weeks and {} day(s)".format(
-                str(weeks), str(days)))
-            item['WeeksToExpire'] = weeks_to_expire
-
         methods = obj.getMethods()
         if methods:
             links = map(
@@ -183,7 +179,18 @@ class InstrumentsView(BikaListingView):
                                    css_class="link"),
                 methods)
             item["replace"]["Methods"] = ", ".join(links)
-
+        
+        import_interface = obj.getImportDataInterface()
+        import_interfaces_list = obj.getImportDataInterfacesList()
+        if len(import_interface) > 1:
+            for name in import_interface:
+                if name:
+                    item["replace"]["ImportInterface"] = import_interfaces_list.getValue(name)
+        
+        export_interfaces_list = obj.getExportDataInterfacesList()
+        export_interface = obj.DataInterface
+        if export_interface:
+            item["replace"]["ExportInterface"] = export_interfaces_list.getValue(export_interface)
         return item
 
 

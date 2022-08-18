@@ -75,6 +75,9 @@ class CalculationsView(BikaListingView):
                 "title": _("Description"),
                 "index": "Description",
                 "toggle": True}),
+            ("InterimFields", {
+                "title": _("Interim Fields"),
+                "toggle": True}),
             ("Formula", {
                 "title": _("Formula"),
                 "index": "getFormula",
@@ -118,6 +121,13 @@ class CalculationsView(BikaListingView):
         item["replace"]["Title"] = get_link(url, value=title)
         item["Description"] = description
         item["Formula"] = obj.getMinifiedFormula()
+
+        interim_fields_dict = obj.InterimFields
+        interim_fields = []
+        if interim_fields_dict:
+            for interim in interim_fields_dict:
+                interim_fields.append(interim.get("title"))
+        item["InterimFields"] = interim_fields
 
         return item
 

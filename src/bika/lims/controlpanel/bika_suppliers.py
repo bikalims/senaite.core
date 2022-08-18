@@ -80,8 +80,9 @@ class SuppliersView(BikaListingView):
             ("Phone", {
                 "title": _("Phone"),
                 "toggle": True}),
-            ("Fax", {"title": _("Fax"),
-                     "toggle": True}),
+            ("Contacts", {
+                "title": _("Contacts"),
+                "toggle": True}),
         ))
 
         self.review_states = [
@@ -119,15 +120,27 @@ class SuppliersView(BikaListingView):
         name = obj.getName()
         email = obj.getEmailAddress()
         phone = obj.getPhone()
-        fax = obj.getFax()
         url = obj.absolute_url()
+        children = obj.values()
+        contacts_url = "{}/{}".format(item['url'],"contacts")
+        contacts = []
+        number_of_contacts = 0
+
+        for child in children:
+            if child.portal_type == "SupplierContact":
+                number_of_contacts = number_of_contacts + 1
+                if number_of_contacts > 2:
+                    contacts.append(get_link(contacts_url,"..."))
+                    break
+                child_url = child.absolute_url()
+                child_name = child.getFullname()
+                contacts.append(get_link(child_url,child_name))
 
         item["Name"] = name
         item["Email"] = email
         item["Phone"] = phone
-        item["Fax"] = fax
         item["replace"]["Name"] = get_link(url, value=name)
-
+        item["Contacts"] = contacts
         return item
 
 

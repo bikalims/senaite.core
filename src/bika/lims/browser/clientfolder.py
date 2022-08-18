@@ -76,25 +76,17 @@ class ClientFolderContentsView(BikaListingView):
             ("EmailAddress", {
                 "title": _("Email Address"),
                 "sortable": False}),
-            ("getCountry", {
+            ("Contacts", {
                 "toggle": False,
                 "sortable": False,
-                "title": _("Country")}),
-            ("getProvince", {
-                "toggle": False,
-                "sortable": False,
-                "title": _("Province")}),
-            ("getDistrict", {
-                "toggle": False,
-                "sortable": False,
-                "title": _("District")}),
+                "title": _("Contacts")}),
             ("Phone", {
                 "title": _("Phone"),
                 "sortable": False}),
-            ("Fax", {
+            ("ClientCCEmails", {
                 "toggle": False,
                 "sortable": False,
-                "title": _("Fax")}),
+                "title": _("Client CC Emails")}),
             ("BulkDiscount", {
                 "toggle": False,
                 "sortable": False,
@@ -102,7 +94,7 @@ class ClientFolderContentsView(BikaListingView):
             ("MemberDiscountApplies", {
                 "toggle": False,
                 "sortable": False,
-                "title": _("Member Discount")}),
+                "title": _("Member Discount %")}),
         ))
 
         self.review_states = [
@@ -126,6 +118,14 @@ class ClientFolderContentsView(BikaListingView):
                 "columns": self.columns.keys(),
             },
         ]
+    
+        if not self.context.bika_setup.getShowPrices():
+            for i in range(len(self.review_states)):
+                self.review_states[i]["columns"].remove("BulkDiscount")
+                self.review_states[i]["columns"].remove("MemberDiscountApplies")
+            del self.columns['MemberDiscountApplies']
+            del self.columns['BulkDiscount']
+
 
     def before_render(self):
         """Before template render hook
@@ -178,13 +178,39 @@ class ClientFolderContentsView(BikaListingView):
         email = obj.getEmailAddress()
         item["replace"]["EmailAddress"] = get_email_link(email)
         # translate True/FALSE values
-        item["replace"]["BulkDiscount"] = obj.getBulkDiscount() and _("Yes") or _("No")
-        item["replace"]["MemberDiscountApplies"] = obj.getMemberDiscountApplies() and _("Yes") or _("No")
-        # render a phone link
+
+        # Contacts
+        all_contacts = obj.getContacts()
+        contacts_url = "{}/{}".format(item['url'],"contacts")
+
+        top_contacts = []
+        if all_contacts:
+            for contact in all_contacts:
+                contact_url = contact.absolute_url()
+                contact_name = contact.getFullname()
+                top_contacts.append(get_link(contact_url,contact_name))
+                if len(top_contacts) > 1 and len(all_contacts) > 2:
+                    top_contacts.append(get_link(contacts_url,"..."))
+                    break
+        item["replace"]["Contacts"] = top_contacts
+
+        # Phone - render a phone link
         phone = obj.getPhone()
         if phone:
             item["replace"]["Phone"] = get_link("tel:{}".format(phone), phone)
 
+        # Client CC emails
+        cc_email = obj.getCCEmails()
+        if cc_email:
+            item["replace"]["ClientCCEmails"] = get_email_link(cc_email)
+
+        #Bulk discount
+        item["replace"]["BulkDiscount"] = obj.getBulkDiscount() and _("Yes") or _("")
+
+        #Member discount % 
+        member_discount = api.get_setup().getMemberDiscount()
+        if member_discount and obj.getMemberDiscountApplies():
+            item["replace"]["MemberDiscountApplies"] = member_discount
         return item
 
 

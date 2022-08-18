@@ -71,13 +71,24 @@ class TemplatesView(BikaListingView):
 
         self.columns = collections.OrderedDict((
             ("Title", {
-                "title": _("Profile"),
+                "title": _("Title"),
                 "index": "sortable_title"}),
             ("Description", {
                 "title": _("Description"),
                 "index": "Description",
-                "toggle": True,
-            }),
+                "toggle": True,}),
+            ("SamplePoint", {
+                "title": _("Sample Point"),
+                "toggle": True,}),
+            ("SampleType", {
+                "title": _("Sample Type"),
+                "toggle": True,}),
+            ("NumberOfPartitions", {
+                "title": _("Number Of Partitions"),
+                "toggle": True,}),
+            ("Profiles", {
+                "title": _("Profiles"),
+                "toggle": True,}),
         ))
 
         self.review_states = [
@@ -114,7 +125,21 @@ class TemplatesView(BikaListingView):
 
         item["replace"]["Title"] = get_link(url, value=title)
         item["Description"] = description
-
+        sample_point = obj.getSamplePoint().Title()
+        if sample_point:
+            item["SamplePoint"] = sample_point
+        sample_type = obj.getSampleType().Title()
+        if sample_type:
+            item["SampleType"] = sample_type
+        number_of_partitions = len(obj.getPartitions())
+        if number_of_partitions:
+            item["NumberOfPartitions"] = number_of_partitions
+        profiles = obj.AnalysisProfiles()
+        profiles_list = []
+        for value in profiles.values():
+            if value:
+                profiles_list.append(value)
+        item["Profiles"] = profiles_list
         return item
 
 

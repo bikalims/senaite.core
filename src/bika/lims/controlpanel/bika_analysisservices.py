@@ -214,42 +214,69 @@ class AnalysisServicesView(BikaListingView):
                 "index": "sortable_title",
                 "replace_url": "getURL",
                 "sortable": self.can_sort}),
+            ("Unit", {
+                "title": _("Unit"),
+                "sortable": False}),
             ("Keyword", {
                 "title": _("Keyword"),
                 "index": "getKeyword",
                 "attr": "getKeyword",
                 "sortable": self.can_sort}),
-            ("Category", {
-                "title": _("Category"),
-                "attr": "getCategoryTitle",
-                "sortable": self.can_sort}),
+            ("SortKey", {
+                "title": _("Sort Key"),
+                "sortable": False}),
             ("Methods", {
                 "title": _("Methods"),
                 "sortable": self.can_sort}),
-            ("Department", {
-                "title": _("Department"),
-                "toggle": False,
-                "sortable": self.can_sort}),
-            ("Unit", {
-                "title": _("Unit"),
-                "sortable": False}),
-            ("Price", {
-                "title": _("Price"),
-                "sortable": self.can_sort}),
-            ("MaxTimeAllowed", {
-                "title": _("Max Time"),
-                "toggle": False,
-                "sortable": self.can_sort}),
-            ("DuplicateVariation", {
-                "title": _("Dup Var"),
+            ("Instruments", {
+                "title": _("Instruments"),
                 "toggle": False,
                 "sortable": False}),
             ("Calculation", {
                 "title": _("Calculation"),
                 "sortable": False}),
-            ("SortKey", {
-                "title": _("Sort Key"),
+            ("MaxTimeAllowed", {
+                "title": _("Maximum turnaround time"),
+                "toggle": False,
+                "sortable": self.can_sort}),
+            ("DecimalPrecision", {
+                "title": _("Decimal Precision"),
+                "toggle": False,
                 "sortable": False}),
+            ("StringResult", {
+                "title": _("String Result"),
+                "sortable": self.can_sort}),
+            ("MDL", {
+                "title": _("MDL"),
+                "toggle": False,
+                "sortable": False}),
+            ("UDL", {
+                "title": _("UDL"),
+                "toggle": False,
+                "sortable": False}),
+            ("DuplicateVariation", {
+                "title": _("Duplicate Variation"),
+                "toggle": False,
+                "sortable": False}),
+            ("Accredited", {
+                "title": _("Accredited"),
+                "toggle": False,
+                "sortable": False}),
+            ("Category", {
+                "title": _("Category"),
+                "attr": "getCategoryTitle",
+                "sortable": self.can_sort}),
+            ("Department", {
+                "title": _("Department"),
+                "toggle": False,
+                "sortable": self.can_sort}),
+            ("Price", {
+                "title": _("Price"),
+                "toggle": False,
+                "sortable": self.can_sort}),
+            ("BulkPrice", {
+                "title": _("Bulk Price"),
+                "sortable": self.can_sort}),
         ))
 
         copy_transition = {
@@ -283,6 +310,9 @@ class AnalysisServicesView(BikaListingView):
         if not self.context.bika_setup.getShowPrices():
             for i in range(len(self.review_states)):
                 self.review_states[i]["columns"].remove("Price")
+                self.review_states[i]["columns"].remove("BulkPrice")
+            del self.columns['Price']
+            del self.columns['BulkPrice']
 
     def get_decimal_mark(self):
         """Returns the decimal mark
@@ -376,7 +406,13 @@ class AnalysisServicesView(BikaListingView):
             item["MaxTimeAllowed"] = self.format_maxtime(maxtime)
 
         # Price
-        item["Price"] = self.format_price(obj.Price)
+        user_roles = api.get_current_user().getRoles()
+        if "Manager" in user_roles:
+            financial_permissions = True
+        else:
+            financial_permissions = False
+        if financial_permissions:
+            item["Price"] = self.format_price(obj.Price)
 
         # Duplicate Variation
         dup_variation = obj.DuplicateVariation
@@ -398,6 +434,44 @@ class AnalysisServicesView(BikaListingView):
         # Sort key
         sortkey = obj.getSortKey()
         item["SortKey"] = sortkey
+
+        #MDL
+        mdl = obj.getAllowManualDetectionLimit()
+        item["MDL"] = mdl
+
+        #UDL
+        udl = obj.getUpperDetectionLimit()
+        item["UDL"] = udl
+
+        #Decimal Precision
+        decimal_precision = obj.Precision
+        item["DecimalPrecision"] = decimal_precision
+
+        #Instruments
+        instruments = obj.getInstruments()
+        instrument_names = []
+        for instrument in instruments:
+            instrument_names.append(instrument.title)
+        item["Instruments"] = instrument_names
+    
+        #Accredited
+        accredited = obj.getAccredited()
+        if accredited:
+            item["Accredited"] = "Y"
+        else:
+            item["Accredited"] = ""
+
+        #Bulk Price
+        bulk_price = obj.BulkPrice
+        if financial_permissions:
+            item["BulkPrice"] = self.format_price(bulk_price)
+
+        #String result Y/N
+        string_result = obj.getStringResult()
+        if string_result:
+            item["StringResult"] = "Y"
+        else:
+            item["StringResult"] = ""
 
         # Icons
         after_icons = ""

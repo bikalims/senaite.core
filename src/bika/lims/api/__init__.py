@@ -18,9 +18,15 @@
 # Copyright 2018-2021 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
-import Missing
 import re
+from collections import OrderedDict
+from datetime import datetime
+from datetime import timedelta
+from itertools import groupby
+
 import six
+
+import Missing
 from AccessControl.PermissionRole import rolesForPermissionOn
 from Acquisition import aq_base
 from Acquisition import aq_inner
@@ -29,12 +35,8 @@ from bika.lims import logger
 from bika.lims.interfaces import IClient
 from bika.lims.interfaces import IContact
 from bika.lims.interfaces import ILabContact
-from collections import OrderedDict
-from datetime import datetime
 from DateTime import DateTime
-from datetime import timedelta
 from DateTime.interfaces import DateTimeError
-from itertools import groupby
 from plone import api as ploneapi
 from plone.api.exc import InvalidParameterError
 from plone.app.layout.viewlets.content import ContentHistoryView
@@ -118,6 +120,13 @@ def get_bika_setup():
     """Fetch the `bika_setup` folder.
     """
     return get_setup()
+
+
+def get_senaite_setup():
+    """Fetch the new DX `setup` folder.
+    """
+    portal = get_portal()
+    return portal.get("setup")
 
 
 def create(container, portal_type, *args, **kwargs):
@@ -1372,6 +1381,52 @@ def to_float(value, default=_marker):
     return float(value)
 
 
+def float_to_string(value, default=_marker):
+    """Convert a float value to string without exponential notation
+
+    This function preserves the whole fraction
+
+    :param value: The float value to be converted to a string
+    :type value: str, float, int
+    :returns: String representation of the float w/o exponential notation
+    :rtype: str
+    """
+    if not is_floatable(value):
+        if default is not _marker:
+            return default
+        fail("Value %s is not floatable" % repr(value))
+
+    # Leave floatable string values unchanged
+    if isinstance(value, six.string_types):
+        return value
+
+    value = float(value)
+    str_value = str(value)
+
+    if "." in str_value:
+        # might be something like 1.23e-26
+        front, back = str_value.split(".")
+    else:
+        # or 1e-07 for 0.0000001
+        back = str_value
+
+    if "e-" in back:
+        fraction, zeros = back.split("e-")
+        # we want to cover the faction and the zeros
+        precision = len(fraction) + int(zeros)
+        template = "{:.%df}" % precision
+        str_value = template.format(value)
+    elif "e+" in back:
+        # positive numbers, e.g. 1e+16 don't need a fractional part
+        str_value = "{:.0f}".format(value)
+
+    # cut off trailing zeros
+    if "." in str_value:
+        str_value = str_value.rstrip("0").rstrip(".")
+
+    return str_value
+
+
 def to_searchable_text_metadata(value):
     """Parse the given metadata value to searchable text
 
@@ -1393,7 +1448,8 @@ def to_searchable_text_metadata(value):
     if isinstance(value, dict):
         return to_searchable_text_metadata(value.values())
     if is_date(value):
-        return value.strftime("%Y-%m-%d")
+        from senaite.core.api.dtime import date_to_string
+        return date_to_string(value, "%Y-%m-%d")
     if is_at_content(value):
         return to_searchable_text_metadata(get_title(value))
     if not isinstance(value, six.string_types):

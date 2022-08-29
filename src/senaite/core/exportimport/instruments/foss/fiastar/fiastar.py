@@ -49,7 +49,6 @@ class Export(BrowserView):
     def __call__(self, analyses):
         tray = 1
         now = DateTime().strftime('%Y%m%d-%H%M')
-        bsc = getToolByName(self.context, 'senaite_catalog_setup')
         uc = getToolByName(self.context, 'uid_catalog')
         instrument = self.context.getInstrument()
         norm = getUtility(IIDNormalizer).normalize
@@ -69,7 +68,7 @@ class Export(BrowserView):
             a_uid = layout[x]['analysis_uid']
             p_uid = uc(UID=a_uid)[0].getObject().aq_parent.UID()
             layout[x]['parent_uid'] = p_uid
-            if not p_uid in parent_to_slot.keys():
+            if p_uid not in parent_to_slot.keys():
                 parent_to_slot[p_uid] = int(layout[x]['position'])
 
         # write rows, one per PARENT
@@ -157,7 +156,7 @@ def Import(context, request):
         tbex = ''
         try:
             importer.process()
-        except:
+        except Exception:
             tbex = traceback.format_exc()
         errors = importer.errors
         logs = importer.logs

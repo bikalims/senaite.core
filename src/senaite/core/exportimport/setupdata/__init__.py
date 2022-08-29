@@ -35,6 +35,7 @@ from bika.lims.utils import getFromString
 from bika.lims.utils import t
 from bika.lims.utils import tmpID
 from bika.lims.utils import to_unicode
+from bika.lims.utils import to_utf8
 from bika.lims.utils.analysis import create_analysis
 from Products.Archetypes.event import ObjectInitializedEvent
 from Products.CMFCore.utils import getToolByName
@@ -175,7 +176,7 @@ class WorksheetImporter:
                     self.dataset_project,
                     "setupdata/%s/%s" % (self.dataset_name, filename))
                 file_data = open(path, "rb").read()
-            except:
+            except Exception:
                 file_data = None
         else:
             file_data = None
@@ -188,15 +189,15 @@ class WorksheetImporter:
 
         try:
             value = value.lower()
-        except:
+        except Exception:
             pass
         try:
             value = value.encode('utf-8')
-        except:
+        except Exception:
             pass
         try:
             value = int(value)
-        except:
+        except Exception:
             pass
         if value in ('true', 1):
             return True
@@ -211,7 +212,7 @@ class WorksheetImporter:
         except ValueError:
             try:
                 return int(default)
-            except:
+            except Exception:
                 return 0
 
     def to_float(self, value, default=0):
@@ -222,7 +223,7 @@ class WorksheetImporter:
         except ValueError:
             try:
                 return float(default)
-            except:
+            except Exception:
                 return 0.0
 
     def defer(self, **kwargs):
@@ -275,7 +276,7 @@ class WorksheetImporter:
         for fieldname in fieldnames:
             try:
                 field = fields[fieldname]
-            except:
+            except Exception:
                 if fieldname in row:
                     logger.info("Address field %s not found on %s"%(fieldname,obj))
                 continue
@@ -430,9 +431,10 @@ class Lab_Contacts(WorksheetImporter):
                 username = safe_unicode(row['Username']).encode('utf-8')
                 passw = row['Password']
                 if not passw:
-                    warn = "Lab Contact: No password defined for user '{0}' in row {1}. Password established automatically to '{3}'".format(username, str(rownum), username)
-                    logger.warning(warn)
                     passw = username
+                    warn = ("Lab Contact: No password defined for user '{0}' in row {1}."
+                            " Password established automatically to '{2}'").format(username, str(rownum), passw)
+                    logger.warning(warn)
 
                 try:
                     member = portal_registration.addMember(
@@ -514,7 +516,6 @@ class Lab_Departments(WorksheetImporter):
 class Lab_Products(WorksheetImporter):
 
     def Import(self):
-        context = self.context
         # Refer to the default folder
         folder = self.context.bika_setup.bika_labproducts
         # Iterate through the rows
@@ -608,7 +609,7 @@ class Client_Contacts(WorksheetImporter):
             password = safe_unicode(row['Password']).encode('utf-8')
             if(username):
                 try:
-                    member = self.context.portal_registration.addMember(
+                    self.context.portal_registration.addMember(
                         username,
                         password,
                         properties={
@@ -1038,7 +1039,7 @@ class Instrument_Maintenance_Tasks(WorksheetImporter):
                 obj = _createObjectByType("InstrumentMaintenanceTask", folder, tmpID())
                 try:
                     cost = "%.2f" % (row.get('cost', 0))
-                except:
+                except Exception:
                     cost = row.get('cost', '0.0')
 
                 obj.edit(
@@ -1222,8 +1223,6 @@ class Storage_Locations(WorksheetImporter):
 
     def Import(self):
         setup_folder = self.context.bika_setup.bika_storagelocations
-        bsc = getToolByName(self.context, 'senaite_catalog_setup')
-        pc = getToolByName(self.context, 'portal_catalog')
         for row in self.get_rows(3):
             if not row['Address']:
                 continue
@@ -1722,7 +1721,6 @@ class Analysis_Specifications(WorksheetImporter):
         return service
 
     def Import(self):
-        s_t = ""
         bucket = {}
         pc = getToolByName(self.context, "portal_catalog")
         bsc = getToolByName(self.context, "senaite_catalog_setup")
@@ -1916,7 +1914,7 @@ class Reference_Definitions(WorksheetImporter):
             if row['ReferenceDefinition_title'] not in self.results.keys():
                 self.results[row['ReferenceDefinition_title']] = []
             service = self.get_object(bsc, 'AnalysisService',
-                                      row.get('service'))
+                    row.get('service'), **{"getKeyword": row.get("Keyword")})
             if not service:
                 continue
             self.results[
@@ -2015,7 +2013,7 @@ class Setup(WorksheetImporter):
         }
         try:
             return converters.get(field.type, None)(field, value)
-        except:
+        except Exception:
             logger.error("No valid type for Setup.{} ({}): {}"
                          .format(field.getName(), field.type, value))
 
@@ -2095,7 +2093,7 @@ class Setup(WorksheetImporter):
             try:
                 obj_field = bsetup.getField(field_name)
                 obj_field.set(bsetup, str(value))
-            except:
+            except Exception:
                 logger.error("No valid type for Setup.{} ({}): {}"
                              .format(field_name, field.type, value))
 
@@ -2197,7 +2195,6 @@ class Reference_Samples(WorksheetImporter):
             if not worksheet:
                 return
             self.interim_worksheet = worksheet
-        bsc = getToolByName(self.context, 'senaite_catalog_setup')
         interims = []
         for row in self.get_rows(3, worksheet=self.interim_worksheet):
             if row['ReferenceAnalysis_id'] != analysis.getId():
@@ -2301,8 +2298,6 @@ class Analysis_Requests(WorksheetImporter):
         analysis.setInterimFields(interims)
 
     def Import(self):
-        bc = getToolByName(self.context, 'senaite_catalog')
-        bsc = getToolByName(self.context, 'senaite_catalog_setup')
         pc = getToolByName(self.context, 'portal_catalog')
         for row in self.get_rows(3):
             if not row['id']:

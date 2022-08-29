@@ -26,7 +26,6 @@ from bika.lims.utils import t
 from . import FacsCaliburCSVParser, FacsCaliburImporter
 import json
 import traceback
-import logging
 
 title = "FACS Calibur"
 
@@ -38,8 +37,6 @@ def Import( context, request):
     fileformat = request.form['facs_calibur_format']
     artoapply = request.form['facs_calibur_artoapply']
     override = request.form['facs_calibur_override']
-    sample = request.form.get('facs_calibur_sample',
-                              'requestid')
     instrument = request.form.get('instrument', None)
     errors = []
     logs = []
@@ -71,16 +68,6 @@ def Import( context, request):
         elif override == 'overrideempty':
             over = [True, True]
 
-        sam = ['getId', 'getSampleID', 'getClientSampleID']
-        if sample == 'requestid':
-            sam = ['getId']
-        if sample == 'sampleid':
-            sam = ['getSampleID']
-        elif sample == 'clientsid':
-            sam = ['getClientSampleID']
-        elif sample == 'sample_clientsid':
-            sam = ['getSampleID', 'getClientSampleID']
-
         importer = FacsCalibur2Importer(parser=parser,
                                         context=context,
                                         allowed_ar_states=status,
@@ -90,7 +77,7 @@ def Import( context, request):
         tbex = ''
         try:
             importer.process()
-        except:
+        except Exception:
             tbex = traceback.format_exc()
         errors = importer.errors
         logs = importer.logs

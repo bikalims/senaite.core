@@ -33,6 +33,41 @@ Changelog
 2.3.0 (unreleased)
 ------------------
 
+- #2118 Customized Quickinstaller Configlet
+- #2117 Customized User/Groups Preferences in Site Configuration
+- #2115 Fix insufficient privileges for instrument QC viewlet
+- #2114 Allow Multi Analysis Results Entry
+- #2111 Replace header table with customizable sample header viewlet
+- #2110 Add a more descriptive message for "Reject" action inside a Worksheet
+- #2104 Fix result formatting when result is below LDL or above UDL
+- #2103 Convert LDL/UDL fields to string
+- #2101 Add help text for numeric result
+- #2097 Fix Attribute Error in Multi- Sample Add form when current user is a client contact
+- #2096 Convert uncertainty field to string
+- #2095 Fix rounded uncertainty value is stored in the database
+- #2094 Skip Auditlog catalog if disabled for DX types catalog multiplexer
+- #2090 Add support for dates before 1900
+- #2089 Fix LDL/UDL cut-off and exponential float conversion
+- #2078 Replace dynamic code execution with dynamic import in reports
+- #2083 Lookup workflow action redirect URL from request first
+- #2082 Include sample ID in form ID for lab, field and qc analyses listings
+- #2075 Allow to override logo and styles in new SENAITE Setup
+- #2076 Fix style of selected language in dropdown
+- #2074 Allow to disable global Auditlogging
+- #2072 Refactor report filename generation to own method
+- #2071 Move sample reports to report catalog, add batch ID and email sent flag to listing
+- #2070 Fix typo/duplicate translation key in colophon
+- #2067 Replace ParentAnalysisRequest ReferenceField by UIDReferenceField
+- #2066 Fix samples w/o active analyses are displayed under "unassigned" filter
+- #2065 Fix "Create Worksheet" modal visible for samples w/o unassigned analyses
+- #2063 Allow to customize email publication template in setup
+- #2062 Fix listing not updated after instrument assignment in Worksheet's view
+- #2061 Fire notifications when UID references are created/destroyed
+- #2058 Filter 'Interpretation templates' in sample view by template and type
+- #2048 Fix catalog logging counter duplicates
+- #2047 Make resultsinterpretation.pt to retrieve departments from viewlet
+- #2045 Fix instrument types instruments view
+- #2044 Skip Invoice for content exports
 - #2043 Fix printed time does not get updated on re-Print
 - #2033 Fix blurry Barcode and QRCode in stickers
 - #2032 Fix add-on stickers not displayed in sample type admitted stickers

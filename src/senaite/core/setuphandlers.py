@@ -128,6 +128,7 @@ COLUMNS = (
 
 CATALOG_MAPPINGS = (
     # portal_type, catalog_ids
+    ("ARReport", ["senaite_catalog_report", "portal_catalog"]),
     ("ARTemplate", ["senaite_catalog_setup", "portal_catalog"]),
     ("AnalysisCategory", ["senaite_catalog_setup", "portal_catalog"]),
     ("AnalysisProfile", ["senaite_catalog_setup", "portal_catalog"]),
@@ -197,6 +198,7 @@ def install(context):
     setup_catalog_mappings(portal)
     setup_auditlog_catalog_mappings(portal)
     setup_content_structure(portal)
+    add_senaite_setup(portal)
     add_dexterity_portal_items(portal)
     add_dexterity_setup_items(portal)
 
@@ -234,6 +236,22 @@ def add_dexterity_setup_items(portal):
     add_dexterity_items(setup, items)
 
 
+def add_senaite_setup(portal):
+    """Add the new SENAITE Setup container
+    """
+    items = [
+        # ID, Title, FTI
+        ("setup", "SENAITE Setup", "Setup"),
+    ]
+    add_dexterity_items(portal, items)
+
+    # Move Setup at the beginning
+    portal.moveObjectToPosition("setup", 0)
+
+    # Reindex order
+    portal.plone_utils.reindexOnReorder(portal)
+
+
 def add_dexterity_portal_items(portal):
     """Adds the Dexterity Container in the Site folder
 
@@ -242,15 +260,16 @@ def add_dexterity_portal_items(portal):
     """
     # Tuples of ID, Title, FTI
     items = [
-        ("samples",  # ID
-         "Samples",  # Title
-         "Samples"),  # FTI
+        # ID, Title, FTI
+        ("samples", "Samples", "Samples"),
     ]
     add_dexterity_items(portal, items)
 
     # Move Samples after Clients nav item
     position = portal.getObjectPosition("clients")
     portal.moveObjectToPosition("samples", position + 1)
+
+    # Reindex order
     portal.plone_utils.reindexOnReorder(portal)
 
 

@@ -611,11 +611,7 @@ class Instrument(ATFolder):
         """
         # TODO Workflow - Analyses. Assignment of refanalysis to Instrument
         addedanalyses = []
-        wf = getToolByName(self, 'portal_workflow')
         bsc = getToolByName(self, 'senaite_catalog_setup')
-        bac = getToolByName(self, 'senaite_catalog_analysis')
-        ref_type = reference.getBlank() and 'b' or 'c'
-        ref_uid = reference.UID()
         postfix = 1
         for refa in reference.getReferenceAnalyses():
             grid = refa.getReferenceAnalysesGroupID()
@@ -623,7 +619,7 @@ class Instrument(ATFolder):
                 cand = int(grid.split('-')[2])
                 if cand >= postfix:
                     postfix = cand + 1
-            except:
+            except Exception:
                 pass
         postfix = str(postfix).zfill(int(3))
         refgid = 'I%s-%s' % (reference.id, postfix)

@@ -35,7 +35,7 @@ class LabAnalysesTable(AnalysesView):
             "getAncestorsUIDs": [api.get_uid(context)]
         })
 
-        self.form_id = "lab_analyses"
+        self.form_id = "%s_lab_analyses" % api.get_id(context)
         self.allow_edit = True
         self.show_workflow_action_buttons = True
         self.show_select_column = True
@@ -56,7 +56,7 @@ class FieldAnalysesTable(AnalysesView):
             "getAncestorsUIDs": [api.get_uid(context)]
         })
 
-        self.form_id = "field_analyses"
+        self.form_id = "%s_field_analyses" % api.get_id(context)
         self.allow_edit = True
         self.show_workflow_action_buttons = True
         self.show_select_column = True
@@ -70,7 +70,7 @@ class QCAnalysesTable(QCAnalysesView):
     def __init__(self, context, request):
         super(QCAnalysesTable, self).__init__(context, request)
 
-        self.form_id = "qc_analyses"
+        self.form_id = "%s_qc_analyses" % api.get_id(context)
         self.allow_edit = False
         self.show_select_column = False
         self.show_workflow_action_buttons = False

@@ -34,7 +34,6 @@ def getResultsInputFile(request):
 
 def GenericImport(context, request, parser, importer=None):
     infile = getResultsInputFile(request)
-    fileformat = getFileFormat(request)
     artoapply = request.form['artoapply']
     override = request.form['results_override']
 
@@ -74,7 +73,7 @@ def GenericImport(context, request, parser, importer=None):
         tbex = ''
         try:
             imp.process()
-        except:
+        except Exception:
             tbex = traceback.format_exc()
         errors = imp.errors
         logs = imp.logs

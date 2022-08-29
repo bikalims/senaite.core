@@ -43,7 +43,6 @@ from bika.lims.content.abstractbaseanalysis import AbstractBaseAnalysis
 from bika.lims.content.abstractbaseanalysis import schema
 from bika.lims.interfaces import IDuplicateAnalysis
 from bika.lims.permissions import FieldEditAnalysisResult
-from bika.lims.utils import drop_trailing_zeros_decimal
 from bika.lims.utils import formatDecimalMark
 from bika.lims.utils.analysis import format_numeric_result
 from bika.lims.utils.analysis import get_significant_digits
@@ -51,7 +50,6 @@ from bika.lims.workflow import getTransitionActor
 from bika.lims.workflow import getTransitionDate
 from DateTime import DateTime
 from Products.Archetypes.Field import DateTimeField
-from Products.Archetypes.Field import FixedPointField
 from Products.Archetypes.Field import IntegerField
 from Products.Archetypes.Field import StringField
 from Products.Archetypes.references import HoldingReference
@@ -109,7 +107,7 @@ Analyst = StringField(
 
 # The actual uncertainty for this analysis' result, populated from the ranges
 # specified in the analysis service when the result is submitted.
-Uncertainty = FixedPointField(
+Uncertainty = StringField(
     'Uncertainty',
     read_permission=View,
     write_permission="Field: Edit Result",
@@ -240,56 +238,66 @@ class AbstractAnalysis(AbstractBaseAnalysis):
                 return None
 
             for d in uncertainties:
-                _min = float(d['intercept_min'])
-                _max = float(d['intercept_max'])
-                if _min <= res and res <= _max:
-                    if str(d['errorvalue']).strip().endswith('%'):
+
+                # convert to min/max
+                unc_min = api.to_float(d["intercept_min"], default=0)
+                unc_max = api.to_float(d["intercept_max"], default=0)
+
+                if unc_min <= res and res <= unc_max:
+                    _err = str(d["errorvalue"]).strip()
+                    if _err.endswith("%"):
                         try:
-                            percvalue = float(d['errorvalue'].replace('%', ''))
+                            percvalue = float(_err.replace("%", ""))
                         except ValueError:
                             return None
+                        # calculate uncertainty from result
                         uncertainty = res / 100 * percvalue
                     else:
-                        uncertainty = float(d['errorvalue'])
+                        uncertainty = api.to_float(_err, default=0)
 
-                    return uncertainty
+                    # convert back to string value
+                    return api.float_to_string(uncertainty, default=None)
         return None
 
     @security.public
     def getUncertainty(self, result=None):
         """Returns the uncertainty for this analysis and result.
-        Returns the value from Schema's Uncertainty field if the Service has
-        the option 'Allow manual uncertainty'. Otherwise, do a callback to
-        getDefaultUncertainty(). Returns None if no result specified and the
-        current result for this analysis is below or above detections limits.
-        """
-        uncertainty = self.getField('Uncertainty').get(self)
-        if result is None and (self.isAboveUpperDetectionLimit() or
-                               self.isBelowLowerDetectionLimit()):
-            return None
 
-        if uncertainty and self.getAllowManualUncertainty() is True:
-            try:
-                uncertainty = float(uncertainty)
-                return uncertainty
-            except (TypeError, ValueError):
-                # if uncertainty is not a number, return default value
-                pass
+        Returns the value from Schema's Uncertainty field if the Service has
+        the option 'Allow manual uncertainty'.
+        Otherwise, do a callback to getDefaultUncertainty().
+
+        Returns empty string if no result specified and the current result for this
+        analysis is below or above detections limits.
+        """
+        uncertainty = self.getField("Uncertainty").get(self)
+        if result is None:
+            if self.isAboveUpperDetectionLimit():
+                return None
+            if self.isBelowLowerDetectionLimit():
+                return None
+
+        if uncertainty and self.getAllowManualUncertainty():
+            return api.float_to_string(uncertainty, default=None)
+
         return self.getDefaultUncertainty(result)
 
     @security.public
     def setUncertainty(self, unc):
-        """Sets the uncertainty for this analysis. If the result is a
-        Detection Limit or the value is below LDL or upper UDL, sets the
-        uncertainty value to 0
+        """Sets the uncertainty for this analysis
+
+        If the result is a Detection Limit or the value is below LDL or upper
+        UDL, set the uncertainty to None``
         """
         # Uncertainty calculation on DL
         # https://jira.bikalabs.com/browse/LIMS-1808
-        if self.isAboveUpperDetectionLimit() or \
-                self.isBelowLowerDetectionLimit():
-            self.getField('Uncertainty').set(self, None)
-        else:
-            self.getField('Uncertainty').set(self, unc)
+        if self.isAboveUpperDetectionLimit():
+            unc = None
+        if self.isBelowLowerDetectionLimit():
+            unc = None
+
+        field = self.getField("Uncertainty")
+        field.set(self, api.float_to_string(unc, default=None))
 
     @security.public
     def setDetectionLimitOperand(self, value):
@@ -388,7 +396,8 @@ class AbstractAnalysis(AbstractBaseAnalysis):
             return True
 
         if api.is_floatable(result):
-            return api.to_float(result) < self.getLowerDetectionLimit()
+            ldl = self.getLowerDetectionLimit()
+            return api.to_float(result) < api.to_float(ldl, 0.0)
 
         return False
 
@@ -405,10 +414,13 @@ class AbstractAnalysis(AbstractBaseAnalysis):
             return True
 
         if api.is_floatable(result):
-            return api.to_float(result) > self.getUpperDetectionLimit()
+            udl = self.getUpperDetectionLimit()
+            return api.to_float(result) > api.to_float(udl, 0.0)
 
         return False
 
+    # TODO: REMOVE:  nowhere used
+    @deprecated("This Method will be removed in version 2.5")
     @security.public
     def getDetectionLimits(self):
         """Returns a two-value array with the limits of detection (LDL and
@@ -416,7 +428,9 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         the analysis service doesn't allow manual input of detection limits,
         returns the value set by default in the Analysis Service
         """
-        return [self.getLowerDetectionLimit(), self.getUpperDetectionLimit()]
+        ldl = self.getLowerDetectionLimit()
+        udl = self.getUpperDetectionLimit()
+        return [api.to_float(ldl, 0.0), api.to_float(udl, 0.0)]
 
     @security.public
     def isLowerDetectionLimit(self):
@@ -575,8 +589,8 @@ class AbstractAnalysis(AbstractBaseAnalysis):
                     adl = dependency.isAboveUpperDetectionLimit()
                     mapping[key] = result
                     mapping['%s.%s' % (key, 'RESULT')] = result
-                    mapping['%s.%s' % (key, 'LDL')] = ldl
-                    mapping['%s.%s' % (key, 'UDL')] = udl
+                    mapping['%s.%s' % (key, 'LDL')] = api.to_float(ldl, 0.0)
+                    mapping['%s.%s' % (key, 'UDL')] = api.to_float(udl, 0.0)
                     mapping['%s.%s' % (key, 'BELOWLDL')] = int(bdl)
                     mapping['%s.%s' % (key, 'ABOVEUDL')] = int(adl)
                 except (TypeError, ValueError):
@@ -850,8 +864,7 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         dl = self.getDetectionLimitOperand()
         if dl:
             try:
-                res = float(result)  # required, check if floatable
-                res = drop_trailing_zeros_decimal(res)
+                res = api.float_to_string(float(result))
                 fdm = formatDecimalMark(res, decimalmark)
                 hdl = cgi.escape(dl) if html else dl
                 return '%s %s' % (hdl, fdm)
@@ -915,19 +928,19 @@ class AbstractAnalysis(AbstractBaseAnalysis):
 
         # Below Lower Detection Limit (LDL)?
         ldl = self.getLowerDetectionLimit()
+        ldl = api.to_float(ldl, 0.0)
         if result < ldl:
             # LDL must not be formatted according to precision, etc.
-            # Drop trailing zeros from decimal
-            ldl = drop_trailing_zeros_decimal(ldl)
+            ldl = api.float_to_string(ldl)
             fdm = formatDecimalMark('< %s' % ldl, decimalmark)
             return fdm.replace('< ', '&lt; ', 1) if html else fdm
 
         # Above Upper Detection Limit (UDL)?
         udl = self.getUpperDetectionLimit()
+        udl = api.to_float(udl, 0.0)
         if result > udl:
             # UDL must not be formatted according to precision, etc.
-            # Drop trailing zeros from decimal
-            udl = drop_trailing_zeros_decimal(udl)
+            udl = api.float_to_string(udl)
             fdm = formatDecimalMark('> %s' % udl, decimalmark)
             return fdm.replace('> ', '&gt; ', 1) if html else fdm
 
@@ -964,10 +977,10 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         if allow_manual or precision_unc:
             uncertainty = self.getUncertainty(result)
             if uncertainty is None:
-                return self.getField('Precision').get(self)
-            if uncertainty == 0 and result is None:
-                return self.getField('Precision').get(self)
-            if uncertainty == 0:
+                return self.getField("Precision").get(self)
+            if api.to_float(uncertainty) == 0 and result is None:
+                return self.getField("Precision").get(self)
+            if api.to_float(uncertainty) == 0:
                 strres = str(result)
                 numdecimals = strres[::-1].find('.')
                 return numdecimals

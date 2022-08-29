@@ -21,13 +21,10 @@
 from AccessControl import ClassSecurityInfo
 from Products.Archetypes.Registry import registerWidget
 from Products.Archetypes.Widget import TypesWidget
-from Products.Archetypes.interfaces import IVocabulary
-from zope.interface import implements
-from zope.schema.vocabulary import SimpleVocabulary
-from zope.schema.vocabulary import SimpleTerm
+
 try:
     from zope.component.hooks import getSite
-except:
+except Exception:
     # Plone < 4.3
     from zope.app.component.hooks import getSite
 

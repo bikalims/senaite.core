@@ -21,10 +21,11 @@
 """ TESCAN TIMA
 """
 from . import TimaCSVParser, TimaImporter
-from senaite.core.exportimport.instruments.resultsimport import \
-    AnalysisResultsImporter
 import json
 import traceback
+
+from bika.lims import _
+from bika.lims.utils import t
 
 title = "Tescan - TIMA"
 
@@ -77,7 +78,7 @@ def Import(context, request):
         tbex = ''
         try:
             importer.process()
-        except:
+        except Exception:
             tbex = traceback.format_exc()
         errors = importer.errors
         logs = importer.logs

@@ -50,7 +50,6 @@ from bika.lims.utils import formatDecimalMark
 from bika.lims.utils import get_image
 from bika.lims.utils import get_link
 from bika.lims.utils import get_link_for
-from bika.lims.utils import getUsers
 from bika.lims.utils import t
 from bika.lims.utils.analysis import format_uncertainty
 from DateTime import DateTime
@@ -707,6 +706,10 @@ class AnalysesView(ListingView):
                 if field not in item:
                     item[field] = ""
 
+            # Graceful handling of new item key introduced in
+            # https://github.com/senaite/senaite.app.listing/pull/81
+            item["help"] = item.get("help", {})
+
         # XXX order the list of interim columns
         interim_keys = self.interim_columns.keys()
         interim_keys.reverse()
@@ -882,6 +885,9 @@ class AnalysesView(ListingView):
 
             else:
                 item["result_type"] = "numeric"
+                item["help"]["result"] = _(
+                    "Enter the result either in decimal or scientific "
+                    "notation, e.g. 0.00005 or 1e-5, 10000 or 1e5")
 
         if not result:
             return
@@ -1143,24 +1149,30 @@ class AnalysesView(ListingView):
         :param analysis_brain: Brain that represents an analysis
         :param item: analysis' dictionary counterpart that represents a row
         """
-
         item["Uncertainty"] = ""
 
         if not self.has_permission(ViewResults, analysis_brain):
             return
 
-        result = analysis_brain.getResult
-
+        # Wake up the Analysis object
         obj = self.get_object(analysis_brain)
-        formatted = format_uncertainty(obj, result, decimalmark=self.dmk,
-                                       sciformat=int(self.scinot))
+
+        # NOTE: When we allow to edit the uncertainty, we want to have the raw
+        #       uncertainty value and not the formatted (and possibly rounded)!
+        #       This ensures that not the rounded value get stored
+        allow_edit = self.is_uncertainty_edition_allowed(analysis_brain)
+        if allow_edit:
+            item["Uncertainty"] = obj.getUncertainty()
+            item["allow_edit"].append("Uncertainty")
+            return
+
+        result = obj.getResult()
+        formatted = format_uncertainty(
+            obj, result, decimalmark=self.dmk, sciformat=int(self.scinot))
         if formatted:
-            item["Uncertainty"] = formatted
+            item["replace"]["Uncertainty"] = formatted
             item["before"]["Uncertainty"] = "± "
             item["after"]["Uncertainty"] = obj.getUnit()
-
-        if self.is_uncertainty_edition_allowed(analysis_brain):
-            item["allow_edit"].append("Uncertainty")
 
     def _folder_item_detection_limits(self, analysis_brain, item):
         """Fills the analysis' detection limits to the item passed in.

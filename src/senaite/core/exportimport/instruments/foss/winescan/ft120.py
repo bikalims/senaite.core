@@ -78,7 +78,7 @@ def Import(context, request):
         tbex = ''
         try:
             importer.process()
-        except:
+        except Exception:
             tbex = traceback.format_exc()
         errors = importer.errors
         logs = importer.logs
@@ -143,7 +143,7 @@ class WinescanFT120CSVParser(WinescanCSVParser):
                 from datetime import datetime
                 dtobj = datetime.strptime(dtstr, '%d/%m/%Y %H:%M %p')
                 dateTime = dtobj.strftime("%Y%m%d %H:%M")
-            except:
+            except Exception:
                 pass
             del values['Date']
             del values['Time']
@@ -158,7 +158,6 @@ class WinescanFT120CSVParser(WinescanCSVParser):
         # First, we must find if already exists a row with results for
         # the same date, in order to take into account replicas, Mean
         # and Standard Deviation
-        dtidx = values.get('Calibration',{}).get('Calibration',0)
         rows = self.getRawResults().get(resid, [])
         row, rows = self._extractrowbycalibration(rows, self._calibration)
         is_std = values.get('Rep #',{}).get('Rep #','') == 'Sd'

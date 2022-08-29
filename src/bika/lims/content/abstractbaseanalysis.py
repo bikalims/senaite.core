@@ -139,11 +139,10 @@ ExponentialFormatPrecision = IntegerField(
 # If the value is below this limit, it means that the measurement lacks
 # accuracy and this will be shown in manage_results and also on the final
 # report.
-LowerDetectionLimit = FixedPointField(
-    'LowerDetectionLimit',
+LowerDetectionLimit = StringField(
+    "LowerDetectionLimit",
     schemata="Analysis",
-    default='0.0',
-    precision=7,
+    default="0.0",
     widget=DecimalWidget(
         label=_("Lower Detection Limit (LDL)"),
         description=_(
@@ -157,11 +156,10 @@ LowerDetectionLimit = FixedPointField(
 # If the value is above this limit, it means that the measurement lacks
 # accuracy and this will be shown in manage_results and also on the final
 # report.
-UpperDetectionLimit = FixedPointField(
-    'UpperDetectionLimit',
+UpperDetectionLimit = StringField(
+    "UpperDetectionLimit",
     schemata="Analysis",
-    default='1000000000.0',
-    precision=7,
+    default="1000000000.0",
     widget=DecimalWidget(
         label=_("Upper Detection Limit (UDL)"),
         description=_(
@@ -847,23 +845,25 @@ class AbstractBaseAnalysis(BaseContent):  # TODO BaseContent?  is really needed?
 
     @security.public
     def getLowerDetectionLimit(self):
-        """Returns the Lower Detection Limit for this service as a floatable
+        """Get the lower detection limit
         """
-        ldl = self.getField('LowerDetectionLimit').get(self)
-        try:
-            return float(ldl)
-        except ValueError:
-            return 0
+        field = self.getField("LowerDetectionLimit")
+        value = field.get(self)
+        # cut off trailing zeros
+        if "." in value:
+            value = value.rstrip("0").rstrip(".")
+        return value
 
     @security.public
     def getUpperDetectionLimit(self):
-        """Returns the Upper Detection Limit for this service as a floatable
+        """Get the upper detection limit
         """
-        udl = self.getField('UpperDetectionLimit').get(self)
-        try:
-            return float(udl)
-        except ValueError:
-            return 0
+        field = self.getField("UpperDetectionLimit")
+        value = field.get(self)
+        # cut off trailing zeros
+        if "." in value:
+            value = value.rstrip("0").rstrip(".")
+        return value
 
     @security.public
     def isSelfVerificationEnabled(self):

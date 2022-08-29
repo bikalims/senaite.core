@@ -30,11 +30,11 @@ from bika.lims.browser.widgets import RejectionSetupWidget
 from bika.lims.browser.worksheet.tools import getWorksheetLayouts
 from bika.lims.config import CURRENCIES
 from bika.lims.config import DECIMAL_MARKS
+from bika.lims.config import DEFAULT_WORKSHEET_LAYOUT
 from bika.lims.config import MULTI_VERIFICATION_TYPE
 from bika.lims.config import PROJECTNAME
 from bika.lims.config import SCINOTATION_OPTIONS
 from bika.lims.config import WEEKDAYS
-from bika.lims.config import DEFAULT_WORKSHEET_LAYOUT
 from bika.lims.content.bikaschema import BikaFolderSchema
 from bika.lims.interfaces import IBikaSetup
 from bika.lims.numbergenerator import INumberGenerator
@@ -53,7 +53,6 @@ from Products.Archetypes.atapi import SelectionWidget
 from Products.Archetypes.atapi import StringField
 from Products.Archetypes.atapi import TextAreaWidget
 from Products.Archetypes.atapi import registerType
-from Products.Archetypes.Field import BooleanField
 from Products.Archetypes.Field import TextField
 from Products.Archetypes.utils import DisplayList
 from Products.Archetypes.utils import IntDisplayList
@@ -200,6 +199,21 @@ schema = BikaFolderSchema.copy() + Schema((
                           "this option will be checked and readonly.")
         )
     ),
+    # NOTE: This is a Proxy Field which delegates to the SENAITE Registry!
+    BooleanField(
+        "EnableGlobalAuditlog",
+        schemata="Security",
+        default=False,
+        widget=BooleanWidget(
+            label=_("Enable global Audit Log"),
+            description=_(
+                "The global Auditlog shows all modifications of the system. "
+                "When enabled, all entities will be indexed in a separate "
+                "catalog. This will increase the time when objects are "
+                "created or modified."
+            )
+        )
+    ),
     BooleanField(
         'ShowPrices',
         schemata="Accounting",
@@ -323,6 +337,22 @@ schema = BikaFolderSchema.copy() + Schema((
                 "letter 'e' to indicate the exponent.  The precision can be "
                 "configured in individual Analysis Services."),
         )
+    ),
+    BooleanField(
+        "ImmediateResultsEntry",
+        schemata="Analyses",
+        default=False,
+        widget=BooleanWidget(
+            label=_("label_bikasetup_immediateresultsentry",
+                    default=u"Immediate results entry"),
+            description=_(
+                "description_bikasetup_immediateresultsentry",
+                default=u"Allow the user to directly enter results after "
+                "sample creation, e.g. to enter field results immediately, or "
+                "lab results, when the automatic sample reception is "
+                "activated."
+            ),
+        ),
     ),
     BooleanField(
         'EnableAnalysisRemarks',
@@ -574,6 +604,25 @@ schema = BikaFolderSchema.copy() + Schema((
                 "any more. This setting can be overwritten per individual sample type "
                 "in the sample types setup"),
         )
+    ),
+    # NOTE: This is a Proxy Field which delegates to the SENAITE Registry!
+    TextField(
+        "EmailBodySamplePublication",
+        default_content_type="text/html",
+        default_output_type="text/x-html-safe",
+        schemata="Notifications",
+        # Needed to fetch the default value from the registry
+        edit_accessor="getEmailBodySamplePublication",
+        widget=RichWidget(
+            label=_("Email body for Sample publication notifications"),
+            description=_(
+                "The default text that is used for the publication email. "
+                " sending publication reports."),
+            default_mime_type="text/x-html",
+            output_mime_type="text/x-html",
+            allow_file_upload=False,
+            rows=15,
+        ),
     ),
     BooleanField(
         'NotifyOnSampleRejection',
@@ -965,6 +1014,56 @@ class BikaSetup(folder.ATFolder):
         for i in range(len(keys)):
             results.append('%s: %s' % (keys[i], values[i]))
         return "\n".join(results)
+
+    def getEmailBodySamplePublication(self):
+        """Get the value from the senaite setup
+        """
+        setup = api.get_senaite_setup()
+        # setup is `None` during initial site content structure installation
+        if setup:
+            return setup.getEmailBodySamplePublication()
+
+    def setEmailBodySamplePublication(self, value):
+        """Set the value in the senaite setup
+        """
+        setup = api.get_senaite_setup()
+        # setup is `None` during initial site content structure installation
+        if setup:
+            setup.setEmailBodySamplePublication(value)
+
+    def getEnableGlobalAuditlog(self):
+        """Get the value from the senaite setup
+        """
+        setup = api.get_senaite_setup()
+        # setup is `None` during initial site content structure installation
+        if setup:
+            return setup.getEnableGlobalAuditlog()
+        return False
+
+    def setEnableGlobalAuditlog(self, value):
+        """Set the value in the senaite setup
+        """
+        setup = api.get_senaite_setup()
+        # setup is `None` during initial site content structure installation
+        if setup:
+            setup.setEnableGlobalAuditlog(value)
+
+    def getImmediateResultsEntry(self):
+        """Get the value from the senaite setup
+        """
+        setup = api.get_senaite_setup()
+        # setup is `None` during initial site content structure installation
+        if setup:
+            return setup.getImmediateResultsEntry()
+        return False
+
+    def setImmediateResultsEntry(self, value):
+        """Set the value in the senaite setup
+        """
+        setup = api.get_senaite_setup()
+        # setup is `None` during initial site content structure installation
+        if setup:
+            setup.setImmediateResultsEntry(value)
 
 
 registerType(BikaSetup, PROJECTNAME)

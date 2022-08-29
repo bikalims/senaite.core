@@ -20,8 +20,7 @@
 
 """ Thermo Scientific 'Gallery'
 """
-from bika.lims import bikaMessageFactory as _
-from bika.lims.utils import t
+
 from senaite.core.exportimport.instruments.resultsimport import \
     AnalysisResultsImporter, InstrumentCSVResultsFileParser
 
@@ -35,10 +34,10 @@ class ThermoGalleryTSVParser(InstrumentCSVResultsFileParser):
 
     def _parseline(self, line):
         sline = line.replace('"', '').strip()
-        if self._end_header == False:
-            return self.parse_headerline(sline)
-        else:
+        if self._end_header:
             return self.parse_resultline(sline)
+        else:
+            return self.parse_headerline(sline)
 
     def splitLine(self, line):
         return [token.strip() for token in line.split('\t')]

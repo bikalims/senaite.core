@@ -56,7 +56,6 @@ class EmailView(BrowserView):
     implements(IPublishTraverse)
 
     template = ViewPageTemplateFile("templates/email.pt")
-    email_template = ViewPageTemplateFile("templates/email_template.pt")
 
     def __init__(self, context, request):
         super(EmailView, self).__init__(context, request)
@@ -300,7 +299,14 @@ class EmailView(BrowserView):
         body = self.request.get("body", None)
         if body is not None:
             return body
-        return self.context.translate(_(self.email_template(self)))
+        setup = api.get_setup()
+        body = setup.getEmailBodySamplePublication()
+        template_context = {
+            "client_name": self.client_name,
+        }
+        rendered_body = self.render_email_template(
+            body, template_context=template_context)
+        return rendered_body
 
     @property
     def email_attachments(self):
@@ -313,8 +319,7 @@ class EmailView(BrowserView):
                 logger.error("Skipping empty PDF for report {}"
                              .format(report.getId()))
                 continue
-            sample = report.getAnalysisRequest()
-            filename = "{}.pdf".format(api.get_id(sample))
+            filename = self.get_report_filename(report)
             filedata = pdf.data
             attachments.append(
                 mailapi.to_email_attachment(filedata, filename))
@@ -468,7 +473,7 @@ class EmailView(BrowserView):
         except WorkflowException as e:
             logger.error(e)
 
-    def render_email_template(self, template):
+    def render_email_template(self, template, template_context=None):
         """Return the rendered email template
 
         This method interpolates the $recipients variable with the selected
@@ -478,10 +483,13 @@ class EmailView(BrowserView):
         :returns: Rendered email template
         """
 
+        # allow to add translation for initial template
+        template = self.context.translate(template)
         recipients = self.email_recipients_and_responsibles
-        template_context = {
-            "recipients": "\n".join(recipients)
-        }
+        if template_context is None:
+            template_context = {
+                "recipients": "<br/>".join(recipients),
+            }
 
         email_template = Template(safe_unicode(template)).safe_substitute(
             **template_context)
@@ -510,7 +518,8 @@ class EmailView(BrowserView):
                                              to_address,
                                              subject,
                                              email_body,
-                                             attachments=attachments)
+                                             attachments=attachments,
+                                             html=True)
             sent = mailapi.send_email(mime_msg)
             if not sent:
                 msg = _("Could not send email to {0} ({1})").format(pair[0],
@@ -540,7 +549,7 @@ class EmailView(BrowserView):
         attachments_data = map(self.get_attachment_data, attachments)
         pdf = self.get_pdf(report)
         filesize = "{} Kb".format(self.get_filesize(pdf))
-        filename = "{}.pdf".format(sample.getId())
+        filename = self.get_report_filename(report)
 
         return {
             "sample": sample,
@@ -689,6 +698,12 @@ class EmailView(BrowserView):
             return float("%.2f" % (filesize / 1024))
         except (POSKeyError, TypeError, AttributeError):
             return 0.0
+
+    def get_report_filename(self, report):
+        """Generate the filename for the sample PDF
+        """
+        sample = report.getAnalysisRequest()
+        return "{}.pdf".format(api.get_id(sample))
 
     def get_pdf(self, obj):
         """Get the report PDF

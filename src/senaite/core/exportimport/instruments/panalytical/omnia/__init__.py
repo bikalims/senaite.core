@@ -22,7 +22,6 @@
 """
 from datetime import datetime
 from bika.lims.utils import to_unicode
-from bika.lims import bikaMessageFactory as _
 from senaite.core.exportimport.instruments.resultsimport import \
     AnalysisResultsImporter, InstrumentCSVResultsFileParser
 
@@ -38,16 +37,16 @@ class AxiosXrfCSVMultiParser(InstrumentCSVResultsFileParser):
 
     def _parseline(self, line):
         # Process the line differenly if it pertains at header or results block
-        if self._end_header == False:
+        if self._end_header:
+            return self.parse_resultline(line)
+        else:
             sline = line.strip(',')
             return self.parse_headerline(sline)
-        else:
-            return self.parse_resultline(line)
 
     def splitLine(self, line):
         # If pertains at header it split the line by ':' and then remove ','
         # Else split by ',' and remove blank spaces
-        if self._end_header == False:
+        if not self._end_header:
             sline = line.split(':')
             return [token.strip(',') for token in sline]
 
@@ -130,8 +129,6 @@ class AxiosXrfCSVMultiParser(InstrumentCSVResultsFileParser):
         # Split by ","
         splitted = self.splitLine(line.strip(";"))
 
-        errors = ''
-
         # Adjunt separated values from split by ','
         for idx, result in enumerate(splitted):
             if result.startswith('"'):
@@ -160,7 +157,7 @@ class AxiosXrfCSVMultiParser(InstrumentCSVResultsFileParser):
         try:
             rawdict['DateTime'] = {'DateTime':self.csvDate2BikaDate(self._header['Date']),
                                    'DefaultValue':'DateTime'}
-        except:
+        except Exception:
             pass
         if not rid:
             self.err("No Sample defined", numline=self._numline)
@@ -184,11 +181,11 @@ class AxiosXrfCSVParser(InstrumentCSVResultsFileParser):
 
     def _parseline(self, line):
         # Process the line differenly if it pertains at header or results block
-        if self._end_header == False:
+        if self._end_header:
+            return self.parse_resultline(line)
+        else:
             sline = line.strip(',')
             return self.parse_headerline(sline)
-        else:
-            return self.parse_resultline(line)
 
     def csvDate2BikaDate(self,DateTime):
     #11/03/2014 14:46:46 --> %d/%m/%Y %H:%M %p
@@ -198,7 +195,7 @@ class AxiosXrfCSVParser(InstrumentCSVResultsFileParser):
     def splitLine(self, line):
         # If pertains at header it split the line by ':' and then remove ','
         # Else split by ',' and remove blank spaces
-        if self._end_header == False:
+        if not self._end_header:
             sline = line.split(':')
             return [token.strip(',') for token in sline]
 
@@ -496,11 +493,11 @@ class AxiosXrfCSVParser(InstrumentCSVResultsFileParser):
         rawres = self.getRawResults().get(rid, [])
         raw = rawres[0] if len(rawres) > 0 else {}
         raw[aname] = rawdict
-        if not 'DateTime' in raw:
+        if 'DateTime' not in raw:
             try:
                 raw['DateTime'] = {'DateTime':self.csvDate2BikaDate(self._header['Date']),
                                    'DefaultValue':'DateTime'}
-            except:
+            except Exception:
                 pass
             
         self._addRawResult(rid, raw, True)

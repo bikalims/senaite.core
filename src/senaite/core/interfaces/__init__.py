@@ -75,6 +75,21 @@ class IAjaxEditForm(Interface):
         """
 
 
+class IContainer(Interface):
+    """SENAITE Base Container
+    """
+
+
+class IItem(Interface):
+    """SENAITE Base Item
+    """
+
+
+class ISetup(Interface):
+    """Marker interface for setup folder
+    """
+
+
 class ISamples(Interface):
     """Marker interface for samples main folder
     """
@@ -112,4 +127,9 @@ class IFieldMigrator(Interface):
 
 class IDynamicLocalRoles(Interface):
     """Marker interface for objects with dynamic assignment of local roles
+    """
+
+
+class IInterpretationTemplate(Interface):
+    """Marker interface for interpretation template objects
     """

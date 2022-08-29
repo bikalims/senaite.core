@@ -167,9 +167,7 @@ class InstrumentsView(BikaListingView):
         if expiry_date is None:
             item["ExpiryDate"] = _("No date set")
         else:
-
-            item["ExpiryDate"] = expiry_date.asdatetime().strftime(
-                self.date_format_short)
+            item["ExpiryDate"] = self.ulocalized_time(expiry_date, long_format=0)
 
         methods = obj.getMethods()
         if methods:

@@ -830,6 +830,8 @@ class AnalysesView(ListingView):
             img = get_image('late.png', title=t(_("Late Analysis")),
                             width='16px', height='16px')
             item['replace']['DueDate'] = '{} {}'.format(due_date_str, img)
+        else:
+            item['replace']['DueDate'] = due_date_str
 
     def _folder_item_result(self, analysis_brain, item):
         """Set the analysis' result to the item passed in.

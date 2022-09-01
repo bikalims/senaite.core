@@ -246,8 +246,8 @@ class AnalysisServicesView(BikaListingView):
             ("StringResult", {
                 "title": _("String Result"),
                 "sortable": self.can_sort}),
-            ("MDL", {
-                "title": _("MDL"),
+            ("LDL", {
+                "title": _("LDL"),
                 "toggle": False,
                 "sortable": False}),
             ("UDL", {
@@ -435,13 +435,21 @@ class AnalysisServicesView(BikaListingView):
         sortkey = obj.getSortKey()
         item["SortKey"] = sortkey
 
-        #MDL
-        mdl = obj.getAllowManualDetectionLimit()
-        item["MDL"] = mdl
-
-        #UDL
+        #LDL and UDL
+        ldl = obj.getLowerDetectionLimit()
         udl = obj.getUpperDetectionLimit()
-        item["UDL"] = udl
+        
+        if not ldl and not udl:
+            pass
+        elif(udl=='0' and ldl=='0'):
+            pass
+        else:
+            if len(udl) > 1 and len(ldl) > 1:
+                item["LDL"] = ldl[0] if ldl else 0
+                item["UDL"] = udl[0] if udl else 0
+            else:
+                item["LDL"] = ldl if ldl else 0
+                item["UDL"] = udl if udl else 0
 
         #Decimal Precision
         decimal_precision = obj.Precision

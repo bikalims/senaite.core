@@ -444,7 +444,7 @@ class AnalysisServicesView(BikaListingView):
         elif(udl=='0' and ldl=='0'):
             pass
         else:
-            if len(udl) > 1 and len(ldl) > 1:
+            if isinstance(udl,tuple) and isinstance(ldl,tuple):
                 item["LDL"] = ldl[0] if ldl else 0
                 item["UDL"] = udl[0] if udl else 0
             else:

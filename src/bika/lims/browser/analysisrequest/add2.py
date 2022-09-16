@@ -983,6 +983,8 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
         # client
         client = self.get_client()
         client_uid = client and api.get_uid(client) or ""
+        if not client_uid and self.request.form.get("ar_count"):
+            client_uid = self.request.form.get("Client-0_uid")
 
         info.update({
             "prefix": obj.getPrefix(),

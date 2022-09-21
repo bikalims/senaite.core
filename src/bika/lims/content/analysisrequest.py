@@ -750,7 +750,6 @@ schema = BikaSchema.copy() + Schema((
             catalog_name='senaite_catalog_setup',
             base_query={"is_active": True,
                         "sort_on": "sortable_title",
-                        "sampletype_uid": [],
                         "sort_order": "ascending"},
             showOn=True,
         ),

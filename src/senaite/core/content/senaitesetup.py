@@ -40,9 +40,14 @@ class ISetupSchema(model.Schema):
 
     directives.widget("email_body_sample_publication", RichTextFieldWidget)
     email_body_sample_publication = RichTextField(
-        title=_(u"Publication Email Text"),
+        title=_("title_senaitesetup_publication_email_text",
+                default=u"Publication Email Text"),
         description=_(
-            "The default text that is used for the publication email."),
+            "description_senaitesetup_publication_email_text",
+            default=u"Set the email body text to be used by default "
+            "when sending out result reports to the selected recipients. "
+            "You can use reserved keywords: "
+            "$client_name, $recipients, $lab_name, $lab_address"),
         defaultFactory=default_email_body_sample_publication,
         required=False,
     )
@@ -88,6 +93,16 @@ class ISetupSchema(model.Schema):
         ),
     )
 
+    categorize_sample_analyses = schema.Bool(
+        title=_("title_senaitesetup_categorizesampleanalyses",
+                default=u"Categorize sample analyses"),
+        description=_(
+            "description_senaitesetup_categorizesampleanalyses",
+            default=u"Group analyses by category for samples"
+        ),
+        default=False,
+    )
+
     ###
     # Fieldsets
     ###
@@ -96,6 +111,7 @@ class ISetupSchema(model.Schema):
         label=_("label_senaitesetup_fieldset_analyses", default=u"Analyses"),
         fields=[
             "immediate_results_entry",
+            "categorize_sample_analyses",
         ]
     )
 
@@ -202,4 +218,18 @@ class Setup(Container):
         """Enable/Disable global Auditlogging
         """
         mutator = self.mutator("immediate_results_entry")
+        return mutator(self, value)
+
+    @security.protected(permissions.View)
+    def getCategorizeSampleAnalyses(self):
+        """Returns if analyses should be grouped by category for samples
+        """
+        accessor = self.accessor("categorize_sample_analyses")
+        return accessor(self)
+
+    @security.protected(permissions.ModifyPortalContent)
+    def setCategorizeSampleAnalyses(self, value):
+        """Enable/Disable grouping of analyses by category for samples
+        """
+        mutator = self.mutator("categorize_sample_analyses")
         return mutator(self, value)

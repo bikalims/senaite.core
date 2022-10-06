@@ -30,7 +30,6 @@ from bika.lims import api
 from bika.lims import bikaMessageFactory as _
 from bika.lims import deprecated
 from bika.lims import logger
-from bika.lims import workflow as wf
 from bika.lims.browser.fields import HistoryAwareReferenceField
 from bika.lims.browser.fields import InterimFieldsField
 from bika.lims.browser.fields import ResultRangeField
@@ -214,7 +213,7 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         """
         verifiers = list()
         actions = ["verify", "multi_verify"]
-        for event in wf.getReviewHistory(self):
+        for event in api.get_review_history(self):
             if event['action'] in actions:
                 verifiers.append(event['actor'])
         sorted(verifiers, reverse=True)
@@ -729,7 +728,7 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         :rtype: bool
         """
         uid = api.get_uid(instrument)
-        return uid in map(api.get_uid, self.getAllowedInstruments())
+        return uid in self.getRawAllowedInstruments()
 
     @security.public
     def isMethodAllowed(self, method):
@@ -740,7 +739,7 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         :rtype: bool
         """
         uid = api.get_uid(method)
-        return uid in map(api.get_uid, self.getAllowedMethods())
+        return uid in self.getRawAllowedMethods()
 
     @security.public
     def getAllowedMethods(self):
@@ -758,6 +757,15 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         return service.getMethods()
 
     @security.public
+    def getRawAllowedMethods(self):
+        """Returns the UIDs of the allowed methods for this analysis
+        """
+        service = self.getAnalysisService()
+        if not service:
+            return []
+        return service.getRawMethods()
+
+    @security.public
     def getAllowedInstruments(self):
         """Returns the allowed instruments from the service
 
@@ -768,6 +776,15 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         if not service:
             return []
         return service.getInstruments()
+
+    @security.public
+    def getRawAllowedInstruments(self):
+        """Returns the UIDS of the allowed instruments from the service
+        """
+        service = self.getAnalysisService()
+        if not service:
+            return []
+        return service.getRawInstruments()
 
     @security.public
     def getExponentialFormatPrecision(self, result=None):

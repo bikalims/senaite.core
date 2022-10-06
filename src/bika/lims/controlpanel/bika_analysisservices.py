@@ -22,6 +22,7 @@ import collections
 
 from bika.lims import api
 from bika.lims import bikaMessageFactory as _
+from bika.lims.api.security import check_permission
 from bika.lims.browser.bika_listing import BikaListingView
 from bika.lims.config import PROJECTNAME
 from bika.lims.idserver import renameAfterCreation
@@ -38,6 +39,7 @@ from plone.app.folder.folder import ATFolderSchema
 from plone.app.layout.globals.interfaces import IViewView
 from Products.Archetypes import atapi
 from Products.ATContentTypes.content.schemata import finalizeATCTSchema
+from Products.CMFCore.permissions import ModifyPortalContent
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import _createObjectByType
 from Products.CMFPlone.utils import safe_unicode
@@ -257,6 +259,13 @@ class AnalysisServicesView(BikaListingView):
             ("DuplicateVariation", {
                 "title": _("Duplicate Variation"),
                 "toggle": False,
+            ("SortKey", {
+                "ajax": True,
+                "help": _(
+                    "Float value from 0.0 - 1000.0 indicating the sort order. "
+                    "Duplicate values are ordered alphabetically."),
+                "refetch": True,
+                "title": _("Sort Key"),
                 "sortable": False}),
             ("Accredited", {
                 "title": _("Accredited"),
@@ -313,6 +322,11 @@ class AnalysisServicesView(BikaListingView):
                 self.review_states[i]["columns"].remove("BulkPrice")
             del self.columns['Price']
             del self.columns['BulkPrice']
+
+    def can_edit(self, service):
+        """Check if manage is allowed
+        """
+        return check_permission(ModifyPortalContent, self.context)
 
     def get_decimal_mark(self):
         """Returns the decimal mark
@@ -438,7 +452,6 @@ class AnalysisServicesView(BikaListingView):
         #LDL and UDL
         ldl = obj.getLowerDetectionLimit()
         udl = obj.getUpperDetectionLimit()
-        
         if not ldl and not udl:
             pass
         elif(udl=='0' and ldl=='0'):
@@ -480,6 +493,8 @@ class AnalysisServicesView(BikaListingView):
             item["StringResult"] = "Y"
         else:
             item["StringResult"] = ""
+        if self.can_edit(obj):
+            item["allow_edit"].append("SortKey")
 
         # Icons
         after_icons = ""

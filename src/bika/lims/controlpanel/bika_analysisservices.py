@@ -258,7 +258,7 @@ class AnalysisServicesView(BikaListingView):
                 "sortable": False}),
             ("DuplicateVariation", {
                 "title": _("Duplicate Variation"),
-                "toggle": False,
+                "toggle": False,}),
             ("SortKey", {
                 "ajax": True,
                 "help": _(

@@ -550,7 +550,7 @@ schema = BikaSchema.copy() + Schema((
     UIDReferenceField(
         'Container',
         required=0,
-        allowed_types='SampleContainer',
+        allowed_types='Container',
         mode="rw",
         read_permission=View,
         write_permission=FieldEditContainer,

@@ -112,6 +112,9 @@ class SamplesView(ListingView):
                 "type": "datetime",
                 "max": now,
                 "sortable": True}),
+            ("Container", {
+                "title": _("Container"),
+                "toggle": False}),
             ("getDatePreserved", {
                 "title": _("Date Preserved"),
                 "toggle": False,
@@ -520,6 +523,12 @@ class SamplesView(ListingView):
         item["getDueDate"] = self.str_date(obj.getDueDate)
         item["getDatePublished"] = self.str_date(obj.getDatePublished)
         item["getDateVerified"] = self.str_date(obj.getDateVerified)
+
+        container = obj.getObject().getContainer()
+        if container:
+            item["Container"] = container.Title()
+            item["replace"]["Container"] = "<a href='%s'>%s</a>" % \
+                                               (container.absolute_url(), container.Title())
 
         if self.is_printing_workflow_enabled:
             item["Printed"] = ""

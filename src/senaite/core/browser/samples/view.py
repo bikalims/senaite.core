@@ -524,12 +524,6 @@ class SamplesView(ListingView):
         item["getDatePublished"] = self.str_date(obj.getDatePublished)
         item["getDateVerified"] = self.str_date(obj.getDateVerified)
 
-        container = obj.getObject().getContainer()
-        if container:
-            item["Container"] = container.Title()
-            item["replace"]["Container"] = "<a href='%s'>%s</a>" % \
-                                               (container.absolute_url(), container.Title())
-
         if self.is_printing_workflow_enabled:
             item["Printed"] = ""
             printed = obj.getPrinted if hasattr(obj, "getPrinted") else "0"
@@ -586,9 +580,19 @@ class SamplesView(ListingView):
                                                (obj.getContactURL, obj.getContactFullName)
         else:
             item["ClientContact"] = ""
+
+        # TODO-performance:  we have to get the
+        # full object to get the container title and url, mgiht be
+        # a performance hit.
+        full_object = api.get_object(obj)
+        container = full_object.getContainer()
+        if container:
+            item["Container"] = container.Title()
+            item["replace"]["Container"] = "<a href='%s'>%s</a>" % \
+                                               (container.absolute_url(), container.Title())
         # TODO-performance: If SamplingWorkflowEnabled, we have to get the
         # full object to check the user permissions, so far this is
-        # a performance hit.
+        # a performance hit. Update - Now using full object from above
         if obj.getSamplingWorkflowEnabled:
 
             sampler = obj.getSampler
@@ -599,8 +603,7 @@ class SamplesView(ListingView):
             # sampling workflow - inline edits for Sampler and Date Sampled
             if item["review_state"] == "to_be_sampled":
                 # We need to get the full object in order to check
-                # the permissions
-                full_object = api.get_object(obj)
+                # the permissions. Update - Using full object from above
                 if check_permission(TransitionSampleSample, full_object):
                     # make fields required and editable
                     item["required"] = ["getSampler", "getDateSampled"]

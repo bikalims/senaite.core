@@ -975,6 +975,33 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
         return info
 
     @cache(cache_key)
+    def get_samplepoint_info(self, obj):
+        """Returns the client info of an object"""
+
+        info = self.get_base_info(obj)
+        UIDs = []
+        for sample_type in obj.getSampleTypes():
+            UIDs.append(sample_type.UID())
+        # catalog queries for UI field filtering
+        st_query = {"UID": UIDs}
+
+        if UIDs:
+            filter_queries = {
+                # Display Sample Points that have this sample type assigned plus
+                # those that do not have a sample type assigned
+                "SampleType": st_query
+            }
+            info["filter_queries"] = filter_queries
+        if len(UIDs) == 1:
+            sample_uid = UIDs[0]
+            sample_title = api.get_object_by_uid(sample_uid).Title()
+            info["field_values"].update(
+                {"SampleType": {"uid": sample_uid, "title": sample_title}}
+            )
+
+        return info
+
+    @cache(cache_key)
     def get_sampletype_info(self, obj):
         """Returns the info for a Sample Type
         """

@@ -1292,53 +1292,21 @@ class Analysis_Categories(WorksheetImporter):
 
 class Methods(WorksheetImporter):
 
-    def load_instrument_methods(self):
-        sheetname = 'Instrument Methods'
-        worksheet = self.workbook[sheetname]
-        insfolder = self.context.bika_setup.bika_instruments
-        self.instrument_methods = {}
-        bsc = getToolByName(self.context, 'senaite_catalog_setup')
-        if not worksheet:
-            return
-        for i, row in enumerate(self.get_rows(3, worksheet=worksheet)):
-            if not row.get('Instrument_title', '') or not row.get('Method_title', ''):
-                continue
-            if row['Method_title'] not in self.instrument_methods.keys():
-                self.instrument_methods[row['Method_title']] = []
-            instrument = self.get_object(bsc,
-                             'Instrument', title=row['Instrument_title'])
-            if instrument:
-                self.instrument_methods[row['Method_title']].append(instrument)
-
-
     def Import(self):
-        self.load_instrument_methods()
         folder = self.context.methods
         bsc = getToolByName(self.context, 'senaite_catalog_setup')
         for row in self.get_rows(3):
             if row['title']:
                 calculation = self.get_object(bsc, 'Calculation', row.get('Calculation_title'))
-                instrument = self.get_object(bsc, 'Instrument', Title=row.get('Instrument_title'))
-                instruments = self.instrument_methods.get(row['title'], [])
-                if instrument:
-                    instruments.append(instrument)
-                supplier = self.get_object(bsc, 'Supplier',Title=row.get('Subcontractor_title'))
-
-                if calculation:
-                    calculation = calculation.UID()
                 obj = _createObjectByType("Method", folder, tmpID())
                 obj.edit(
                     title=row['title'],
                     description=row.get('description', ''),
                     Instructions=row.get('Instructions', ''),
                     ManualEntryOfResults=row.get('ManualEntryOfResults', True),
-                    Calculations=[calculation],
                     Calculation=calculation,
                     MethodID=row.get('MethodID', ''),
                     Accredited=row.get('Accredited', True),
-                    Supplier=supplier,
-                    Instruments=[inst.UID() for inst in instruments],
-
                 )
                 # Obtain all created methods
                 catalog = getToolByName(self.context, 'portal_catalog')
@@ -1659,8 +1627,6 @@ class Analysis_Services(WorksheetImporter):
             _calculation = deferredcalculation if deferredcalculation else \
                             (defaultmethod.getCalculation() if defaultmethod else None)
 
-            if _calculation:
-                _calculation = _calculation.UID()
             obj.edit(
                 title=row['title'],
                 ShortTitle=row.get('ShortTitle', row['title']),
@@ -1679,11 +1645,10 @@ class Analysis_Services(WorksheetImporter):
                 Price="%02f" % Float(row['Price']),
                 BulkPrice="%02f" % Float(row['BulkPrice']),
                 VAT="%02f" % Float(row['VAT']),
-                Method=defaultmethod,
+                _Method=defaultmethod,
                 Methods=methods,
                 ManualEntryOfResults=allowmanualentry,
                 InstrumentEntryOfResults=allowinstrentry,
-                Instrument=defaultinstrument,
                 Instruments=instruments,
                 Calculation=_calculation,
                 UseDefaultCalculation=usedefaultcalculation,
@@ -1821,9 +1786,6 @@ class AR_Templates(WorksheetImporter):
             # XXX service_uid is not a uid
             service = self.get_object(bsc, 'AnalysisService',
                                       row.get('service_uid'))
-            if not service:
-                continue
-
             if row['ARTemplate'] not in self.artemplate_analyses.keys():
                 self.artemplate_analyses[row['ARTemplate']] = []
             self.artemplate_analyses[row['ARTemplate']].append(
@@ -1848,10 +1810,10 @@ class AR_Templates(WorksheetImporter):
                                            row.get('preservation'))
             self.artemplate_partitions[row['ARTemplate']].append({
                 'part_id': row['part_id'],
-                'Container': container.Title() if container else None,
-                'container_uid': container.UID() if container else None,
-                'Preservation': preservation.Title() if preservation else None,
-                'preservation_uid': preservation.UID()} if preservation else None)
+                'Container': container.Title(),
+                'container_uid': container.UID(),
+                'Preservation': preservation.Title(),
+                'preservation_uid': preservation.UID()})
 
     def Import(self):
         self.load_artemplate_analyses()
@@ -1914,9 +1876,7 @@ class Reference_Definitions(WorksheetImporter):
             if row['ReferenceDefinition_title'] not in self.results.keys():
                 self.results[row['ReferenceDefinition_title']] = []
             service = self.get_object(bsc, 'AnalysisService',
-                    row.get('service'), **{"getKeyword": row.get("Keyword")})
-            if not service:
-                continue
+                                      row.get('service'))
             self.results[
                 row['ReferenceDefinition_title']].append({
                     'uid': service.UID(),
@@ -1975,8 +1935,6 @@ class Worksheet_Templates(WorksheetImporter):
                                       row.get('service'))
             if row['WorksheetTemplate_title'] not in self.wst_services.keys():
                 self.wst_services[row['WorksheetTemplate_title']] = []
-            if not service:
-                continue
             self.wst_services[
                 row['WorksheetTemplate_title']].append(service.UID())
 

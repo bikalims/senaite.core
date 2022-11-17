@@ -31,6 +31,19 @@ Changelog
 2.4.0 (unreleased)
 ------------------
 
+- #2183 Fix instrument supplier does not load on test data import
+- #2180 Rely on analysis permission when displaying results
+- #2179 Fix Traceback when removing a Worksheet
+- #2178 AT Queryselect Widget
+- #2177 Dexterity Queryselect Widget
+- #2173 Fix UnicodeDecodeError when a required condition is empty in add form
+- #2172 Fix SuperModel import error introduced in PR #2154
+- #2169 Fix field error indication in sample header
+- #2166 Fix partitions not displaying complete list of Interpretation Templates
+- #2165 Add DX phone field and widget
+- #2164 Added `IRetracted` and `IRejected` marker interfaces for analyses
+- #2162 Allow to create samples without analyses
+- #2160 Allow indexed attributes for ZCTextIndex in catalog API
 - #2158 Fix traceback when accessing registry
 - #2154 Cleanup the internal logic used for the creation of analysis objects
 - #2156 Fix groups for selection in login details view are hardcoded

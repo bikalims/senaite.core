@@ -13,6 +13,7 @@ Needed Imports:
 
     >>> from AccessControl.PermissionRole import rolesForPermissionOn
     >>> from bika.lims import api
+    >>> from bika.lims.interfaces import IRetracted
     >>> from bika.lims.utils.analysisrequest import create_analysisrequest
     >>> from bika.lims.workflow import doActionFor as do_action_for
     >>> from bika.lims.workflow import isTransitionAllowed
@@ -306,3 +307,101 @@ And the current state of the Analysis Request is `sample_received` now:
 
     >>> api.get_workflow_status_of(ar)
     'sample_received'
+
+
+IRetracted interface is provided by retracted analyses
+......................................................
+
+When retracted, routine analyses are marked with the `IRetracted` interface:
+
+    >>> sample = new_ar([Cu])
+    >>> submit_analyses(sample)
+    >>> analysis = sample.getAnalyses(full_objects=True)[0]
+    >>> IRetracted.providedBy(analysis)
+    False
+
+    >>> success = do_action_for(analysis, "retract")
+    >>> IRetracted.providedBy(analysis)
+    True
+
+But the retest does not provide `IRetracted`:
+
+    >>> retest = analysis.getRetest()
+    >>> IRetracted.providedBy(retest)
+    False
+
+
+Retract an analysis with a result that is a Detection Limit
+...........................................................
+
+Allow the user to manually enter the detection limit as the result:
+
+    >>> Cu.setAllowManualDetectionLimit(True)
+
+Create the sample:
+
+    >>> sample = new_ar([Cu])
+    >>> cu = sample.getAnalyses(full_objects=True)[0]
+    >>> cu.setResult("< 10")
+    >>> success = do_action_for(cu, "submit")
+    >>> cu.getResult()
+    '10'
+
+    >>> cu.getFormattedResult(html=False)
+    '< 10'
+
+    >>> cu.isLowerDetectionLimit()
+    True
+
+    >>> cu.getDetectionLimitOperand()
+    '<'
+
+The Detection Limit is not kept on the retest:
+
+    >>> success = do_action_for(analysis, "retract")
+    >>> retest = analysis.getRetest()
+    >>> retest.getResult()
+    ''
+
+    >>> retest.getFormattedResult(html=False)
+    ''
+
+    >>> retest.isLowerDetectionLimit()
+    False
+
+    >>> retest.getDetectionLimitOperand()
+    ''
+
+Do the same with Upper Detection Limit (UDL):
+
+    >>> sample = new_ar([Cu])
+    >>> cu = sample.getAnalyses(full_objects=True)[0]
+    >>> cu.setResult("> 10")
+    >>> success = do_action_for(cu, "submit")
+    >>> cu.getResult()
+    '10'
+
+    >>> cu.getFormattedResult(html=False)
+    '> 10'
+
+    >>> cu.isUpperDetectionLimit()
+    True
+
+    >>> cu.getDetectionLimitOperand()
+    '>'
+
+The Detection Limit is not kept on the retest:
+
+    >>> success = do_action_for(analysis, "retract")
+    >>> retest = analysis.getRetest()
+    >>> retest.getResult()
+    ''
+
+    >>> retest.getFormattedResult(html=False)
+    ''
+
+    >>> retest.isUpperDetectionLimit()
+    False
+
+    >>> retest.getDetectionLimitOperand()
+    ''

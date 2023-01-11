@@ -42,6 +42,7 @@ from bika.lims.content.abstractbaseanalysis import AbstractBaseAnalysis
 from bika.lims.content.abstractbaseanalysis import schema
 from bika.lims.interfaces import IDuplicateAnalysis
 from bika.lims.permissions import FieldEditAnalysisResult
+from bika.lims.permissions import ViewResults
 from bika.lims.utils import formatDecimalMark
 from bika.lims.utils.analysis import format_numeric_result
 from bika.lims.utils.analysis import get_significant_digits
@@ -65,7 +66,8 @@ AnalysisService = UIDReferenceField(
 Attachment = UIDReferenceField(
     'Attachment',
     multiValued=1,
-    allowed_types=('Attachment',)
+    allowed_types=('Attachment',),
+    relationship='AnalysisAttachment'
 )
 
 # The final result of the analysis is stored here.  The field contains a
@@ -73,7 +75,7 @@ Attachment = UIDReferenceField(
 # a non-numeric result is needed, ResultOptions can be used.
 Result = StringField(
     'Result',
-    read_permission=View,
+    read_permission=ViewResults,
     write_permission=FieldEditAnalysisResult,
 )
 
@@ -87,7 +89,8 @@ ResultCaptureDate = DateTimeField(
 
 # Returns the retracted analysis this analysis is a retest of
 RetestOf = UIDReferenceField(
-    'RetestOf'
+    'RetestOf',
+    relationship="AnalysisRetestOf",
 )
 
 # If the result is outside of the detection limits of the method or instrument,
@@ -328,13 +331,6 @@ class AbstractAnalysis(AbstractBaseAnalysis):
 
         else:
             value = ""
-            # Restore the DetectionLimitSelector, cause maybe its visibility
-            # was changed because allow manual detection limit was enabled and
-            # the user set a result with "<" or ">"
-            if manual_dl:
-                service = self.getAnalysisService()
-                selector = service.getDetectionLimitSelector()
-                self.setDetectionLimitSelector(selector)
 
         # Set the result
         self.getField("Result").set(self, result)
@@ -352,14 +348,12 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         """
         if self.isLowerDetectionLimit():
             result = self.getResult()
-            try:
-                # in this case, the result itself is the LDL.
-                return float(result)
-            except (TypeError, ValueError):
-                logger.warn("The result for the analysis %s is a lower "
-                            "detection limit, but not floatable: '%s'. "
-                            "Returnig AS's default LDL." %
-                            (self.id, result))
+            if api.is_floatable(result):
+                return result
+
+            logger.warn("The result for the analysis %s is a lower detection "
+                        "limit, but not floatable: '%s'. Returning AS's "
+                        "default LDL." % (self.id, result))
         return AbstractBaseAnalysis.getLowerDetectionLimit(self)
 
     # Method getUpperDetectionLimit overrides method of class BaseAnalysis
@@ -372,14 +366,12 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         """
         if self.isUpperDetectionLimit():
             result = self.getResult()
-            try:
-                # in this case, the result itself is the LDL.
-                return float(result)
-            except (TypeError, ValueError):
-                logger.warn("The result for the analysis %s is a lower "
-                            "detection limit, but not floatable: '%s'. "
-                            "Returnig AS's default LDL." %
-                            (self.id, result))
+            if api.is_floatable(result):
+                return result
+
+            logger.warn("The result for the analysis %s is an upper detection "
+                        "limit, but not floatable: '%s'. Returning AS's "
+                        "default UDL." % (self.id, result))
         return AbstractBaseAnalysis.getUpperDetectionLimit(self)
 
     @security.public
@@ -483,34 +475,33 @@ class AbstractAnalysis(AbstractBaseAnalysis):
 
         # UDL/LDL directly entered in the results field
         if val and val[0] in [LDL, UDL]:
-            # Result prefixed with LDL/UDL
-            oper = val[0]
-            # Strip off LDL/UDL from the result
-            val = val.replace(oper, "", 1)
-            # Check if the value is indeterminate / non-floatable
-            try:
-                val = float(val)
-            except (ValueError, TypeError):
-                val = value
+            # Strip off the detection limit operand from the result
+            operand = val[0]
+            val = val.replace(operand, "", 1).strip()
 
-            # We dismiss the operand and the selector visibility unless the user
-            # is allowed to manually set the detection limit or the DL selector
-            # is visible.
-            allow_manual = self.getAllowManualDetectionLimit()
+            # Result becomes the detection limit
             selector = self.getDetectionLimitSelector()
-            if allow_manual or selector:
-                # Ensure visibility of the detection limit selector
-                self.setDetectionLimitSelector(True)
+            allow_manual = self.getAllowManualDetectionLimit()
+            if any([selector, allow_manual]):
 
                 # Set the detection limit operand
-                self.setDetectionLimitOperand(oper)
+                self.setDetectionLimitOperand(operand)
 
                 if not allow_manual:
-                    # Override value by default DL
-                    if oper == LDL:
+                    # Manual introduction of DL is not permitted
+                    if operand == LDL:
+                        # Result is default LDL
                         val = self.getLowerDetectionLimit()
                     else:
+                        # Result is default UDL
                         val = self.getUpperDetectionLimit()
+
+        elif not self.getDetectionLimitSelector():
+            # User cannot choose the detection limit from a selection list,
+            # but might be allowed to manually enter the dl with the result.
+            # If so, reset the detection limit operand, cause the previous
+            # entered result might be an DL, but current doesn't
+            self.setDetectionLimitOperand("")
 
         # Update ResultCapture date if necessary
         if not val:
@@ -628,20 +619,6 @@ class AbstractAnalysis(AbstractBaseAnalysis):
 
         self.setResult(str(result))
         return True
-
-    @security.public
-    def getPrice(self):
-        """The function obtains the analysis' price without VAT and without
-        member discount
-        :return: the price (without VAT or Member Discount) in decimal format
-        """
-        analysis_request = self.aq_parent
-        client = analysis_request.aq_parent
-        if client.getBulkDiscount():
-            price = self.getBulkPrice()
-        else:
-            price = self.getField('Price').get(self)
-        return price
 
     @security.public
     def getVATAmount(self):
@@ -1140,26 +1117,35 @@ class AbstractAnalysis(AbstractBaseAnalysis):
     def isRetest(self):
         """Returns whether this analysis is a retest or not
         """
-        return self.getRetestOf() and True or False
+        if self.getRawRetestOf():
+            return True
+        return False
 
     def getRetestOfUID(self):
         """Returns the UID of the retracted analysis this is a retest of
         """
-        retest_of = self.getRetestOf()
-        if retest_of:
-            return api.get_uid(retest_of)
+        return self.getRawRetestOf()
+
+    def getRawRetest(self):
+        """Returns the UID of the retest that comes from this analysis, if any
+        """
+        relationship = self.getField("RetestOf").relationship
+        uids = get_backreferences(self, relationship)
+        if not uids:
+            return None
+        if len(uids) > 1:
+            logger.warn("Analysis {} with multiple retests".format(self.id))
+        return uids[0]
 
     def getRetest(self):
         """Returns the retest that comes from this analysis, if any
         """
-        relationship = "{}RetestOf".format(self.portal_type)
-        back_refs = get_backreferences(self, relationship)
-        if not back_refs:
-            return None
-        if len(back_refs) > 1:
-            logger.warn("Analysis {} with multiple retests".format(self.id))
-        retest_uid = back_refs[0]
-        retest = api.get_object_by_uid(retest_uid, default=None)
-        if retest is None:
-            logger.error("Retest with UID {} not found".format(retest_uid))
-        return retest
+        retest_uid = self.getRawRetest()
+        return api.get_object(retest_uid, default=None)
+
+    def isRetested(self):
+        """Returns whether this analysis has been retested or not
+        """
+        if self.getRawRetest():
+            return True
+        return False

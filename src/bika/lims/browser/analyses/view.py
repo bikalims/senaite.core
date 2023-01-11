@@ -863,9 +863,7 @@ class AnalysesView(ListingView):
 
         item["Result"] = ""
 
-        # TODO: The permission `ViewResults` is managed on the sample.
-        #       -> Change to a proper field permission!
-        if not self.has_permission(ViewResults, self.context):
+        if not self.has_permission(ViewResults, analysis_brain):
             # If user has no permissions, don"t display the result but an icon
             img = get_image("to_follow.png", width="16px", height="16px")
             item["before"]["Result"] = img
@@ -895,6 +893,14 @@ class AnalysesView(ListingView):
             # Set the results field editable
             if self.is_result_edition_allowed(analysis_brain):
                 item["allow_edit"].append("Result")
+
+            # Display the DL operand (< or >) in the results entry field if
+            # the manual entry of DL is set, but DL selector is hidden
+            allow_manual = obj.getAllowManualDetectionLimit()
+            selector = obj.getDetectionLimitSelector()
+            if allow_manual and not selector:
+                operand = obj.getDetectionLimitOperand()
+                item["Result"] = "{} {}".format(operand, result).strip()
 
             # Prepare result options
             choices = obj.getResultOptions()
@@ -1163,12 +1169,12 @@ class AnalysesView(ListingView):
         attachments_names = []
         attachments_html = []
         analysis = self.get_object(obj)
-        for at in analysis.getAttachment():
-            at_file = at.getAttachmentFile()
-            url = "{}/at_download/AttachmentFile".format(api.get_url(at))
-            link = get_link(url, at_file.filename, tabindex="-1")
+        for attachment in analysis.getRawAttachment():
+            attachment = self.get_object(attachment)
+            link = self.get_attachment_link(attachment)
             attachments_html.append(link)
-            attachments_names.append(at_file.filename)
+            filename = attachment.getFilename()
+            attachments_names.append(filename)
 
         if attachments_html:
             item["replace"]["Attachments"] = "<br/>".join(attachments_html)
@@ -1177,6 +1183,14 @@ class AnalysesView(ListingView):
         elif analysis.getAttachmentRequired():
             img = get_image("warning.png", title=_("Attachment required"))
             item["replace"]["Attachments"] = img
+
+    def get_attachment_link(self, attachment):
+        """Returns a well-formed link for the attachment passed in
+        """
+        filename = attachment.getFilename()
+        att_url = api.get_url(attachment)
+        url = "{}/at_download/AttachmentFile".format(att_url)
+        return get_link(url, filename, tabindex="-1")
 
     def _folder_item_uncertainty(self, analysis_brain, item):
         """Fills the analysis' uncertainty to the item passed in.
@@ -1201,9 +1215,8 @@ class AnalysesView(ListingView):
             item["allow_edit"].append("Uncertainty")
             return
 
-        result = obj.getResult()
         formatted = format_uncertainty(
-            obj, result, decimalmark=self.dmk, sciformat=int(self.scinot))
+            obj, decimalmark=self.dmk, sciformat=int(self.scinot))
         if formatted:
             item["replace"]["Uncertainty"] = formatted
             item["before"]["Uncertainty"] = "± "
@@ -1525,12 +1538,21 @@ class AnalysesView(ListingView):
             return
 
         conditions = analysis.getConditions()
-        if conditions:
-            conditions = map(lambda it: ": ".join([it["title"], it["value"]]),
-                             conditions)
-            conditions = "<br/>".join(conditions)
-            service = item["replace"].get("Service") or item["Service"]
-            item["replace"]["Service"] = "{}<br/>{}".format(service, conditions)
+        if not conditions:
+            return
+
+        def to_str(condition):
+            title = condition.get("title")
+            value = condition.get("value", "")
+            if condition.get("type") == "file" and api.is_uid(value):
+                att = self.get_object(value)
+                value = self.get_attachment_link(att)
+            return ": ".join([title, str(value)])
+
+        # Display the conditions properly formatted
+        conditions = "<br/>".join([to_str(cond) for cond in conditions])
+        service = item["replace"].get("Service") or item["Service"]
+        item["replace"]["Service"] = "<br/>".join([service, conditions])
 
     def is_method_required(self, analysis):
         """Returns whether the render of the selection list with methods is

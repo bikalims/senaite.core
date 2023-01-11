@@ -75,19 +75,19 @@ class ARAnalysesField(ObjectField):
         :param kwargs: Keyword arguments to inject in the search query
         :returns: A list of Analysis Objects/Catalog Brains
         """
-        # Do we need to return objects or brains
-        full_objects = kwargs.get("full_objects", False)
-
-        # Bail out parameters from kwargs that don't match with indexes
+        # Filter out parameters from kwargs that don't match with indexes
         catalog = api.get_tool(ANALYSIS_CATALOG)
         indexes = catalog.indexes()
         query = dict([(k, v) for k, v in kwargs.items() if k in indexes])
 
-        # Do the search against the catalog
         query["portal_type"] = "Analysis"
         query["getAncestorsUIDs"] = api.get_uid(instance)
+        query["sort_on"] = kwargs.get("sort_on", "sortable_title")
+        query["sort_order"] = kwargs.get("sort_order", "ascending")
+
+        # Do the search against the catalog
         brains = catalog(query)
-        if full_objects:
+        if kwargs.get("full_objects", False):
             return map(api.get_object, brains)
         return brains
 
@@ -274,9 +274,7 @@ class ARAnalysesField(ObjectField):
 
         if not analyses:
             # Create the analysis
-            new_id = self.generate_analysis_id(instance, service)
-            logger.info("Creating new analysis '{}'".format(new_id))
-            analysis = create_analysis(instance, service, id=new_id)
+            analysis = create_analysis(instance, service)
             analyses.append(analysis)
 
         for analysis in analyses:
@@ -304,17 +302,6 @@ class ARAnalysesField(ObjectField):
             analysis.setConditions(conditions)
 
             analysis.reindexObject()
-
-    def generate_analysis_id(self, instance, service):
-        """Generate a new analysis ID
-        """
-        count = 1
-        keyword = service.getKeyword()
-        new_id = keyword
-        while new_id in instance.objectIds():
-            new_id = "{}-{}".format(keyword, count)
-            count += 1
-        return new_id
 
     def remove_analysis(self, analysis):
         """Removes a given analysis from the instance

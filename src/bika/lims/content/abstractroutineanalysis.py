@@ -19,6 +19,7 @@
 # Some rights reserved, see README and LICENSE.
 
 import copy
+from collections import OrderedDict
 from datetime import timedelta
 
 from AccessControl import ClassSecurityInfo
@@ -27,6 +28,7 @@ from bika.lims import bikaMessageFactory as _
 from bika.lims.browser.widgets import DecimalWidget
 from bika.lims.content.abstractanalysis import AbstractAnalysis
 from bika.lims.content.abstractanalysis import schema
+from bika.lims.content.attachment import Attachment
 from bika.lims.content.clientawaremixin import ClientAwareMixin
 from bika.lims.interfaces import IAnalysis
 from bika.lims.interfaces import ICancellable
@@ -253,9 +255,10 @@ class AbstractRoutineAnalysis(AbstractAnalysis, ClientAwareMixin):
     def getSampleTypeUID(self):
         """Used to populate catalog values.
         """
-        sample_type = self.getSampleType()
-        if sample_type:
-            return api.get_uid(sample_type)
+        sample = self.getRequest()
+        if not sample:
+            return None
+        return sample.getRawSampleType()
 
     @security.public
     def getResultsRange(self):
@@ -293,6 +296,15 @@ class AbstractRoutineAnalysis(AbstractAnalysis, ClientAwareMixin):
         if not calculation:
             return None
         return calculation
+
+    @security.public
+    def setCalculation(self, value):
+        self.getField("Calculation").set(self, value)
+        # TODO Something weird here
+        # Reset interims so they get extended with those from calculation
+        # see bika.lims.browser.fields.interimfieldsfield.set
+        interim_fields = copy.deepcopy(self.getInterimFields())
+        self.setInterimFields(interim_fields)
 
     @security.public
     def getDependents(self, with_retests=False, recursive=False):
@@ -456,6 +468,7 @@ class AbstractRoutineAnalysis(AbstractAnalysis, ClientAwareMixin):
         """
         sample = self.getRequest()
         service_uid = self.getRawAnalysisService()
+        attachments = self.getRawAttachment()
 
         def is_valid(condition):
             uid = condition.get("uid")
@@ -463,6 +476,8 @@ class AbstractRoutineAnalysis(AbstractAnalysis, ClientAwareMixin):
                 if empties:
                     return True
                 value = condition.get("value", None)
+                if condition.get("type") == "file":
+                    return value in attachments
                 return value not in [None, ""]
             return False
 
@@ -509,4 +524,55 @@ class AbstractRoutineAnalysis(AbstractAnalysis, ClientAwareMixin):
 
         # Sanitize the conditions
         conditions = filter(None, [to_condition(cond) for cond in conditions])
+
+        # Conditions from "file" type are stored as attachments
+        attachments = []
+        for condition in conditions:
+            if condition.get("type") != "file":
+                continue
+
+            value = condition.get("value")
+            orig_attachment = condition.pop("attachment", None)
+            if api.is_uid(value):
+                # link to an existing attachment
+                attachments.append(value)
+            elif isinstance(value, Attachment):
+                # link to an existing attachment
+                uid = api.get_uid(value)
+                attachments.append(uid)
+                condition["value"] = uid
+            elif getattr(value, "filename", ""):
+                # create new attachment
+                client = sample.getClient()
+                att = api.create(client, "Attachment", AttachmentFile=value)
+                attachments.append(api.get_uid(att))
+                # update with the attachment uid
+                condition["value"] = api.get_uid(att)
+            elif api.is_uid(orig_attachment):
+                # restore to original attachment
+                attachments.append(orig_attachment)
+                condition["value"] = orig_attachment
+            else:
+                # nothing we can handle, update with an empty value
+                condition["value"] = ""
+
+        # Link the analysis to the attachments
+        if attachments:
+            # Remove duplicates while keeping the order
+            attachments.extend(self.getRawAttachment() or [])
+            attachments = list(OrderedDict.fromkeys(attachments))
+            self.setAttachment(attachments)
+
+        # Store the conditions in sample
         sample.setServiceConditions(other_conditions + conditions)
+
+    @security.public
+    def getPrice(self):
+        """The function obtains the analysis' price without VAT and without
+        member discount
+        :return: the price (without VAT or Member Discount) in decimal format
+        """
+        client = self.getClient()
+        if client and client.getBulkDiscount():
+            return self.getBulkPrice()
+        return self.getField('Price').get(self)

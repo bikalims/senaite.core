@@ -1,0 +1,106 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="senaite.core">
+
+  <!-- Reindex QC Analyses
+       https://github.com/senaite/senaite.core/pull/2157 -->
+  <genericsetup:upgradeStep
+      title="SENAITE CORE 2.4.0: Reindex QC Analyses"
+      description="Reindex the QC analyses to ensure they are displayed again in worksheets"
+      source="2.4.0"
+      destination="2401"
+      handler="senaite.core.upgrade.v02_04_000.reindex_qc_analyses"
+      profile="senaite.core:default"/>
+
+  <!-- Mark analyses with IRejected or IRetracted
+       https://github.com/senaite/senaite.core/pull/2164 -->
+  <genericsetup:upgradeStep
+      title="SENAITE CORE 2.4.0: Mark analyses with IRetracted and IRejected"
+      description="Mark analyses with IRetracted and IRejected"
+      source="2401"
+      destination="2402"
+      handler="senaite.core.upgrade.v02_04_000.mark_retracted_and_rejected_analyses"
+      profile="senaite.core:default"/>
+
+  <!-- Fix sample actions without translation
+       https://github.com/senaite/senaite.core/pull/2190 -->
+  <genericsetup:upgradeStep
+      title="SENAITE CORE 2.4.0: Fix sample actions without translation"
+      description="Fix sample actions without translation"
+      source="2402"
+      destination="2403"
+      handler="senaite.core.upgrade.v02_04_000.fix_sample_actions_not_translated"
+      profile="senaite.core:default"/>
+
+  <!-- Use portal as relative path for sticker icon
+       https://github.com/senaite/senaite.core/pull/2197 -->
+  <genericsetup:upgradeStep
+      title="SENAITE CORE 2.4.0: Use portal as relative path for sticker icons"
+      description="Use portal as relative path for sticker icons"
+      source="2403"
+      destination="2404"
+      handler="senaite.core.upgrade.v02_04_000.import_typeinfo"
+      profile="senaite.core:default"/>
+
+  <!-- Fix traceback when retracting an analysis with a detection limit
+       https://github.com/senaite/senaite.core/pull/2204 -->
+  <genericsetup:upgradeStep
+      title="SENAITE CORE 2.4.0: Fix traceback when retracting DL"
+      description="Fix traceback when retracting an analysis with a detection limit"
+      source="2404"
+      destination="2405"
+      handler="senaite.core.upgrade.v02_04_000.fix_traceback_retract_dl"
+      profile="senaite.core:default"/>
+
+  <!-- Purge ComputedField from AnalysisRequest related with Profiles
+       https://github.com/senaite/senaite.core/pull/2213 -->
+  <genericsetup:upgradeStep
+      title="SENAITE CORE 2.4.0: Purge ComputedField from AnalysisRequest related with Profiles"
+      description="Purge ComputedField from AnalysisRequest related with Profiles"
+      source="2405"
+      destination="2406"
+      handler="senaite.core.upgrade.v02_04_000.purge_computed_fields_profile"
+      profile="senaite.core:default"/>
+
+  <!-- Remove `DefaultContainerType` field (stale) from AnalysisRequest
+       https://github.com/senaite/senaite.core/pull/2214 -->
+  <genericsetup:upgradeStep
+      title="SENAITE CORE 2.4.0: Remove `DefaultContainerType` field (stale) from AnalysisRequest"
+      description="Remove `DefaultContainerType` field (stale) from AnalysisRequest"
+      source="2406"
+      destination="2407"
+      handler="senaite.core.upgrade.v02_04_000.remove_default_container_type"
+      profile="senaite.core:default"/>
+
+  <!-- Migrate ReferenceField from AnalysisRequest to UIDReferenceField
+       https://github.com/senaite/senaite.core/pull/2209 -->
+  <genericsetup:upgradeStep
+      title="SENAITE CORE 2.4.0: Migrate ReferenceField from AnalysisRequest"
+      description="Migrate ReferenceField from AnalysisRequest to UIDReferenceField"
+      source="2407"
+      destination="2408"
+      handler="senaite.core.upgrade.v02_04_000.migrate_analysisrequest_referencefields"
+      profile="senaite.core:default"/>
+
+  <!-- Rename RetestOf relationship
+       https://github.com/senaite/senaite.core/pull/2219 -->
+  <genericsetup:upgradeStep
+      title="SENAITE CORE 2.4.0: Rename RetestOf relationship"
+      description="Rename RetestOf relationship to AnalysisRetestOf"
+      source="2408"
+      destination="2409"
+      handler="senaite.core.upgrade.v02_04_000.rename_retestof_relationship"
+      profile="senaite.core:default"/>
+
+  <!-- Purge back-references that are no longer required
+       https://github.com/senaite/senaite.core/pull/2219 -->
+  <genericsetup:upgradeStep
+      title="SENAITE CORE 2.4.0: Purge back-references that are no longer required"
+      description="Purge back-references from UIDReferenceField that are no longer required"
+      source="2409"
+      destination="2410"
+      handler="senaite.core.upgrade.v02_04_000.purge_backreferences"
+      profile="senaite.core:default"/>
+
+</configure>

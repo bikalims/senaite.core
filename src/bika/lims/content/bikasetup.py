@@ -325,6 +325,17 @@ schema = BikaFolderSchema.copy() + Schema((
         ),
     ),
     BooleanField(
+        "SampleAnalysesRequired",
+        schemata="Analyses",
+        default=True,
+        widget=BooleanWidget(
+            label=_("label_bikasetup_sampleanalysesrequired",
+                    default="Require sample analyses"),
+            description=_("description_bikasetup_sampleanalysesrequired",
+                          "Analyses are required for sample registration")
+        ),
+    ),
+    BooleanField(
         'EnableARSpecs',
         schemata="Analyses",
         default=False,
@@ -638,6 +649,21 @@ schema = BikaFolderSchema.copy() + Schema((
             output_mime_type="text/x-html",
             allow_file_upload=False,
             rows=15,
+        ),
+    ),
+    # NOTE: This is a Proxy Field which delegates to the SENAITE Registry!
+    BooleanField(
+        "AlwaysCCResponsiblesInReportEmail",
+        schemata="Notifications",
+        default=True,
+        widget=BooleanWidget(
+            label=_(
+                "label_bikasetup_always_cc_responsibles_in_report_emails",
+                default="Always send publication email to responsibles"),
+            description=_(
+                "description_bikasetup_always_cc_responsibles_in_report_emails",
+                default="When selected, the responsible persons of all "
+                "involved lab departments will receive publication emails."),
         ),
     ),
     BooleanField(
@@ -1047,6 +1073,22 @@ class BikaSetup(folder.ATFolder):
         if setup:
             setup.setEmailBodySamplePublication(value)
 
+    def getAlwaysCCResponsiblesInReportEmail(self):
+        """Get the value from the senaite setup
+        """
+        setup = api.get_senaite_setup()
+        # setup is `None` during initial site content structure installation
+        if setup:
+            return setup.getAlwaysCCResponsiblesInReportEmail()
+
+    def setAlwaysCCResponsiblesInReportEmail(self, value):
+        """Set the value in the senaite setup
+        """
+        setup = api.get_senaite_setup()
+        # setup is `None` during initial site content structure installation
+        if setup:
+            setup.setAlwaysCCResponsiblesInReportEmail(value)
+
     def getEnableGlobalAuditlog(self):
         """Get the value from the senaite setup
         """
@@ -1097,6 +1139,23 @@ class BikaSetup(folder.ATFolder):
         # setup is `None` during initial site content structure installation
         if setup:
             setup.setCategorizeSampleAnalyses(value)
+
+    def getSampleAnalysesRequired(self):
+        """Get the value from the senaite setup
+        """
+        setup = api.get_senaite_setup()
+        # setup is `None` during initial site content structure installation
+        if setup:
+            return setup.getSampleAnalysesRequired()
+        return False
+
+    def setSampleAnalysesRequired(self, value):
+        """Set the value in the senaite setup
+        """
+        setup = api.get_senaite_setup()
+        # setup is `None` during initial site content structure installation
+        if setup:
+            setup.setSampleAnalysesRequired(value)
 
 
 registerType(BikaSetup, PROJECTNAME)

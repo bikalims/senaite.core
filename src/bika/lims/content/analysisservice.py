@@ -98,6 +98,7 @@ Calculation = UIDReferenceField(
     "Calculation",
     schemata="Method",
     required=0,
+    relationship="AnalysisServiceCalculation",
     vocabulary="_default_calculation_vocabulary",
     allowed_types=("Calculation", ),
     accessor="getRawCalculation",
@@ -259,6 +260,7 @@ Conditions = RecordsField(
             ('number', _('Number')),
             ('checkbox', _('Checkbox')),
             ('select', _('Select')),
+            ('file', _('File upload')),
         )),
     },
     widget=RecordsWidget(

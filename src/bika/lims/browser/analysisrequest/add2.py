@@ -19,10 +19,10 @@
 # Some rights reserved, see README and LICENSE.
 
 import json
-import six
-
 from collections import OrderedDict
 from datetime import datetime
+
+import six
 
 from bika.lims import POINTS_OF_CAPTURE
 from bika.lims import api
@@ -35,7 +35,6 @@ from bika.lims.interfaces import IAddSampleFieldsFlush
 from bika.lims.interfaces import IAddSampleObjectInfo
 from bika.lims.interfaces import IAddSampleRecordsValidator
 from bika.lims.interfaces import IGetDefaultFieldValueARAddHook
-from bika.lims.utils import tmpID
 from bika.lims.utils.analysisrequest import create_analysisrequest as crar
 from bika.lims.workflow import ActionHandlerPool
 from BTrees.OOBTree import OOBTree
@@ -45,7 +44,6 @@ from plone.memoize import view as viewcache
 from plone.memoize.volatile import DontCache
 from plone.memoize.volatile import cache
 from plone.protect.interfaces import IDisableCSRFProtection
-from Products.CMFPlone.utils import _createObjectByType
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -131,6 +129,13 @@ class AnalysisRequestAddView(BrowserView):
         if obj is None:
             logger.warn("!! No object found for UID #{} !!")
         return obj
+
+    @viewcache.memoize
+    def analyses_required(self):
+        """Check if analyses are required
+        """
+        setup = api.get_setup()
+        return setup.getSampleAnalysesRequired()
 
     def get_currency(self):
         """Returns the configured currency
@@ -1108,6 +1113,56 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
             "title": obj and api.get_title(obj) or ""
         }
 
+    def to_attachment_record(self, fileupload):
+        """Returns a dict-like structure with suitable information for the
+        proper creation of Attachment objects
+        """
+        if not fileupload.filename:
+            # ZPublisher.HTTPRequest.FileUpload is empty
+            return None
+        return {
+            "AttachmentFile": fileupload,
+            "AttachmentType": "",
+            "ReportOption": "",
+            "AttachmentKeys": "",
+            "Service": "",
+        }
+
+    def create_attachment(self, sample, attachment_record):
+        """Creates an attachment for the given sample with the information
+        provided in attachment_record
+        """
+        # create the attachment object
+        client = sample.getClient()
+        attachment = api.create(client, "Attachment", **attachment_record)
+        uid = attachment_record.get("Service")
+        if not uid:
+            # Link the attachment to the sample
+            sample.addAttachment(attachment)
+            return attachment
+
+        # Link the attachment to analyses with this service uid
+        ans = sample.objectValues(spec="Analysis")
+        ans = filter(lambda an: an.getRawAnalysisService() == uid, ans)
+        for analysis in ans:
+            attachments = analysis.getRawAttachment()
+            analysis.setAttachment(attachments + [attachment])
+
+        # Assign the attachment to the given condition
+        condition_title = attachment_record.get("Condition")
+        if not condition_title:
+            return attachment
+
+        conditions = sample.getServiceConditions()
+        for condition in conditions:
+            is_uid = condition.get("uid") == uid
+            is_title = condition.get("title") == condition_title
+            is_file = condition.get("type") == "file"
+            if all([is_uid, is_title, is_file]):
+                condition["value"] = api.get_uid(attachment)
+        sample.setServiceConditions(conditions)
+        return attachment
+
     def ajax_get_global_settings(self):
         """Returns the global Bika settings
         """
@@ -1585,7 +1640,8 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
             # Extract file uploads (fields ending with _file)
             # These files will be added later as attachments
             file_fields = filter(lambda f: f.endswith("_file"), record)
-            attachments[n] = map(lambda f: record.pop(f), file_fields)
+            uploads = map(lambda f: record.pop(f), file_fields)
+            attachments[n] = [self.to_attachment_record(f) for f in uploads]
 
             # Required fields and their values
             required_keys = [field.getName() for field in fields
@@ -1598,6 +1654,10 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
             # columns pass the required check below.
             if record.get("Client", False):
                 required_fields.pop('Client', None)
+
+            # Check if analyses are required for sample registration
+            if not self.analyses_required():
+                required_fields.pop("Analyses", None)
 
             # Contacts get pre-filled out if only one contact exists.
             # We won't force those columns with only the Contact filled out to
@@ -1624,8 +1684,23 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
             # Missing required fields
             missing = [f for f in required_fields if not record.get(f, None)]
 
-            # Handle required fields from Service conditions
+            # Handle fields from Service conditions
             for condition in record.get("ServiceConditions", []):
+                if condition.get("type") == "file":
+                    # Add the file as an attachment
+                    file_upload = condition.get("value")
+                    att = self.to_attachment_record(file_upload)
+                    if att:
+                        # Add the file as an attachment
+                        att.update({
+                            "Service": condition.get("uid"),
+                            "Condition": condition.get("title"),
+                        })
+                        attachments[n].append(att)
+                    # Reset the condition value
+                    filename = file_upload and file_upload.filename or ""
+                    condition.value = filename
+
                 if condition.get("required") == "on":
                     if not condition.get("value"):
                         title = condition.get("title")
@@ -1635,7 +1710,7 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
             # If there are required fields missing, flag an error
             for field in missing:
                 fieldname = "{}-{}".format(field, n)
-                msg = _("Field '{}' is required".format(field))
+                msg = _("Field '{}' is required").format(safe_unicode(field))
                 fielderrors[fieldname] = msg
 
             # Process valid record
@@ -1686,17 +1761,18 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
             except Exception as e:
                 actions.resume()
                 errors["message"] = str(e)
+                logger.error(e, exc_info=True)
                 return {"errors": errors}
+
             # We keep the title to check if AR is newly created
             # and UID to print stickers
             ARs[ar.Title()] = ar.UID()
-            for attachment in attachments.get(n, []):
-                if not attachment.filename:
-                    continue
-                att = _createObjectByType("Attachment", client, tmpID())
-                att.setAttachmentFile(attachment)
-                att.processForm()
-                ar.addAttachment(att)
+
+            # Create the attachments
+            ar_attachments = filter(None, attachments.get(n, []))
+            for attachment_record in ar_attachments:
+                self.create_attachment(ar, attachment_record)
+
         actions.resume()
 
         level = "info"
@@ -1715,14 +1791,24 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
 
         return self.handle_redirect(ARs.values(), message)
 
+    def is_automatic_label_printing_enabled(self):
+        """Returns whether the automatic printing of barcode labels is active
+        """
+        setup = api.get_setup()
+        auto_print = setup.getAutoPrintStickers()
+        auto_receive = setup.getAutoreceiveSamples()
+        action = "receive" if auto_receive else "register"
+        return action in auto_print
+
     def handle_redirect(self, uids, message):
         """Handle redirect after sample creation or cancel
         """
         # Automatic label printing
         setup = api.get_setup()
-        auto_print = setup.getAutoPrintStickers()
+        auto_print = self.is_automatic_label_printing_enabled()
         immediate_results_entry = setup.getImmediateResultsEntry()
         redirect_to = self.context.absolute_url()
+
         # UIDs of the new created samples
         sample_uids = ",".join(uids)
         # UIDs of previous created samples when save&copy was selected
@@ -1739,11 +1825,9 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
                         ",".join(uids),  # copy_from
                         len(uids),  # ar_count
                         sample_uids)  # sample_uids
-        elif "register" in auto_print and sample_uids:
-            redirect_to = "{}/sticker?autoprint=1&template={}&items={}".format(
-                self.context.absolute_url(),
-                setup.getAutoStickerTemplate(),
-                sample_uids)
+        elif auto_print and sample_uids:
+            redirect_to = "{}/sticker?autoprint=1&items={}".format(
+                self.context.absolute_url(), sample_uids)
         elif immediate_results_entry and sample_uids:
             redirect_to = "{}/multi_results?uids={}".format(
                 self.context.absolute_url(),

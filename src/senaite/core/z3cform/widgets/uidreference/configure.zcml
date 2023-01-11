@@ -1,0 +1,36 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:z3c="http://namespaces.zope.org/z3c"
+    i18n_domain="z3c.form">
+
+  <!-- UIDReference Widget -->
+  <adapter factory=".widget.UIDReferenceWidgetFactory" />
+
+  <!-- UIDReference data converter -->
+  <adapter factory=".widget.UIDReferenceDataConverter" />
+
+  <!-- UIDReference input widget template -->
+  <z3c:widgetTemplate
+      mode="input"
+      widget=".widget.UIDReferenceWidget"
+      template="input.pt"
+      layer="senaite.core.interfaces.ISenaiteFormLayer"
+      />
+
+  <!-- UIDReference display widget template -->
+  <z3c:widgetTemplate
+      mode="display"
+      widget=".widget.UIDReferenceWidget"
+      template="display.pt"
+      layer="senaite.core.interfaces.ISenaiteFormLayer"
+      />
+
+  <!-- UIDReference hidden widget template -->
+  <z3c:widgetTemplate
+      mode="hidden"
+      widget=".widget.UIDReferenceWidget"
+      template="hidden.pt"
+      layer="senaite.core.interfaces.ISenaiteFormLayer"
+      />
+
+</configure>

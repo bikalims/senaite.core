@@ -33,3 +33,13 @@ class IDatetimeWidget(IObjectWidget):
 class IAddressWidget(IObjectWidget):
     """Address widget for multiple addresses
     """
+
+
+class IPhoneWidget(IWidget):
+    """Input type "phone" widget
+    """
+
+
+class IQuerySelectWidget(IWidget):
+    """Allows to search and select a value
+    """

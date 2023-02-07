@@ -695,7 +695,7 @@ schema = BikaSchema.copy() + Schema((
             size=20,
             render_own_label=True,
             visible={
-                "add": "invisible",
+                "add": "edit",
                 'secondary': 'disabled',
             },
             catalog_name='senaite_catalog_setup',

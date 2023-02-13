@@ -31,7 +31,7 @@ from bika.lims.interfaces import IDuplicateAnalysis
 from bika.lims.interfaces.analysis import IRequestAnalysis
 
 
-def is_out_of_range(brain_or_object, result=_marker, object_type="Analysis"):
+def is_out_of_range(brain_or_object, result=_marker, spec_type="Analysis"):
     """Checks if the result for the analysis passed in is out of range and/or
     out of shoulders range.
 
@@ -103,9 +103,9 @@ def is_out_of_range(brain_or_object, result=_marker, object_type="Analysis"):
     # - For reference analyses, getResultRange returns the valid range as
     #   indicated in the Reference Sample from which the analysis was created.
     result_range = None
-    if object_type == "Analysis":
+    if spec_type == "Analysis":
         result_range = api.safe_getattr(analysis, "getResultsRange", None)
-    if object_type == "Sample":
+    if spec_type == "Sample":
         sample = analysis.getRequest()
         result_ranges = api.safe_getattr(sample, "getResultsRange", None)
         for i in result_ranges:

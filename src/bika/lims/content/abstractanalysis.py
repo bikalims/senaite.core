@@ -473,8 +473,11 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         # Ensure result integrity regards to None, empty and 0 values
         val = str("" if not value and value != 0 else value).strip()
 
+        # Check if an string result is expected
+        string_result = self.getStringResult()
+
         # UDL/LDL directly entered in the results field
-        if val and val[0] in [LDL, UDL]:
+        if not string_result and val[:1] in [LDL, UDL]:
             # Strip off the detection limit operand from the result
             operand = val[0]
             val = val.replace(operand, "", 1).strip()
@@ -827,6 +830,7 @@ class AbstractAnalysis(AbstractBaseAnalysis):
     def getFormattedResult(self, specs=None, decimalmark='.', sciformat=1,
                            html=True):
         """Formatted result:
+        0: If the result type is StringResult, return it without being formatted
         1. If the result is a detection limit, returns '< LDL' or '> UDL'
         2. Print ResultText of matching ResultOptions
         3. If the result is not floatable, return it without being formatted
@@ -854,21 +858,7 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         """
         result = self.getResult()
 
-        # 1. The result is a detection limit, return '< LDL' or '> UDL'
-        dl = self.getDetectionLimitOperand()
-        if dl:
-            try:
-                res = api.float_to_string(float(result))
-                fdm = formatDecimalMark(res, decimalmark)
-                hdl = cgi.escape(dl) if html else dl
-                return '%s %s' % (hdl, fdm)
-            except (TypeError, ValueError):
-                logger.warn(
-                    "The result for the analysis %s is a detection limit, "
-                    "but not floatable: %s" % (self.id, result))
-                return formatDecimalMark(result, decimalmark=decimalmark)
-
-        # 2. Print ResultText of matching ResultOptions
+        # If result options, return text of matching option
         choices = self.getResultOptions()
         if choices:
             # Create a dict for easy mapping of result options
@@ -890,14 +880,31 @@ class AbstractAnalysis(AbstractBaseAnalysis):
             except (ValueError, TypeError):
                 pass
 
-        # 3. If the result is not floatable, return it without being formatted
+        # If string result, return without any formatting
+        if self.getStringResult():
+            return cgi.escape(result) if html else result
+
+        # If a detection limit, return '< LDL' or '> UDL'
+        dl = self.getDetectionLimitOperand()
+        if dl:
+            try:
+                res = api.float_to_string(float(result))
+                fdm = formatDecimalMark(res, decimalmark)
+                hdl = cgi.escape(dl) if html else dl
+                return '%s %s' % (hdl, fdm)
+            except (TypeError, ValueError):
+                logger.warn(
+                    "The result for the analysis %s is a detection limit, "
+                    "but not floatable: %s" % (self.id, result))
+                return formatDecimalMark(result, decimalmark=decimalmark)
+
+        # If not floatable, return without any formatting
         try:
             result = float(result)
         except (TypeError, ValueError):
             return formatDecimalMark(result, decimalmark=decimalmark)
 
-        # 4. If the analysis specs has enabled hidemin or hidemax and the
-        #    result is out of range, render result as '<min' or '>max'
+        # If specs are set, evaluate if out of range
         specs = specs if specs else self.getResultsRange()
         hidemin = specs.get('hidemin', '')
         hidemax = specs.get('hidemax', '')
@@ -910,17 +917,17 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         except (TypeError, ValueError):
             abovemax = False
 
-        # 4.1. If result is below min and hidemin enabled, return '<min'
+        # If below min and hidemin enabled, return '<min'
         if belowmin:
             fdm = formatDecimalMark('< %s' % hidemin, decimalmark)
             return fdm.replace('< ', '&lt; ', 1) if html else fdm
 
-        # 4.2. If result is above max and hidemax enabled, return '>max'
+        # If above max and hidemax enabled, return '>max'
         if abovemax:
             fdm = formatDecimalMark('> %s' % hidemax, decimalmark)
             return fdm.replace('> ', '&gt; ', 1) if html else fdm
 
-        # Below Lower Detection Limit (LDL)?
+        # If below LDL, return '< LDL'
         ldl = self.getLowerDetectionLimit()
         ldl = api.to_float(ldl, 0.0)
         if result < ldl:
@@ -929,7 +936,7 @@ class AbstractAnalysis(AbstractBaseAnalysis):
             fdm = formatDecimalMark('< %s' % ldl, decimalmark)
             return fdm.replace('< ', '&lt; ', 1) if html else fdm
 
-        # Above Upper Detection Limit (UDL)?
+        # If above UDL, return '< UDL'
         udl = self.getUpperDetectionLimit()
         udl = api.to_float(udl, 0.0)
         if result > udl:

@@ -40,8 +40,7 @@ class LabAnalysesTable(AnalysesView):
         self.show_workflow_action_buttons = True
         self.show_select_column = True
         self.show_search = False
-        self.show_categories = True
-        self.expand_all_categories = True
+        self.reorder_analysis_columns()
 
 
 class FieldAnalysesTable(AnalysesView):
@@ -61,6 +60,7 @@ class FieldAnalysesTable(AnalysesView):
         self.show_workflow_action_buttons = True
         self.show_select_column = True
         self.show_search = False
+        self.reorder_analysis_columns()
 
 
 class QCAnalysesTable(QCAnalysesView):
@@ -75,3 +75,4 @@ class QCAnalysesTable(QCAnalysesView):
         self.show_select_column = False
         self.show_workflow_action_buttons = False
         self.show_search = False
+        self.reorder_analysis_columns()

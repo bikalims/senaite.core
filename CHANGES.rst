@@ -34,6 +34,60 @@ Changelog
 2.4.0 (unreleased)
 ------------------
 
+2.5.0 (unreleased)
+------------------
+
+- #2282 Fix sample reports retrieval
+- #2285 Fix string results with html characters not displayed after submit
+- #2284 Fix the email sent on sample rejection is not text/html
+- #2280 Remove custom date rendering in sample header
+- #2279 Allow all custom transitions in sample report listing
+- #2278 Client catalog
+- #2276 Senaite labels
+- #2275 Fix wrong result when both "Result options" and "String" are enabled
+- #2273 Improve performance for sample listing index
+- #2272 Allow to configure the position of additional value columns
+
+
+2.4.1 (2023-03-11)
+------------------
+
+- #2271 Fix TypeError in Analysis Service's view
+
+
+2.4.0 (2023-03-10)
+------------------
+
+- #2268 Add samplepoint information to worksheet slot header
+- #2267 Worksheet transposed layout fixtures
+- #2266 Change worksheet analysis column order for better results capturing
+- #2265 Change sample analysis column order for better results capturing
+- #2264 Collapsible analyses listings in sample view
+- #2262 Simplify attachment render in report options to single checkbox
+- #2259 Prevent string results from formatting and number conversion
+- #2255 Fix attachments from retracted or rejected analyses are not ignored
+- #2201 Allow manual selection of units on results entry
+- #2258 Reduce conflict errors on number generation
+- #2256 Do not keep DX UID reference field back-references per default
+- #2257 Fix UnicodeEncode error when viewing report objects
+- #2254 Fix attachments to be ignored are included in email results view
+- #2253 Allow to flush referencefields in sample header
+- #2251 Fix UnicodeDecodeError in report email form
+- #2250 Fix cannot set string result with greater or less than symbols
+- #2247 Fix `AttributeError` when running upgrade 240x with stale brains
+- #2246 Update ReactJS to version 18.2.0
+- #2245 Add missing translation for "Show more" (from app.listing)
+- #2243 Add ".pdf" extension to filenames for productivity reports
+- #2239 Allow to create multiple samples for each sample record in add form
+- #2241 Little improvement of getRaw function from legacy uidreference field
+- #2238 Split the add sample's `ajax_form` function to make patching easier
+- #2240 Explicitly set client on sample creation
+- #2237 Fix default value of interim choices and allow empty selection
+- #2234 Add interpretation template columns for assigned sampletypes and result text
+- #2234 Change base class for interpretation templates from Item -> Container
+- #2231 Cannot set conditions with a '<' char when others are from type "file"
+- #2221 Migrate `ReferenceField` fields from setup types to `UIDReferenceField`
+- #2228 Fix worksheet template title is not updated after template assignment
 - #2226 Add setting to CC responsible persons in publication emails
 - #2224 Fix wrong precision for exponential formatted uncertainties
 - #2219 Make `UIDReferenceField` to not keep back-references by default
@@ -49,6 +103,7 @@ Changelog
 - #2204 Fix traceback when retracting an analysis with a detection limit
 - #2202 Fix detection limit set manually is not displayed on result save
 - #2203 Fix empty date sampled in samples listing when sampling workflow is enabled 
+- #2203 Fix empty date sampled in samples listing when sampling workflow is enabled
 - #2197 Use portal as relative path for sticker icons
 - #2196 Order sample analyses by sortable title on get per default
 - #2193 Fix analyst cannot import results from instruments

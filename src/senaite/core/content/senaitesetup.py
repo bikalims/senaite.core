@@ -1,4 +1,22 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of SENAITE.CORE.
+#
+# SENAITE.CORE is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, version 2.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# Copyright 2018-2023 by it's authors.
+# Some rights reserved, see README and LICENSE.
 
 from AccessControl import ClassSecurityInfo
 from bika.lims import api
@@ -124,10 +142,31 @@ class ISetupSchema(model.Schema):
         ),
         default=True,
     )
+    max_number_of_samples_add = schema.Int(
+        title=_(
+            u"label_senaitesetup_maxnumberofsamplesadd",
+            default=u"Maximum value for 'Number of samples' field on "
+                    u"registration"
+        ),
+        description=_(
+            u"description_senaitesetup_maxnumberofsamplesadd",
+            default=u"Maximum number of samples that can be created in "
+                    u"accordance with the value set for the field 'Number of "
+                    u"samples' on the sample registration form"
+        ),
+        default=10
+    )
 
     ###
     # Fieldsets
     ###
+    model.fieldset(
+        "samples",
+        label=_("label_senaitesetup_fieldset_samples", default=u"Samples"),
+        fields=[
+            "max_number_of_samples_add",
+        ]
+    )
     model.fieldset(
         "analyses",
         label=_("label_senaitesetup_fieldset_analyses", default=u"Analyses"),
@@ -284,4 +323,22 @@ class Setup(Container):
         """Allow/Disallow to create samples without analyses
         """
         mutator = self.mutator("sample_analyses_required")
+        return mutator(self, value)
+
+    @security.protected(permissions.View)
+    def getMaxNumberOfSamplesAdd(self):
+        """Returns the maximum number of samples that can be created for each
+        column in sample add form in accordance with the value set for the
+        field 'Number of samples'
+        """
+        accessor = self.accessor("max_number_of_samples_add")
+        return api.to_int(accessor(self))
+
+    @security.protected(permissions.ModifyPortalContent)
+    def setMaxNumberOfSamplesAdd(self, value):
+        """Sets the maximum number of samples that can be created for each
+        column in sample add form in accordance with the value set for the
+        field 'Number of samples'
+        """
+        mutator = self.mutator("max_number_of_samples_add")
         return mutator(self, value)

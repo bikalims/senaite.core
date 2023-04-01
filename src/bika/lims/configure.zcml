@@ -12,6 +12,7 @@
   <includeDependencies package="." />
 
   <!-- Include permissions -->
+  <include package="senaite.core.permissions" />
   <include file="permissions.zcml" />
 
   <five:registerPackage package="." initialize=".initialize" />
@@ -70,11 +71,6 @@
       class="bika.lims.utils.js_err"
       permission="zope.Public"
       layer="bika.lims.interfaces.IBikaLIMS"
-      />
-
-  <utility
-      provides="bika.lims.interfaces.INumberGenerator"
-      factory=".numbergenerator.NumberGenerator"
       />
 
 </configure>

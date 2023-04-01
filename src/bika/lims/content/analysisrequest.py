@@ -23,8 +23,6 @@ import functools
 import re
 from decimal import Decimal
 
-from bika.lims.browser.fields.uidreferencefield import get_backreferences
-from Products.Archetypes.config import UID_CATALOG
 from six.moves.urllib.parse import urljoin
 
 from AccessControl import ClassSecurityInfo
@@ -39,6 +37,7 @@ from bika.lims.browser.fields import EmailsField
 from bika.lims.browser.fields import ResultsRangesField
 from bika.lims.browser.fields import UIDReferenceField
 from bika.lims.browser.fields.remarksfield import RemarksField
+from bika.lims.browser.fields.uidreferencefield import get_backreferences
 from bika.lims.browser.widgets import DateTimeWidget
 from bika.lims.browser.widgets import DecimalWidget
 from bika.lims.browser.widgets import PrioritySelectionWidget
@@ -112,8 +111,10 @@ from Products.Archetypes.atapi import StringField
 from Products.Archetypes.atapi import StringWidget
 from Products.Archetypes.atapi import TextField
 from Products.Archetypes.atapi import registerType
+from Products.Archetypes.config import UID_CATALOG
+from Products.Archetypes.Field import IntegerField
 from Products.Archetypes.public import Schema
-from Products.Archetypes.references import HoldingReference
+from Products.Archetypes.Widget import IntegerWidget
 from Products.Archetypes.Widget import RichWidget
 from Products.CMFCore.permissions import ModifyPortalContent
 from Products.CMFCore.permissions import View
@@ -123,6 +124,7 @@ from Products.CMFPlone.utils import safe_unicode
 from senaite.core.browser.fields.datetime import DateTimeField
 from senaite.core.browser.fields.records import RecordsField
 from senaite.core.catalog import ANALYSIS_CATALOG
+from senaite.core.catalog import CLIENT_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.core.catalog import SENAITE_CATALOG
 from senaite.core.catalog import WORKSHEET_CATALOG
@@ -178,8 +180,6 @@ schema = BikaSchema.copy() + Schema((
         'CCContact',
         multiValued=1,
         allowed_types=('Contact',),
-        referenceClass=HoldingReference,
-        relationship='AnalysisRequestCCContact',
         mode="rw",
         read_permission=View,
         write_permission=FieldEditContact,
@@ -242,11 +242,20 @@ schema = BikaSchema.copy() + Schema((
                 'add': 'edit',
                 'header_table': 'prominent',
             },
-            catalog_name="portal_catalog",
+            catalog_name=CLIENT_CATALOG,
             base_query={"is_active": True,
                         "sort_limit": 30,
                         "sort_on": "sortable_title",
                         "sort_order": "ascending"},
+            colModel=[
+                {"columnName": "getName", "width": "70", "label": _(
+                    "Client Name"), "align": "left"},
+                {"columnName": "getClientID", "width": "30", "label": _(
+                    "Client ID"), "align": "left"},
+                # UID is required in colModel
+                {"columnName": "UID", "hidden": True},
+            ],
+            ui_item="getName",
             showOn=True,
         ),
     ),
@@ -257,7 +266,6 @@ schema = BikaSchema.copy() + Schema((
     UIDReferenceField(
         "PrimaryAnalysisRequest",
         allowed_types=("AnalysisRequest",),
-        referenceClass=HoldingReference,
         relationship='AnalysisRequestPrimaryAnalysisRequest',
         mode="rw",
         read_permission=View,
@@ -297,7 +305,6 @@ schema = BikaSchema.copy() + Schema((
     UIDReferenceField(
         'Batch',
         allowed_types=('Batch',),
-        relationship='AnalysisRequestBatch',
         mode="rw",
         read_permission=View,
         write_permission=FieldEditBatch,
@@ -335,8 +342,6 @@ schema = BikaSchema.copy() + Schema((
         'SubGroup',
         required=False,
         allowed_types=('SubGroup',),
-        referenceClass=HoldingReference,
-        relationship='AnalysisRequestSubGroup',
         mode="rw",
         read_permission=View,
         write_permission=FieldEditBatch,
@@ -367,8 +372,6 @@ schema = BikaSchema.copy() + Schema((
     UIDReferenceField(
         'Template',
         allowed_types=('ARTemplate',),
-        referenceClass=HoldingReference,
-        relationship='AnalysisRequestARTemplate',
         mode="rw",
         read_permission=View,
         write_permission=FieldEditTemplate,
@@ -396,8 +399,6 @@ schema = BikaSchema.copy() + Schema((
         'Profiles',
         multiValued=1,
         allowed_types=('AnalysisProfile',),
-        referenceClass=HoldingReference,
-        relationship='AnalysisRequestAnalysisProfiles',
         mode="rw",
         read_permission=View,
         write_permission=FieldEditProfiles,
@@ -632,7 +633,6 @@ schema = BikaSchema.copy() + Schema((
         required=0,
         primary_bound=True,  # field changes propagate to partitions
         allowed_types='AnalysisSpec',
-        relationship='AnalysisRequestAnalysisSpec',
         mode="rw",
         read_permission=View,
         write_permission=FieldEditSpecification,
@@ -683,7 +683,6 @@ schema = BikaSchema.copy() + Schema((
         'PublicationSpecification',
         required=0,
         allowed_types='AnalysisSpec',
-        relationship='AnalysisRequestPublicationSpec',
         mode="rw",
         read_permission=View,
         write_permission=FieldEditPublicationSpecifications,
@@ -937,7 +936,6 @@ schema = BikaSchema.copy() + Schema((
         'Attachment',
         multiValued=1,
         allowed_types=('Attachment',),
-        referenceClass=HoldingReference,
         relationship='AnalysisRequestAttachment',
         mode="rw",
         read_permission=View,
@@ -975,8 +973,6 @@ schema = BikaSchema.copy() + Schema((
     UIDReferenceField(
         'Invoice',
         allowed_types=('Invoice',),
-        referenceClass=HoldingReference,
-        relationship='AnalysisRequestInvoice',
         mode="rw",
         read_permission=View,
         write_permission=ModifyPortalContent,
@@ -1175,7 +1171,6 @@ schema = BikaSchema.copy() + Schema((
         'ParentAnalysisRequest',
         allowed_types=('AnalysisRequest',),
         relationship='AnalysisRequestParentAnalysisRequest',
-        referenceClass=HoldingReference,
         mode="rw",
         read_permission=View,
         write_permission=ModifyPortalContent,
@@ -1188,8 +1183,6 @@ schema = BikaSchema.copy() + Schema((
     UIDReferenceField(
         "DetachedFrom",
         allowed_types=("AnalysisRequest",),
-        relationship="AnalysisRequestDetachedFrom",
-        referenceClass=HoldingReference,
         mode="rw",
         read_permission=View,
         write_permission=ModifyPortalContent,
@@ -1204,7 +1197,6 @@ schema = BikaSchema.copy() + Schema((
         'Invalidated',
         allowed_types=('AnalysisRequest',),
         relationship='AnalysisRequestRetracted',
-        referenceClass=HoldingReference,
         mode="rw",
         read_permission=View,
         write_permission=ModifyPortalContent,
@@ -1289,7 +1281,31 @@ schema = BikaSchema.copy() + Schema((
     RecordsField(
         "ServiceConditions",
         widget=ComputedWidget(visible=False)
-    )
+    ),
+
+    # Number of samples to create on add form
+    IntegerField(
+        "NumSamples",
+        default=1,
+        widget=IntegerWidget(
+            label=_(
+                u"label_analysisrequest_numsamples",
+                default=u"Number of samples"
+            ),
+            description=_(
+                u"description_analysisrequest_numsamples",
+                default=u"Number of samples to create with the information "
+                        u"provided"),
+            # This field is only visible in add sample form
+            visible={
+                "add": "edit",
+                "view": "invisible",
+                "header_table": "invisible",
+                "secondary": "invisible",
+            },
+            render_own_label=True,
+        ),
+    ),
 )
 )
 
@@ -1629,27 +1645,44 @@ class AnalysisRequest(BaseFolder, ClientAwareMixin):
                 return True
         return False
 
+    def getRawReports(self):
+        """Returns UIDs of reports with a reference to this sample
+
+        see: ARReport.ContainedAnalysisRequests field
+
+        :returns: List of report UIDs
+        """
+        return get_backreferences(self, "ARReportAnalysisRequest")
+
+    def getReports(self):
+        """Returns a list of report objects
+
+        :returns: List of report objects
+        """
+        return list(map(api.get_object, self.getRawReports()))
+
     def getPrinted(self):
         """ returns "0", "1" or "2" to indicate Printed state.
             0 -> Never printed.
             1 -> Printed after last publish
             2 -> Printed but republished afterwards.
         """
-        workflow = getToolByName(self, 'portal_workflow')
-        review_state = workflow.getInfoFor(self, 'review_state', '')
-        if review_state not in ['published']:
+        if not self.getDatePublished():
             return "0"
-        report_list = sorted(self.objectValues('ARReport'),
-                             key=lambda report: report.getDatePublished())
-        if not report_list:
+
+        report_uids = self.getRawReports()
+        if not report_uids:
             return "0"
-        last_report = report_list[-1]
+
+        last_report = api.get_object(report_uids[-1])
         if last_report.getDatePrinted():
             return "1"
-        else:
-            for report in report_list:
-                if report.getDatePrinted():
-                    return "2"
+
+        for report_uid in report_uids[:-1]:
+            report = api.get_object(report_uid)
+            if report.getDatePrinted():
+                return "2"
+
         return "0"
 
     @security.protected(View)
@@ -2388,7 +2421,7 @@ class AnalysisRequest(BaseFolder, ClientAwareMixin):
             # create a new attachment
             attachment = self.createAttachment(filedata, filename)
             # ignore the attachment in report
-            attachment.setReportOption("i")
+            attachment.setRenderInReport(False)
             # remove the image data base64 prefix
             html = html.replace(data_type, "")
             # remove the base64 image data with the attachment link

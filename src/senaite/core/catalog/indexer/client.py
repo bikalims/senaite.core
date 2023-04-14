@@ -12,12 +12,12 @@ def client_searchable_text(instance):
     """
 
     tokens = [
-        instance.getClientID(),
-        instance.getName(),
-        instance.getPhone(),
-        instance.getFax(),
-        instance.getEmailAddress(),
-        instance.getTaxNumber(),
+        str(instance.getClientID()),
+        str(instance.getName()),
+        str(instance.getPhone()),
+        str(instance.getFax()),
+        str(instance.getEmailAddress()),
+        str(instance.getTaxNumber()),
     ]
 
     # extend address lines

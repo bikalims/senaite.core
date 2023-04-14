@@ -96,23 +96,23 @@ def listing_searchable_text(instance):
     entries = set()
 
     for obj in [instance] + instance.getDescendants():
-        entries.add(obj.getId())
-        entries.add(obj.getClientOrderNumber())
-        entries.add(obj.getClientReference())
-        entries.add(obj.getClientSampleID())
+        entries.add(str(obj.getId()))
+        entries.add(str(obj.getClientOrderNumber()))
+        entries.add(str(obj.getClientReference()))
+        entries.add(str(obj.getClientSampleID()))
 
         # we use this approach to bypass the computed fields
         client = obj.getClient()
-        entries.add(client.getName())
-        entries.add(client.getClientID())
+        entries.add(str(client.getName()))
+        entries.add(str(client.getClientID()))
 
         sampletype = obj.getSampleType()
-        entries.add(sampletype.Title() if sampletype else '')
+        entries.add(str(sampletype.Title()) if sampletype else '')
 
         samplepoint = obj.getSamplePoint()
-        entries.add(samplepoint.Title() if samplepoint else '')
+        entries.add(str(samplepoint.Title()) if samplepoint else '')
 
         batch = obj.getBatch()
-        entries.add(batch.getId() if batch else '')
+        entries.add(str(batch.getId()) if batch else '')
 
     return u" ".join(map(api.safe_unicode, entries))

@@ -4,6 +4,14 @@
     i18n_domain="senaite.core">
 
   <genericsetup:upgradeStep
+      title="SENAITE.CORE 2.5.0: client catalog"
+      description="Removes duplicated clients on geo-angol"
+      source="2506"
+      destination="2507"
+      handler=".v02_05_000.remove_duplicated_clients"
+      profile="senaite.core:default"/>
+
+  <genericsetup:upgradeStep
       title="SENAITE.CORE 2.5.0: Additional index/metadata for client catalog"
       description="Add searchable Title index and Description metadata for relation fields"
       source="2505"

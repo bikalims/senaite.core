@@ -27,13 +27,16 @@ from senaite.core.api.catalog import reindex_index
 from senaite.core.catalog import CLIENT_CATALOG
 from senaite.core.catalog import REPORT_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
+from senaite.core.catalog import SETUP_CATALOG
 from senaite.core.config import PROJECTNAME as product
 from senaite.core.setuphandlers import add_dexterity_items
 from senaite.core.setuphandlers import setup_catalog_mappings
 from senaite.core.setuphandlers import setup_core_catalogs
 from senaite.core.upgrade import upgradestep
 from senaite.core.upgrade.utils import UpgradeUtils
+from senaite.core.upgrade.utils import delete_object
 from senaite.core.upgrade.utils import uncatalog_brain
+from senaite.core.upgrade.v02_04_000 import migrate_reference_fields
 
 version = "2.5.0"  # Remember version number in metadata.xml and setup.py
 profile = "profile-{0}:default".format(product)
@@ -150,3 +153,46 @@ def update_report_catalog(self):
     del_column(REPORT_CATALOG, "getDatePrinted")
 
     logger.info("Update report catalog [DONE]")
+
+
+def remove_duplicated_clients(self):
+    query = {"portal_type": "Client",
+             "sort_on": "is_active",
+             "sort_order": "descending"}
+    brains = api.search(query, catalog=CLIENT_CATALOG)
+    client_titles = []
+    to_be_removed = []
+
+    for brain in brains:
+        title = brain.Title
+        client = brain.getObject()
+        contacts = client.objectValues()
+        for contact in contacts:
+            try:
+                contact.setFirstname(contact.getFirstname().decode("utf8"))
+                contact.setSurname(contact.getSurname().decode("utf8"))
+                contact.reindexObject()
+            except Exception as e:
+                contact.setFirstname("xx")
+                contact.setSurname("XXX")
+                contact.reindexObject()
+        setup_catalog = api.get_tool(SETUP_CATALOG)
+        if title not in client_titles:
+            client_titles.append(title)
+        else:
+            obj = brain.getObject()
+            to_be_removed.append(obj)
+
+    setup_catalog.clearFindAndRebuild()
+    for client in to_be_removed:
+        if client.objectValues():
+            values = client.objectValues()
+            for contact in values:
+                migrate_reference_fields(contact)
+                delete_object(contact)
+        migrate_reference_fields(client)
+        delete_object(client)
+
+    if to_be_removed:
+        client_catalog = api.get_tool(CLIENT_CATALOG)
+        client_catalog.clearFindAndRebuild()

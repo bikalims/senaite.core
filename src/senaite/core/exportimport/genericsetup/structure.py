@@ -141,7 +141,7 @@ class SenaiteSiteXMLAdapter(XMLAdapterBase, ObjectManagerHelpers):
 
                 if not user: # add new user with password
                     self._logger.info("Adding user {}".format(user_id))
-                    user = reg_tool.addMember(user_id, '12345') 
+                    user = reg_tool.addMember(str(user_id), '12345') 
 
                 # set the user properties
                 user.setProperties(properties={
@@ -201,7 +201,7 @@ class SenaiteSiteXMLAdapter(XMLAdapterBase, ObjectManagerHelpers):
             child.setAttribute("name", safe_unicode(name))
             child.setAttribute("email", user.getProperty("email"))
             child.setAttribute("groups", ",".join(groups))
-            text = self._doc.createTextNode(user.getId())
+            text = self._doc.createTextNode(str(user.getId()))
             child.appendChild(text)
             node.appendChild(child)
         return node

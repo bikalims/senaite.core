@@ -188,9 +188,7 @@ def remove_duplicated_clients(self):
         if client.objectValues():
             values = client.objectValues()
             for contact in values:
-                migrate_reference_fields(contact)
                 delete_object(contact)
-        migrate_reference_fields(client)
         delete_object(client)
 
     if to_be_removed:

@@ -162,6 +162,7 @@ def remove_duplicated_clients(self):
     brains = api.search(query, catalog=CLIENT_CATALOG)
     client_titles = []
     to_be_removed = []
+    setup_catalog = api.get_tool(SETUP_CATALOG)
 
     for brain in brains:
         title = brain.Title
@@ -176,7 +177,6 @@ def remove_duplicated_clients(self):
                 contact.setFirstname("xx")
                 contact.setSurname("XXX")
                 contact.reindexObject()
-        setup_catalog = api.get_tool(SETUP_CATALOG)
         if title not in client_titles:
             client_titles.append(title)
         else:

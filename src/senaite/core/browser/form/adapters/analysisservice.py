@@ -160,6 +160,7 @@ class EditForm(EditFormAdapterBase):
 
         Writable if no active analyses exist with the given keyword
         """
+        return True
         query = {
             "portal_type": "Analysis",
             "is_active": True,

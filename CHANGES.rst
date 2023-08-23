@@ -37,6 +37,19 @@ Changelog
 2.5.0 (unreleased)
 ------------------
 
+- #2341 Handle nonexisting UIDs gracefully in referencewidget
+- #2340 Fix UID copy method in AT->DX content migrator
+- #2332 Fix unauthorized error when accessing immediate results entry view with a client contact user
+- #2295 Integrate new UID reference widget
+- #2315 Apply dynamic analyses specs for new added analyses
+- #2314 Display error for required fields without value in current language
+- #2313 Log error when calculation fails
+- #2310 Added `get_relative_delta` and `get_tzinfo` in datetime API
+- #2311 Properly process and validate field values from sample header on submit
+- #2307 Rely on fields when validating submitted values on sample creation
+- #2305 Add support for dates in ANSI X3.30 and ANSI X3.43.3 formats
+- #2304 Fix dynamic sample specification not applied for new samples
+- #2303 Fix managed permission of analysis workflow for lab roles
 - #2301 Use client groups for local role sharing
 - #2300 Re-add searchable text provider adapters for sample catalog listing_searchable_text index
 - #2298 Move all permissions into senaite.core

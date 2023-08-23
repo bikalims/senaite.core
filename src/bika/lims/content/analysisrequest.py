@@ -41,7 +41,7 @@ from bika.lims.browser.fields.uidreferencefield import get_backreferences
 from bika.lims.browser.widgets import DateTimeWidget
 from bika.lims.browser.widgets import DecimalWidget
 from bika.lims.browser.widgets import PrioritySelectionWidget
-from bika.lims.browser.widgets import ReferenceWidget
+from senaite.core.browser.widgets.referencewidget import ReferenceWidget
 from bika.lims.browser.widgets import RejectionWidget
 from bika.lims.browser.widgets import RemarksWidget
 from bika.lims.browser.widgets import SelectionWidget as BikaSelectionWidget
@@ -56,7 +56,6 @@ from bika.lims.interfaces import IAnalysisRequestWithPartitions
 from bika.lims.interfaces import IBatch
 from bika.lims.interfaces import ICancellable
 from bika.lims.interfaces import IClient
-from bika.lims.interfaces import IDynamicResultsRange
 from bika.lims.interfaces import ISubmitted
 from senaite.core.permissions import FieldEditBatch
 from senaite.core.permissions import FieldEditClient
@@ -167,12 +166,12 @@ schema = BikaSchema.copy() + Schema((
             showOn=True,
             popup_width='400px',
             colModel=[
-                {'columnName': 'Fullname', 'width': '50',
+                {'columnName': 'getFullname', 'width': '50',
                  'label': _('Name')},
-                {'columnName': 'EmailAddress', 'width': '50',
+                {'columnName': 'getEmailAddress', 'width': '50',
                  'label': _('Email Address')},
             ],
-            ui_item='Fullname',
+            ui_item='getFullname',
         ),
     ),
 
@@ -200,12 +199,12 @@ schema = BikaSchema.copy() + Schema((
             showOn=True,
             popup_width='400px',
             colModel=[
-                {'columnName': 'Fullname', 'width': '50',
+                {'columnName': 'getFullname', 'width': '50',
                  'label': _('Name')},
-                {'columnName': 'EmailAddress', 'width': '50',
+                {'columnName': 'getEmailAddress', 'width': '50',
                  'label': _('Email Address')},
             ],
-            ui_item='Fullname',
+            ui_item='getFullname',
         ),
     ),
 
@@ -243,6 +242,7 @@ schema = BikaSchema.copy() + Schema((
                 'header_table': 'prominent',
             },
             catalog_name=CLIENT_CATALOG,
+            search_index="client_searchable_text",
             base_query={"is_active": True,
                         "sort_limit": 30,
                         "sort_on": "sortable_title",
@@ -359,7 +359,7 @@ schema = BikaSchema.copy() + Schema((
                  'label': _('Title'), 'align': 'left'},
                 {'columnName': 'Description', 'width': '70',
                  'label': _('Description'), 'align': 'left'},
-                {'columnName': 'SortKey', 'hidden': True},
+                {'columnName': 'getSortKey', 'hidden': True},
                 {'columnName': 'UID', 'hidden': True},
             ],
             base_query={'is_active': True},
@@ -650,7 +650,7 @@ schema = BikaSchema.copy() + Schema((
                         "sort_order": "ascending"},
             search_fields=('listing_searchable_text',),
             colModel=[
-                {'columnName': 'contextual_title',
+                {'columnName': 'Title',
                  'width': '30',
                  'label': _('Title'),
                  'align': 'left'},
@@ -661,7 +661,7 @@ schema = BikaSchema.copy() + Schema((
                 # UID is required in colModel
                 {'columnName': 'UID', 'hidden': True},
             ],
-            ui_item="contextual_title",
+            ui_item="Title",
             showOn=True,
         ),
     ),
@@ -1404,11 +1404,6 @@ class AnalysisRequest(BaseFolder, ClientAwareMixin):
             if not ISubmitted.providedBy(analysis):
                 service_uid = analysis.getRawAnalysisService()
                 result_range = field.get(self, search_by=service_uid)
-                # check if we have an dynamic results range adapter
-                adapter = IDynamicResultsRange(analysis, None)
-                if adapter:
-                    # update the result range with the dynamic values
-                    result_range.update(adapter())
                 analysis.setResultsRange(result_range)
                 analysis.reindexObject()
 

@@ -26,12 +26,14 @@ from senaite.core.api.catalog import add_index
 from senaite.core.api.catalog import del_column
 from senaite.core.api.catalog import del_index
 from senaite.core.api.catalog import reindex_index
+from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.catalog import CLIENT_CATALOG
 from senaite.core.catalog import REPORT_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.core.config import PROJECTNAME as product
 from senaite.core.permissions import ManageBika
 from senaite.core.registry import get_registry_record
+from senaite.core.setuphandlers import _run_import_step
 from senaite.core.setuphandlers import add_dexterity_items
 from senaite.core.setuphandlers import setup_catalog_mappings
 from senaite.core.setuphandlers import setup_core_catalogs
@@ -250,9 +252,28 @@ def _recursive_reindex_object_security(obj):
     """Recursively reindex object security for the given object
     """
     if hasattr(aq_base(obj), "objectValues"):
-        for child_obj in obj.objectValues():
+        children = obj.objectValues()
+        for num, child_obj in enumerate(children):
+            if num and num % 100 == 0:
+                path = api.get_path(obj)
+                logger.info("{}: committing children {} ...".format(path, num))
+                transaction.commit()
             _recursive_reindex_object_security(child_obj)
-    obj.reindexObject(idxs=["allowedRolesAndUsers"])
+
+    # We don't do obj.reindexObject(idxs=["allowedRolesAndUsers"]) because
+    # the function reindex the whole object (metadata included) if the catalog
+    # does not contain the index 'allowedRolesAndUsers'. This makes the system
+    # to consume a lot of RAM when thousands of objects need to be processed.
+    # Also, the function does other stuff like refreshing Etag and so on, that
+    # are things that we are not interested at all, actually. We just want the
+    # index allowedRolesAndUsers to be updated, nothing else
+    idx = "allowedRolesAndUsers"
+    for cat in api.get_catalogs_for(obj):
+        if idx not in cat.indexes():
+            continue
+        path = api.get_path(obj)
+        cat.catalog_object(obj, path, idxs=[idx], update_metadata=0)
+
     obj._p_deactivate()
 
 
@@ -293,3 +314,47 @@ def _remove_action(type_info, action_id):
     index = actions.index(action_id)
     type_info.deleteActions([index])
     return _remove_action(type_info, action_id)
+
+
+@upgradestep(product, version)
+def import_workflow(tool):
+    """Import workflow step from profiles
+
+    NOTE: we use the upgradestep decorator, because workflows are modified by
+          other add-ons quite often.
+    """
+    logger.info("Import Workflow ...")
+    portal = tool.aq_inner.aq_parent
+    _run_import_step(portal, "workflow", profile=profile)
+    logger.info("Import Workflow [DONE]")
+
+
+def update_workflow_mappings_analyses(tool):
+    """Update the WF mappings for Analyses
+    """
+    logger.info("Updating role mappings for Analyses ...")
+    wf_id = "senaite_analysis_workflow"
+    query = {"portal_type": "Analysis"}
+    brains = api.search(query, ANALYSIS_CATALOG)
+    _update_workflow_mappings_for(wf_id, brains)
+    logger.info("Updating role mappings for Analyses [DONE]")
+
+
+def _update_workflow_mappings_for(wf_id, brains):
+    """Helper to update role mappings for the given brains
+    """
+    wf_tool = api.get_tool("portal_workflow")
+    workflow = wf_tool.getWorkflowById(wf_id)
+    total = len(brains)
+    for num, brain in enumerate(brains):
+        if num and num % 100 == 0:
+            logger.info("Updating role mappings: {0}/{1}".format(num, total))
+        if num and num % 1000 == 0:
+            logger.info("Committing {0}/{1}".format(num, total))
+            transaction.commit()
+            logger.info("Committed {0}/{1}".format(num, total))
+        obj = api.get_object(brain)
+        workflow.updateRoleMappingsFor(obj)
+        obj.reindexObject(idxs=["allowedRolesAndUsers"])
+        # free memory
+        obj._p_deactivate()

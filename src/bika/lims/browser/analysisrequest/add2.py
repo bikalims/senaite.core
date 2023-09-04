@@ -48,6 +48,7 @@ from Products.Archetypes.interfaces import IField
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from senaite.core.catalog import CONTACT_CATALOG
 from senaite.core.p3compat import cmp
 from senaite.core.permissions import TransitionMultiResults
 from zope.annotation.interfaces import IAnnotations
@@ -61,7 +62,7 @@ from zope.publisher.interfaces import IPublishTraverse
 
 AR_CONFIGURATION_STORAGE = "bika.lims.browser.analysisrequest.manage.add"
 SKIP_FIELD_ON_COPY = ["Sample", "PrimaryAnalysisRequest", "Remarks",
-                      "NumSamples"]
+                      "NumSamples", "_ARAttachment"]
 
 
 def cache_key(method, self, obj):
@@ -401,7 +402,7 @@ class AnalysisRequestAddView(BrowserView):
         :returns: The default contact for the AR
         :rtype: Client object or None
         """
-        catalog = api.get_tool("portal_catalog")
+        catalog = api.get_tool(CONTACT_CATALOG)
         client = client or self.get_client()
         path = api.get_path(self.context)
         if client:

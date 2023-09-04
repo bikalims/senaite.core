@@ -37,6 +37,27 @@ Changelog
 2.5.0 (unreleased)
 ------------------
 
+- #2372 Generate unique ID for DX types on object creation
+- #2370 Override default DX add form to obtain renamed IDs correctly
+- #2368 Drop usage of portal_catalog tool
+- #2369 Allow to set a custom comment for when a result is out of range
+- #2367 Contact catalog
+- #2366 Add fallback to sample client field value
+- #2365 New function for interim fields formatting
+- #2364 Support for fieldname-prefixed values on sample header submit
+- #2363 Auto-hide non-multivalued reference widget input on value selection
+- #2359 Improve sample create performance
+- #2361 Fix KeyError if registry key not found
+- #2358 Add confirmation when unlinking reference
+- #2357 Skip object reindexing when global auditlog is disabled
+- #2354 Render all legacy resources at the end of the page
+- #2350 Display batch labels in listing
+- #2347 Remove unused inline validation view
+- #2346 Fix unauthorized error when accessing dispatch/partition sample view with shared client role
+- #2343 Allow to define the sorting criteria for Result Options
+- #2345 Retrieve setup items by object
+- #2344 Fix error on sample copy when fields are hidden
+- #2334 Remove legacy reports
 - #2341 Handle nonexisting UIDs gracefully in referencewidget
 - #2340 Fix UID copy method in AT->DX content migrator
 - #2332 Fix unauthorized error when accessing immediate results entry view with a client contact user

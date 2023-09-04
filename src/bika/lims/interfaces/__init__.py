@@ -18,11 +18,43 @@
 # Copyright 2018-2021 by it's authors.
 # Some rights reserved, see README and LICENSE.
 
+# flake8: noqa
+
 from zope.interface import Interface
+from zope import deprecation
 
 # BBB: Only kept for backwards compatibility
 from senaite.core.interfaces import ISamples as IAnalysisRequestsFolder
 from senaite.core.interfaces.widget import IReferenceWidgetVocabulary
+from senaite.core.interfaces import IMultiCatalogBehavior as _IMultiCatalogBehavior
+from senaite.core.interfaces import IAutoGenerateID as _IAutoGenerateID
+from senaite.core.interfaces import IIdServerTypeID as _IIdServerTypeID
+from senaite.core.interfaces import IIdServerVariables as _IIdServerVariables
+
+deprecation.deprecated("IMultiCatalogBehavior", "Moved to senaite.core.interfaces")
+deprecation.deprecated("IAutoGenerateID", "Moved to senaite.core.interfaces")
+deprecation.deprecated("IIdServerTypeID", "Moved to senaite.core.interfaces")
+deprecation.deprecated("IIdServerVariables", "Moved to senaite.core.interfaces")
+
+
+class IMultiCatalogBehavior(_IMultiCatalogBehavior):
+    """BBB: Need to be updated in each profile
+    """
+
+
+class IAutoGenerateID(_IAutoGenerateID):
+    """BBB: Need to be updated in each profile
+    """
+
+
+class IIdServerTypeID(_IIdServerTypeID):
+    """BBB: Need to be updated in each profile
+    """
+
+
+class IIdServerVariables(_IIdServerVariables):
+    """BBB: Need to be updated in each profile
+    """
 
 
 class ISenaiteSiteRoot(Interface):
@@ -39,16 +71,6 @@ class IBikaLIMS(Interface):
 
 class ISenaiteSite(IBikaLIMS):
     """Marker interface for Zope 3 browser layers.
-    """
-
-
-class IAutoGenerateID(Interface):
-    """Auto-generate ID with ID server
-    """
-
-
-class IMultiCatalogBehavior(Interface):
-    """Support multiple catalogs for Dexterity contents
     """
 
 
@@ -74,11 +96,6 @@ class IDoNotSupportSnapshots(Interface):
 
 class IAuditLogCatalog(Interface):
     """Audit Log Catalog
-    """
-
-
-class IGenerateID(Interface):
-    """Marker Interface to generate an ID
     """
 
 
@@ -194,11 +211,6 @@ class IRejectAnalysis(Interface):
     """
 
 
-class IReportFolder(Interface):
-    """Report folder
-    """
-
-
 class ISampleCondition(Interface):
     """Sample Condition
     """
@@ -246,11 +258,6 @@ class IReferenceSample(Interface):
 
 class IReferenceSamplesFolder(Interface):
     """Reference Samples Folder
-    """
-
-
-class IReportsFolder(Interface):
-    """Reports Folder
     """
 
 
@@ -439,6 +446,11 @@ class ILabContact(Interface):
     """
 
 
+class ISupplierContact(Interface):
+    """Marker interface for a supplier contact
+    """
+
+
 class IManufacturer(Interface):
     """Marker interface for Manufacturer
     """
@@ -588,35 +600,6 @@ class IBikaCatalogReport(Interface):
     """
 
 
-class IIdServer(Interface):
-    """Marker Interface for ID server
-    """
-
-    def generate_id(self, portal_type, batch_size=None):
-        """Generate a new id for 'portal_type'
-        """
-
-
-class IIdServerVariables(Interface):
-    """Marker interfaces for variables generator for ID Server
-    """
-
-    def get_variables(self, **kw):
-        """Returns a dict with variables
-        """
-
-
-class IIdServerTypeID(Interface):
-    """Marker interface for type id resolution for ID Server
-    """
-
-    def get_type_id(self, **kw):
-        """Returns the type id for the context passed in the constructor, that
-        is used for custom ID formatting, regardless of the real portal type of
-        the context. Return None if no type id can be resolved by this adapter
-        """
-
-
 class IDisplayListVocabulary(Interface):
     """Make vocabulary from catalog query.
 
@@ -745,40 +728,6 @@ class IPricelist(Interface):
 
 class IPricelistFolder(Interface):
     """Folder view marker for PricelistFolder instance
-    """
-
-
-class IProductivityReport(Interface):
-    """Reports are enumerated manually in reports/*.pt - but addional reports
-    can be added to this list by extension packages using this adapter.
-
-    The adapter must return a dictionary:
-
-    {
-     title: text (i18n translated),
-     description: text (i18n translated),
-     query_form: html <fieldset> of controls used to enter report
-                 parameters (excluding <form> tags and <submit> button)
-     module: The name of the module containing a class named "Report"
-             an instance of this class will be used to create the report
-    }
-    """
-
-
-class IAdministrationReport(Interface):
-    """Reports are enumerated manually in reports/*.pt - but addional reports
-    can be added to this list by extension packages using this adapter.
-
-    The adapter must return a dictionary:
-
-    {
-     title: text (i18n translated),
-     description: text (i18n translated),
-     query_form: html <fieldset> of controls used to enter report
-                 parameters (excluding <form> tags and <submit> button)
-     module: The name of the module containing a class named "Report"
-             an instance of this class will be used to create the report
-    }
     """
 
 

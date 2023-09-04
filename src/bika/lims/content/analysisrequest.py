@@ -124,6 +124,7 @@ from senaite.core.browser.fields.datetime import DateTimeField
 from senaite.core.browser.fields.records import RecordsField
 from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.catalog import CLIENT_CATALOG
+from senaite.core.catalog import CONTACT_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
 from senaite.core.catalog import SENAITE_CATALOG
 from senaite.core.catalog import WORKSHEET_CATALOG
@@ -157,7 +158,7 @@ schema = BikaSchema.copy() + Schema((
                 'add': 'edit',
                 'header_table': 'prominent',
             },
-            catalog_name="portal_catalog",
+            catalog_name=CONTACT_CATALOG,
             base_query={"is_active": True,
                         "sort_limit": 50,
                         "sort_on": "sortable_title",
@@ -191,7 +192,7 @@ schema = BikaSchema.copy() + Schema((
                 'add': 'edit',
                 'header_table': 'prominent',
             },
-            catalog_name="portal_catalog",
+            catalog_name=CONTACT_CATALOG,
             base_query={"is_active": True,
                         "sort_on": "sortable_title",
                         "getParentUID": "",
@@ -1326,19 +1327,6 @@ class AnalysisRequest(BaseFolder, ClientAwareMixin):
     displayContentsTab = False
     schema = schema
 
-    _at_rename_after_creation = True
-
-    def _renameAfterCreation(self, check_auto_id=False):
-        """Rename hook called by processForm
-        """
-        # https://github.com/senaite/senaite.core/issues/1327
-        primary = self.getPrimaryAnalysisRequest()
-        if primary:
-            logger.info("Secondary sample detected: Skipping ID generation")
-            return False
-        from bika.lims.idserver import renameAfterCreation
-        renameAfterCreation(self)
-
     def _getCatalogTool(self):
         from bika.lims.catalog import getCatalog
         return getCatalog(self)
@@ -1454,11 +1442,14 @@ class AnalysisRequest(BaseFolder, ClientAwareMixin):
         Sample Add form, but cannot be changed afterwards. The Sample is
         created directly inside the selected client folder on submit
         """
-        if IClient.providedBy(self.aq_parent):
-            return self.aq_parent
-        if IBatch.providedBy(self.aq_parent):
-            return self.aq_parent.getClient()
-        return None
+        parent = self.aq_parent
+        if IClient.providedBy(parent):
+            return parent
+        elif IBatch.providedBy(parent):
+            return parent.getClient()
+        # Fallback to UID reference field value
+        field = self.getField("Client")
+        return field.get(self)
 
     @deprecated("Will be removed in SENAITE 3.0")
     def getProfilesURL(self):

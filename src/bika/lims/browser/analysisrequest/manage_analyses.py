@@ -66,7 +66,6 @@ class AnalysisRequestAnalysesView(BikaListingView):
         self.categories = []
         self.do_cats = self.context.bika_setup.getCategoriseAnalysisServices()
         if self.do_cats:
-            self.contentFilter["sort_on"]  = "category_sort_key"
             self.show_categories = True
             self.expand_all_categories = False
 
@@ -187,6 +186,7 @@ class AnalysisRequestAnalysesView(BikaListingView):
 
     def folderitems(self):
         items = super(AnalysisRequestAnalysesView, self).folderitems()
+        self.categories.sort()
         return items
 
     def folderitem(self, obj, item, index):

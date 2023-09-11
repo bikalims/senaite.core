@@ -45,7 +45,6 @@ class InstrumentTypesView(BikaListingView):
         self.contentFilter = {
             "portal_type": "InstrumentType",
             "sort_on": "sortable_title",
-            "sort_order": "ascending",
         }
 
         self.context_actions = {

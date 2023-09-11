@@ -45,7 +45,6 @@ class ContainerTypesView(BikaListingView):
         self.contentFilter = {
             "portal_type": "ContainerType",
             "sort_on": "sortable_title",
-            "sort_order": "ascending",
         }
 
         self.context_actions = {

@@ -29,7 +29,6 @@ from bika.lims.utils import get_link
 from plone.memoize import view
 from Products.Archetypes.Registry import registerWidget
 from Products.Archetypes.Widget import TypesWidget
-from Products.CMFCore.utils import getToolByName
 
 
 class ReferenceResultsView(BikaListingView):
@@ -39,8 +38,6 @@ class ReferenceResultsView(BikaListingView):
     def __init__(self, context, request, fieldvalue=[], allow_edit=True):
         super(ReferenceResultsView, self).__init__(context, request)
 
-        self.an_cats = None
-        self.an_cats_order = None
         self.catalog = "senaite_catalog_setup"
         self.contentFilter = {
             "portal_type": "AnalysisService",
@@ -49,6 +46,7 @@ class ReferenceResultsView(BikaListingView):
             "sort_order": "ascending",
         }
         self.context_actions = {}
+
         self.show_select_column = True
         self.show_select_all_checkbox = True
         self.pagesize = 999999
@@ -123,21 +121,8 @@ class ReferenceResultsView(BikaListingView):
         return columns
 
     def folderitems(self):
-        """Sort by Categories
-        """
-        bsc = getToolByName(self.context, "senaite_catalog_setup")
-        self.an_cats = bsc(
-            portal_type="AnalysisCategory",
-            sort_on="sortable_title")
-        self.an_cats_order = dict([
-            (b.Title, "{:04}".format(a))
-            for a, b in enumerate(self.an_cats)])
         items = super(ReferenceResultsView, self).folderitems()
-        if self.show_categories_enabled():
-            self.categories = map(lambda x: x[0],
-                                    sorted(self.categories, key=lambda x: x[1]))
-        else:
-            self.categories.sort()
+        self.categories.sort()
         return items
 
     def folderitem(self, obj, item, index):
@@ -155,14 +140,12 @@ class ReferenceResultsView(BikaListingView):
         uid = api.get_uid(obj)
         url = api.get_url(obj)
         title = api.get_title(obj)
-        cat = obj.getCategoryTitle()
-        cat_order = self.an_cats_order.get(cat)
 
         # get the category
         if self.show_categories_enabled():
             category = obj.getCategoryTitle()
-            if (category,cat_order) not in self.categories:
-                self.categories.append((category,cat_order))
+            if category not in self.categories:
+                self.categories.append(category)
             item["category"] = category
 
         rr = self.referenceresults.get(uid, {})

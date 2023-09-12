@@ -25,7 +25,7 @@ from bika.lims import bikaMessageFactory as _
 from bika.lims.browser.bika_listing import BikaListingView
 from bika.lims.browser.referencesample import ReferenceSamplesView
 from bika.lims.controlpanel.bika_instruments import InstrumentsView
-from bika.lims.utils import get_link, get_email_link
+from bika.lims.utils import get_link
 from senaite.core.catalog import CONTACT_CATALOG
 
 
@@ -147,13 +147,7 @@ class ContactsView(BikaListingView):
         obj = api.get_object(obj)
         name = obj.getFullname()
         url = obj.absolute_url()
-        email = obj.getEmailAddress()
 
         item["replace"]["getFullname"] = get_link(url, value=name)
-        if email:
-            item["replace"]["getEmailAddress"] = get_email_link(email)
-        item["replace"]["getBusinessPhone"] = obj.getBusinessPhone()
-        item["replace"]["getMobilePhone"] = obj.getMobilePhone()
-        item["replace"]["getFax"] = obj.getBusinessFax()
 
         return item

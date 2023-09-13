@@ -84,19 +84,8 @@ class WorksheetTemplatesView(BikaListingView):
             ("Instrument", {
                 "title": _("Instrument"),
                 "index": "instrument_title",
-                "toggle": True,}),
-            ("NumberOfPositions", {
-                "title": _("Number of Positions"),
-                "toggle": True}),
-            ("Blanks", {
-                "title": _("Blanks"),
-                "toggle": True}),
-            ("Controls", {
-                "title": _("Controls"),
-                "toggle": True}),
-            ("NumberOfDuplicates", {
-                "title": _("Number of Duplicates"),
-                "toggle": True}),
+                "toggle": True,
+            }),
         ))
 
         self.review_states = [
@@ -147,47 +136,7 @@ class WorksheetTemplatesView(BikaListingView):
             item["Method"] = method_title
             item["replace"]["Method"] = get_link(
                 method_url, value=method_title)
-        
-        # NumberOfPostions
-        item["NumberOfPositions"] = len(obj.getLayout())
 
-        Raw_layout = obj.getLayout()
-        num = 0
-        blanks = []
-        controls = []
-        controlUrls = []
-        blankUrls = []
-        for position in Raw_layout:
-            if position.get('type') == "d":
-                num = num + 1
-            if position.get('type') == "b":
-                blank_id = position.get('blank_ref')
-                blank_obj = api.get_object_by_uid(blank_id)
-                blank_title = blank_obj.Title()
-                blank_url = api.get_url(blank_obj)
-                if blank_title not in blanks:
-                    blanks.append(blank_title)
-                    blankUrls.append(get_link(blank_url,blank_title))
-            if position.get('type') == "c":
-                control_id = position.get('control_ref')
-                control_obj = api.get_object_by_uid(control_id)
-                control_title = control_obj.Title()
-                control_url = api.get_url(control_obj)
-                if control_title not in controls:
-                    controls.append(control_title)
-                    controlUrls.append(get_link(control_url,control_title))
-
-        # Blanks
-        if blanks:
-            item["replace"]["Blanks"] = blankUrls
-
-        # Controls
-        if controls:
-            item["replace"]["Controls"] = controlUrls
-
-        # NummberOfDuplicates
-        if num:
-            item["NumberOfDuplicates"] = num
         return item
 
 

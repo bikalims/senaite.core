@@ -111,9 +111,6 @@ class SamplesView(ListingView):
                 "type": "datetime",
                 "max": now,
                 "sortable": True}),
-            ("Container", {
-                "title": _("Container"),
-                "toggle": False}),
             ("getDatePreserved", {
                 "title": _("Date Preserved"),
                 "toggle": False,
@@ -578,19 +575,9 @@ class SamplesView(ListingView):
                                                (obj.getContactURL, obj.getContactFullName)
         else:
             item["ClientContact"] = ""
-
-        # TODO-performance:  we have to get the
-        # full object to get the container title and url, mgiht be
-        # a performance hit.
-        full_object = api.get_object(obj)
-        container = full_object.getContainer()
-        if container:
-            item["Container"] = container.Title()
-            item["replace"]["Container"] = "<a href='%s'>%s</a>" % \
-                                               (container.absolute_url(), container.Title())
         # TODO-performance: If SamplingWorkflowEnabled, we have to get the
         # full object to check the user permissions, so far this is
-        # a performance hit. Update - Now using full object from above
+        # a performance hit.
         if obj.getSamplingWorkflowEnabled:
 
             sampler = obj.getSampler
@@ -601,7 +588,8 @@ class SamplesView(ListingView):
             # sampling workflow - inline edits for Sampler and Date Sampled
             if item["review_state"] == "to_be_sampled":
                 # We need to get the full object in order to check
-                # the permissions. Update - Using full object from above
+                # the permissions
+                full_object = api.get_object(obj)
                 if check_permission(TransitionSampleSample, full_object):
                     # make fields required and editable
                     item["required"] = ["getSampler", "getDateSampled"]

@@ -59,7 +59,6 @@ SKIP_EXPORT_TYPES = [
     "Invoice",
     "ReferenceSample",
     "Worksheet",
-    "Invoice",
 ]
 
 ID_MAP = {}

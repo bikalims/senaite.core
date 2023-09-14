@@ -120,9 +120,6 @@ class ImportView(BrowserView):
         brains = bsc(portal_type='Instrument', is_active=True)
         items = [('', '...Choose an Instrument...')]
         for item in brains:
-            instrument = item.getObject()
-            import_interface = instrument.getImportDataInterface()
-            if len(import_interface)>1:
-                items.append((item.UID, item.Title))
+            items.append((item.UID, item.Title))
         items.sort(lambda x, y: cmp(x[1].lower(), y[1].lower()))
         return DisplayList(list(items))

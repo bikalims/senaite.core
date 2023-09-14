@@ -36,7 +36,6 @@ INDEXES = BASE_INDEXES + [
     ("department_uid", "", "KeywordIndex"),
     ("Description", "", "ZCTextIndex"),
     ("getClientUID", "", "FieldIndex"),
-    ("category_sort_key", "", "FieldIndex"),
     ("getKeyword", "", "FieldIndex"),
     ("instrumenttype_title", "", "KeywordIndex"),
     ("instrument_title", "", "KeywordIndex"),

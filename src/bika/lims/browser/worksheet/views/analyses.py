@@ -522,9 +522,8 @@ class AnalysesView(BaseView):
         if IDuplicateAnalysis.providedBy(obj):
             # item
             request = obj.getRequest()
-            reference_analysis_group_id = obj.getReferenceAnalysesGroupID()
             item_obj = request
-            item_title = "{} ({})".format(api.get_id(request), reference_analysis_group_id)
+            item_title = api.get_id(request)
             item_url = api.get_url(request)
             item_img = "duplicate.png"
             item_img_url = api.get_url(request)
@@ -558,8 +557,7 @@ class AnalysesView(BaseView):
             item_obj = sample
             obj_id = api.get_id(obj)
             sample_id = api.get_id(sample)
-            reference_analysis_group_id = obj.getReferenceAnalysesGroupID()
-            item_title = "%s (%s)" % (obj_id, reference_analysis_group_id)
+            item_title = "%s (%s)" % (obj_id, sample_id)
             item_url = api.get_url(sample)
             item_img_url = api.get_url(sample)
             item_img = "control.png"

@@ -48,7 +48,6 @@ from Products.CMFCore.utils import getToolByName
 from senaite.core.catalog import CLIENT_CATALOG
 from senaite.core.catalog import SAMPLE_CATALOG
 from zope.interface import implements
-from DateTime.DateTime import DateTime
 
 
 @indexer(IBatch)

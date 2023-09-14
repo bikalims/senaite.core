@@ -63,20 +63,6 @@ class SampleDataManager(DataManager):
 
         return field
 
-    def get_field_by_name(self, name):
-        """Get the field by name
-        """
-        field = self.fields.get(name)
-
-        # try to fetch the field w/o the `get` prefix
-        # this might be the case is some listings
-        if field is None:
-            # ensure we do not have the field setter as column
-            name = name.split("get", 1)[-1]
-            field = self.fields.get(name)
-
-        return field
-
     def get(self, name):
         """Get sample field
         """

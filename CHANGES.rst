@@ -1,39 +1,6 @@
 Changelog
 =========
 
-2.2.0 (unreleased)
-------------------
-
-- #1933 Added SENAITE maintenance scripts
-- #1932 Fix cannot attach documents to individual analyses in Worksheet context
-- #1930 Ensure valid timezone in DX datetime field setter
-- #1927 Fix Analysis attachment is copied on retest
-- #1928 Added `on_change` hook for methods in analyses listings
-- #1925 Fix sample transition in listings
-- #1924 Fix Login screen shows message error while rendering plone.htmlhead.socialtags
-- #1923 Use native date input fields in reports
-- #1920 Fix indexed attributes not set when adding a new index with catalog API
-- #1918 Fix stale combobox items displayed when search query changed
-- #1917 Fix wrong context in reference widget lookups
-- #1916 Provide the request record to object info adapters in the sample add form
-- #1913 Ported PR #1865 for dexterity contents
-- #1915 Support list queries in dx reference widget
-- #1914 Provide context, widget and fieldname for callable base queries in AT reference widgets
-- #1912 Fixed typo in sample view
-- #1909 Allow to navigate and select with arrow keys in dexterity reference widget
-- #1908 Added searchable text querystring converter to catalog API
-- #1907 Fix datetime field/widget shows current date and time if empty
-- #1905 Fix empty field in sample add form when using edit accessor
-
-
-2.1.0 (2022-01-05)
-------------------
-2.4.0 (unreleased)
-------------------
-
-2.4.0 (unreleased)
-------------------
-
 2.5.0 (unreleased)
 ------------------
 
@@ -150,7 +117,6 @@ Changelog
 - #2208 Remove `default_method` from AnalysisRequest's Contact field
 - #2204 Fix traceback when retracting an analysis with a detection limit
 - #2202 Fix detection limit set manually is not displayed on result save
-- #2203 Fix empty date sampled in samples listing when sampling workflow is enabled 
 - #2203 Fix empty date sampled in samples listing when sampling workflow is enabled
 - #2197 Use portal as relative path for sticker icons
 - #2196 Order sample analyses by sortable title on get per default

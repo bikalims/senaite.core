@@ -37,6 +37,13 @@ Changelog
 2.5.0 (unreleased)
 ------------------
 
+- #2386 Add dynamic search index lookup for referencewidget and added default catalog metadata columns
+- #2385 Fix referencefield dependencies in sample add
+- #2384 Fix reference widget lookups
+- #2379 Add listing adapter for sample workflow "receive" transition
+- #2382 Fix missing fields in client edit mode and listing
+- #2378 Reactivate auditlog catalog mappings
+- #2377 Fix imports for moved idserver module
 - #2372 Generate unique ID for DX types on object creation
 - #2370 Override default DX add form to obtain renamed IDs correctly
 - #2368 Drop usage of portal_catalog tool

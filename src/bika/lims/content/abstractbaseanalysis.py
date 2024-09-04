@@ -641,9 +641,7 @@ GraphTitle = StringField(
     schemata="Result Options",
     widget=StringWidget(
         label=_("Graph Title"),
-        description=_(
-            "Title that appears above the time series graph"
-       )
+        description=_("Title that appears above the time series graph")
     )
 )
 GraphXAxisTitle = StringField(
@@ -651,9 +649,7 @@ GraphXAxisTitle = StringField(
     schemata="Result Options",
     widget=StringWidget(
         label=_("Graph X-Axis Title"),
-        description=_(
-            "Title that appears on the X-Axis of the time series graph"
-       )
+        description=_("Title that appears on the X-Axis of the time series graph")
     )
 )
 GraphYAxisTitle = StringField(
@@ -664,6 +660,51 @@ GraphYAxisTitle = StringField(
         description=_(
             "Title that appears on the Y-Axis of the time series graph"
        )
+    )
+)
+TimeSeriesColumns = RecordsField(
+    "TimeSeriesColumns",
+    schemata="Result Options",
+    subfields=(
+        "ColumnType",
+        "ColumnTitle",
+        "ColumnDataType",
+    ),
+    subfield_labels={'ColumnType': _("Column Type"),
+                    'ColumnTitle': _("Column Title"),
+                    'ColumnDataType': _("Column Data Type"),
+                    },
+    subfield_validators={},
+    subfield_types={'ColumnType': "string",
+                    'ColumnTitle': "string",
+                    'ColumnDataType': "string",
+                    },
+    subfield_sizes={'ColumnType': 1,
+                    # 'ColumnTitle': 25,
+                    'ColumnDataType': 1,
+                    },
+    subfield_maxlength={'ColumnType': 1,
+                    'ColumnTitle': 25,
+                    'ColumnDataType': 1,
+                    },
+    subfield_vocabularies={
+        "ColumnType": DisplayList((
+            ('index', _('Index')),
+            ('data', _('Data')),
+            ('average', _('Average')),
+        )),
+        "ColumnDataType": DisplayList((
+            ('float', _('Float')),
+            ('number', _('Number')),
+            ('date', _('Date')),
+        )),
+    },
+    widget=RecordsWidget(
+        label=_("Time Series Columns"),
+        description=_(
+            "List of possible final results. When set, no custom result is "
+            "allowed on results entry and user has to choose from these values"
+        ),
     )
 )
 
@@ -839,6 +880,7 @@ schema = BikaSchema.copy() + Schema((
     GraphTitle,
     GraphXAxisTitle,
     GraphYAxisTitle,
+    TimeSeriesColumns,
     ResultOptionsType,
     ResultOptionsSorting,
     Hidden,

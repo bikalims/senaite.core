@@ -202,6 +202,18 @@ class EditForm(EditFormAdapterBase):
         if result_type in ["numeric", "string", "text"]:
             self.add_hide_field("ResultOptions")
             self.add_hide_field("ResultOptionsSorting")
+            self.add_hide_field("GraphTitle")
+            self.add_hide_field("GraphXAxisTitle")
+            self.add_hide_field("GraphYAxisTitle")
+        elif result_type == "timeseries":
+            self.add_hide_field("ResultOptions")
+            self.add_hide_field("ResultOptionsSorting")
+            self.add_show_field("GraphTitle")
+            self.add_show_field("GraphXAxisTitle")
+            self.add_show_field("GraphYAxisTitle")
         else:
             self.add_show_field("ResultOptions")
             self.add_show_field("ResultOptionsSorting")
+            self.add_hide_field("GraphTitle")
+            self.add_hide_field("GraphXAxisTitle")
+            self.add_hide_field("GraphYAxisTitle")

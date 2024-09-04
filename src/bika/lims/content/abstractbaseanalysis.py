@@ -28,9 +28,9 @@ from senaite.core.browser.widgets.referencewidget import ReferenceWidget
 from bika.lims.config import SERVICE_POINT_OF_CAPTURE
 from bika.lims.content.bikaschema import BikaSchema
 from bika.lims.interfaces import IBaseAnalysis
-from bika.lims.interfaces import IHaveAnalysisCategory
 from bika.lims.interfaces import IHaveDepartment
 from bika.lims.interfaces import IHaveInstrument
+from bika.lims.interfaces import IHaveAnalysisCategory
 from senaite.core.permissions import FieldEditAnalysisHidden
 from senaite.core.permissions import FieldEditAnalysisRemarks
 from senaite.core.permissions import FieldEditAnalysisResult
@@ -592,6 +592,8 @@ RESULT_TYPES = (
     ("multiselect", _("Multiple selection")),
     ("multiselect_duplicates", _("Multiple selection (with duplicates)")),
     ("multichoice", _("Multiple choices")),
+    ("multivalue", _("Multiple values")),
+    ("timeseries", _("Time series")),
 )
 
 # Type of control to be rendered on results entry
@@ -617,19 +619,51 @@ ResultOptions = RecordsField(
     subfields=('ResultValue', 'ResultText'),
     required_subfields=('ResultValue', 'ResultText'),
     subfield_labels={'ResultValue': _('Result Value'),
-                     'ResultText': _('Display Value'), },
+                     'ResultText': _('Display Value'),
+    },
     subfield_validators={'ResultValue': 'result_options_value_validator',
                          'ResultText': 'result_options_text_validator'},
     subfield_sizes={'ResultValue': 5,
-                    'ResultText': 25,},
+                    'ResultText': 25},
     subfield_maxlength={'ResultValue': 5,
-                        'ResultText': 255,},
+                        'ResultText': 255},
     widget=RecordsWidget(
         label=_("Predefined results"),
         description=_(
             "List of possible final results. When set, no custom result is "
             "allowed on results entry and user has to choose from these values"
         ),
+    )
+)
+
+GraphTitle = StringField(
+    "GraphTitle",
+    schemata="Result Options",
+    widget=StringWidget(
+        label=_("Graph Title"),
+        description=_(
+            "Title that appears above the time series graph"
+       )
+    )
+)
+GraphXAxisTitle = StringField(
+    "GraphXAxisTitle",
+    schemata="Result Options",
+    widget=StringWidget(
+        label=_("Graph X-Axis Title"),
+        description=_(
+            "Title that appears on the X-Axis of the time series graph"
+       )
+    )
+)
+GraphYAxisTitle = StringField(
+    "GraphYAxisTitle",
+    schemata="Result Options",
+    widget=StringWidget(
+        label=_("Graph Y-Axis Title"),
+        description=_(
+            "Title that appears on the Y-Axis of the time series graph"
+       )
     )
 )
 
@@ -802,6 +836,9 @@ schema = BikaSchema.copy() + Schema((
     AllowManualUncertainty,
     ResultType,
     ResultOptions,
+    GraphTitle,
+    GraphXAxisTitle,
+    GraphYAxisTitle,
     ResultOptionsType,
     ResultOptionsSorting,
     Hidden,

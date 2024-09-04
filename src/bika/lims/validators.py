@@ -462,7 +462,7 @@ class InterimFieldsValidator:
             return _t(_("At least, two options for choices field are required"))
 
         # Multivalue is not supported with choices
-        if result_type in ["multivalue"]:
+        if result_type in ["multivalue", "luthandomultivalue"]:
             return _t(_(
                 "Multiple values control type is not supported for choices"
             ))

@@ -592,6 +592,8 @@ RESULT_TYPES = (
     ("multiselect", _("Multiple selection")),
     ("multiselect_duplicates", _("Multiple selection (with duplicates)")),
     ("multichoice", _("Multiple choices")),
+    ("multivalue", _("Multiple values")),
+    ("luthandomultivalue", _("Luthando Multiple values")),
 )
 
 # Type of control to be rendered on results entry
@@ -617,13 +619,25 @@ ResultOptions = RecordsField(
     subfields=('ResultValue', 'ResultText'),
     required_subfields=('ResultValue', 'ResultText'),
     subfield_labels={'ResultValue': _('Result Value'),
-                     'ResultText': _('Display Value'), },
+                     'ResultText': _('Display Value'),
+                     'GraphTitle': _('Graph Title'),
+                     'yaxis': _('y-axis'),
+                     'xaxis': _('x-axis'), },
     subfield_validators={'ResultValue': 'result_options_value_validator',
-                         'ResultText': 'result_options_text_validator'},
+                         'ResultText': 'result_options_text_validator',
+                         'GraphTitle': 'result_options_graph_title_validator',
+                         'yaxis': 'result_options_yaxis_validator',
+                         'xaxis': 'result_options_xaxis_validator'},
     subfield_sizes={'ResultValue': 5,
-                    'ResultText': 25,},
+                    'ResultText': 25,
+                    'GraphTitle': 25,
+                    'yaxis': 25,
+                    'xaxis': 25,},
     subfield_maxlength={'ResultValue': 5,
-                        'ResultText': 255,},
+                        'ResultText': 255,
+                        'GraphTitle': 255,
+                        'yaxis': 255,
+                        'xaxis': 255,},
     widget=RecordsWidget(
         label=_("Predefined results"),
         description=_(

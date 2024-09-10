@@ -462,7 +462,7 @@ class InterimFieldsValidator:
             return _t(_("At least, two options for choices field are required"))
 
         # Multivalue is not supported with choices
-        if result_type in ["multivalue", "timeseries"]:
+        if result_type in ["multivalue", ]:
             return _t(_(
                 "Multiple values control type is not supported for choices"
             ))
@@ -1455,3 +1455,39 @@ class ServiceConditionsValidator(object):
 
 
 validation.register(ServiceConditionsValidator())
+
+
+class TimeSeriesColumnValidator(object):
+    """Checks for duplicates and at least one column must the index field
+    """
+    implements(IValidator)
+    name = "time_series_column_validator"
+
+    def __call__(self, value, *args, **kwargs):
+        # Get all records
+        instance = kwargs['instance']
+        field_name = kwargs['field'].getName()
+        request = instance.REQUEST
+        records = request.form.get(field_name)
+
+        # Result values must be unique
+        valid_records = filter(lambda rec: len(rec.get('ColumnTitle', '')) > 0, records)
+        if len(valid_records) == 0:
+            return _t(_("No columns with types"))
+
+        titles = map(lambda ro: ro.get("ColumnTitle"), valid_records)
+        duplicates = [i for i, x in enumerate(titles) if titles.count(x) > 1]
+        if len(duplicates) > 1:
+            return _t(_("Columns Titles must be unique"))
+
+        types = map(lambda ro: ro.get("ColumnType"), valid_records)
+        dup_index = [i for i, x in enumerate(types) if x == 'index' and types.count(x) > 1]
+        if len(dup_index) > 1:
+            return _t(_("Only one Index column is allowed"))
+        dup_avg = [i for i, x in enumerate(types) if x == 'average' and types.count(x) > 1]
+        if len(dup_avg) > 1:
+            return _t(_("Only one Average column is allowed"))
+
+        return True
+
+validation.register(TimeSeriesColumnValidator())

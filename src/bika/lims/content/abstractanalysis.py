@@ -871,6 +871,12 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         """
         result = self.getResult()
 
+        if self.getResultType() == "timeseries":
+            raw_result = json.loads(result)
+            return {"TimeSeriesValues": raw_result,
+                    "Headers": [col['ColumnTitle'] for col in self.TimeSeriesColumns]
+                    }
+
         # If result options, return text of matching option
         choices = self.getResultOptions()
         if choices:

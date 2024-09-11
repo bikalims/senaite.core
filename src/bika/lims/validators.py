@@ -1466,9 +1466,14 @@ class TimeSeriesColumnValidator(object):
     def __call__(self, value, *args, **kwargs):
         # Get all records
         instance = kwargs['instance']
-        field_name = kwargs['field'].getName()
         request = instance.REQUEST
-        records = request.form.get(field_name)
+        fieldname = kwargs['field'].getName()
+        form_value = request.form.get(fieldname, False)
+        if form_value is False:
+            # not required and/or not visible
+            return True
+
+        records = request.form.get(fieldname)
 
         # Result values must be unique
         valid_records = filter(lambda rec: len(rec.get('ColumnTitle', '')) > 0, records)

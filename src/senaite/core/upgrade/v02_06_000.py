@@ -1328,6 +1328,11 @@ def migrate_samplepoint_to_dx(src, destination=None):
     # NOTE: always convert string values to unicode for dexterity fields!
     target.title = api.safe_unicode(src.Title() or "")
     target.description = api.safe_unicode(src.Description() or "")
+    target.sample_point_id = api.safe_unicode(src.SamplePointId or "")
+    target.sample_point_location = [src.aq_parent.UID()]
+    target.equipment_id = api.safe_unicode(src.EquipmentID or "")
+    target.equipment_type = api.safe_unicode(src.EquipmentType or "")
+    target.equipment_description = api.safe_unicode(src.EquipmentDescription or "")
 
     # we set the fields with our custom setters
     target.setLatitude(src.getLatitude())

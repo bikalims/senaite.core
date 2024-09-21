@@ -299,7 +299,7 @@ def permanently_allow_type_for(portal_type, allowed_type):
     # get the current allowed types for the object
     allowed_types = fti.allowed_content_types
     # append the allowed type
-    fti.allowed_content_types = allowed_types + (allowed_type, )
+    fti.allowed_content_types = allowed_types + [allowed_type, ]
 
 
 def set_uid(obj, uid):

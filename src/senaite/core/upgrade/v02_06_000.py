@@ -60,6 +60,9 @@ from senaite.core.schema.addressfield import PHYSICAL_ADDRESS
 from senaite.core.schema.addressfield import POSTAL_ADDRESS
 from zope.component import getMultiAdapter
 
+from senaite.samplepointlocations.setuphandlers import COLUMNS
+from senaite.samplepointlocations.setuphandlers import INDEXES
+
 version = "2.6.0"  # Remember version number in metadata.xml and setup.py
 profile = "profile-{0}:default".format(product)
 
@@ -988,6 +991,7 @@ def migrate_samplepoints_to_dx(tool):
     # ensure new indexes
     portal = api.get_portal()
     setup_core_catalogs(portal)
+    setup_other_catalogs(portal, indexes=INDEXES, columns=COLUMNS)
 
     # run required import steps
     tool.runImportStepFromProfile(profile, "typeinfo")

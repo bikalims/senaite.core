@@ -60,7 +60,7 @@ class ISubGroupSchema(model.Schema):
         description=_(
             u"description_subgroup_sort_key",
             default=u"Float value from 0.0 - 1000.0 indicating the sort order."
-                    " Duplicate values are ordered alphabetically.",
+                    " Duplicate values are ordered alphabetically."),
         required=False,
     )
 

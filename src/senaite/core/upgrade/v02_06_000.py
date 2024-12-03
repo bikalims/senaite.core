@@ -2733,5 +2733,7 @@ def reindex_sub_groups(tool):
     for brain in cat(portal_type="SubGroup"):
         obj = brain.getObject()
         logger.info("Reindex sub group: %r" % obj)
+        if obj.sort_key:
+            obj.sort_key = api.to_float(obj.sort_key)
         obj.reindexObject(idxs=["sortable_title"], update_metadata=False)
     logger.info("Reindexing sub groups [DONE]")

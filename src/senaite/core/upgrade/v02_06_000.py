@@ -2730,3 +2730,19 @@ def reindex_specs(tool):
         logger.info("Reindex analysis spec: %r" % obj)
         obj.reindexObject(idxs=["sampletype_uid", "sampletype_title"])
     logger.info("Reindexing analysis specifications [DONE]")
+
+
+def reindex_samplepoints(tool):
+    """Reindex the sampletype_uid and sampletype_title indexes from setup
+    catalog for AnalysisSpecs types
+    """
+    logger.info("Reindexing sample points ...")
+    cat = api.get_tool(SETUP_CATALOG)
+    for brain in cat(portal_type="SamplePoint"):
+        obj = brain.getObject()
+        if hasattr(obj, "equipment_id"):
+            continue
+        logger.info("Reindex sample point: %r" % obj)
+        obj.equipment_id = ""
+        obj.reindexObject()
+    logger.info("Reindexing analysis specifications [DONE]")

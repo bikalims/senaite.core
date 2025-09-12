@@ -422,7 +422,11 @@ class AbstractAnalysis(AbstractBaseAnalysis):
         the result respects the detection threshold
         """
         llod = self.getLowerDetectionLimit()
+        if llod == "":
+            llod = 0.0
         lloq = self.getField("LowerLimitOfQuantification").get(self)
+        if lloq == "":
+            lloq = 0.0
         return llod if api.to_float(lloq) < api.to_float(llod) else lloq
 
     @security.public

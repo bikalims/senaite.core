@@ -781,10 +781,14 @@ class Supplier_Contacts(WorksheetImporter):
 class Manufacturers(WorksheetImporter):
 
     def Import(self):
+        sc = api.get_tool(SETUP_CATALOG)
         container = self.context.setup.manufacturers
         for row in self.get_rows(3):
             title = row.get("title")
             if not title:
+                continue
+            manufacturer = self.get_object(sc, "Manufacturer", title=title)
+            if manufacturer:
                 continue
             api.create(container, "Manufacturer",
                        title=title, description=row.get("description"))

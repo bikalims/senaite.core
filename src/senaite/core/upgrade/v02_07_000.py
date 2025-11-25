@@ -137,3 +137,39 @@ def update_analysis_catalog_indexes(tool):
         catalog.reindexIndex(index_id, api.get_request())
 
     logger.info("Update analysis catalog indexes [DONE]")
+
+
+def re_index_samples_and_analyses(tool):
+    """Mark invalidated samples with IInvalidated interface
+    """
+    logger.info("Mark invalidated samples as IInvalidated ...")
+    query = {"portal_type": "AnalysisService"}
+    brains = api.search(query, SAMPLE_CATALOG)
+    catalog = api.get_tool(ANALYSIS_CATALOG)
+    analyses = catalog()
+    for analysis in analyses:
+        obj = analysis.getObject()
+        calculation = obj.getCalculation()
+        if calculation and calculation.Title() == "Unit Conversion psi to mPa":
+            if hasattr(obj, "ConversionFormula"):
+                obj.ConversionFormula = "[Imperial] * 0.00689476"
+            if hasattr(obj, "InverseFormula"):
+                obj.ConversionFormula = "[SI] * 145.038"
+            calculation.reindexObject()
+            calculation._p_deactivate()
+
+    query = {"portal_type": "AnalysisRequest"}
+    brains = api.search(query, SAMPLE_CATALOG)
+    total = len(brains)
+    for num, brain in enumerate(brains):
+        if num and num % 100 == 0:
+            logger.info("Flagging invalidated samples {0}/{1}"
+                        .format(num, total))
+
+        sample = api.get_object(brain)
+
+        alsoProvides(sample, IInvalidated)
+        sample.reindexObject()
+        sample._p_deactivate()
+
+    logger.info("Mark invalidated samples as IInvalidated [DONE]")

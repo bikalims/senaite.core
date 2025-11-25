@@ -1011,6 +1011,8 @@ class AbstractBaseAnalysis(BaseContent):  # TODO BaseContent?  is really needed?
         """
         field = self.getField("LowerDetectionLimit")
         value = field.get(self)
+        if not value:
+            value = field.default
         # cut off trailing zeros
         if "." in value:
             value = value.rstrip("0").rstrip(".")

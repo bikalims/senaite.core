@@ -174,6 +174,111 @@ schema = BikaSchema.copy() + Schema((
         )
     ),
 
+    TextField(
+        'ConversionFormula',
+        required=False,
+        validators=('formulavalidator',),
+        default_content_type='text/plain',
+        allowable_content_types=('text/plain',),
+        widget=TextAreaWidget(
+            label=_("Conversion Formula"),
+            description=_(
+                "<p>The formula you type here will be dynamically calculated "
+                "when an analysis using this calculation is displayed.</p>"
+                "<p>To enter a Calculation, use standard maths operators,  "
+                "+ - * / ( ), and all keywords available, both from other "
+                "Analysis Services and the Interim Fields specified here, "
+                "as variables. Enclose them in square brackets [ ].</p>"
+                "<p>E.g, the calculation for Total Hardness, the total of "
+                "Calcium (ppm) and Magnesium (ppm) ions in water, is entered "
+                "as [Ca] + [Mg], where Ca and MG are the keywords for those "
+                "two Analysis Services.</p>"),
+        )
+    ),
+
+    RecordsField(
+        'ConversionTestParameters',
+        required=False,
+        subfields=('keyword', 'value'),
+        subfield_labels={'keyword': _('Keyword'), 'value': _('Value')},
+        subfield_readonly={'keyword': True, 'value': False},
+        subfield_types={'keyword': 'string', 'value': 'float'},
+        default=[{'keyword': '', 'value': 0}],
+        widget=BikaRecordsWidget(
+            label=_("Conversion Test Parameters"),
+            description=_("To test the calculation, enter values here for all "
+                          "calculation parameters.  This includes Interim "
+                          "fields defined above, as well as any services that "
+                          "this calculation depends on to calculate results."),
+            allowDelete=False,
+        ),
+    ),
+
+    TextField(
+        'ConversionTestResult',
+        default_content_type='text/plain',
+        allowable_content_types=('text/plain',),
+        widget=TextAreaWidget(
+            label=_('Conversion Test Result'),
+            description=_("The result after the calculation has taken place "
+                          "with test values.  You will need to save the "
+                          "calculation before this value will be calculated."),
+        )
+    ),
+
+    TextField(
+        'InverseFormula',
+        required=False,
+        validators=('formulavalidator',),
+        default_content_type='text/plain',
+        allowable_content_types=('text/plain',),
+        widget=TextAreaWidget(
+            label=_("Inverse Formula"),
+            description=_(
+                "<p>The formula you type here will be dynamically calculated "
+                "when an analysis using this calculation is displayed.</p>"
+                "<p>To enter a Calculation, use standard maths operators,  "
+                "+ - * / ( ), and all keywords available, both from other "
+                "Analysis Services and the Interim Fields specified here, "
+                "as variables. Enclose them in square brackets [ ].</p>"
+                "<p>E.g, the calculation for Total Hardness, the total of "
+                "Calcium (ppm) and Magnesium (ppm) ions in water, is entered "
+                "as [Ca] + [Mg], where Ca and MG are the keywords for those "
+                "two Analysis Services.</p>"),
+        )
+    ),
+
+    RecordsField(
+        'InverseTestParameters',
+        required=False,
+        subfields=('keyword', 'value'),
+        subfield_labels={'keyword': _('Keyword'), 'value': _('Value')},
+        subfield_readonly={'keyword': True, 'value': False},
+        subfield_types={'keyword': 'string', 'value': 'float'},
+        default=[{'keyword': '', 'value': 0}],
+        widget=BikaRecordsWidget(
+            label=_("Inverse Test Parameters"),
+            description=_("To test the calculation, enter values here for all "
+                          "calculation parameters.  This includes Interim "
+                          "fields defined above, as well as any services that "
+                          "this calculation depends on to calculate results."),
+            allowDelete=False,
+        ),
+    ),
+
+    TextField(
+        'InverseTestResult',
+        default_content_type='text/plain',
+        allowable_content_types=('text/plain',),
+        widget=TextAreaWidget(
+            label=_('Inverse Test Result'),
+            description=_("The result after the calculation has taken place "
+                          "with test values.  You will need to save the "
+                          "calculation before this value will be calculated."),
+        )
+    ),
+
+
 ))
 
 schema['title'].widget.visible = True
@@ -246,6 +351,13 @@ class Calculation(BaseFolder, HistoryAwareMixin):
         The result will have newlines and additional spaces stripped out.
         """
         value = " ".join(self.getFormula().splitlines())
+        return value
+
+    def getMinifiedInverseFormula(self):
+        """Return the current formula value as text.
+        The result will have newlines and additional spaces stripped out.
+        """
+        value = " ".join(self.getInverseFormula().splitlines())
         return value
 
     def getCalculationDependencies(self, flat=False, deps=None):
@@ -355,6 +467,156 @@ class Calculation(BaseFolder, HistoryAwareMixin):
         # Gather up and parse formula
         formula = self.getMinifiedFormula()
         test_result_field = self.Schema().getField('TestResult')
+
+        # Flush the TestResult field and return
+        if not formula:
+            return test_result_field.set(self, "")
+
+        formula = formula.replace('[', '{').replace(']', '}').replace('  ', '')
+        result = 'Failure'
+
+        try:
+            formula = formula.format(**mapping)
+            result = eval(formula, self._getGlobals())
+        except TypeError as e:
+            # non-numeric arguments in interim mapping?
+            result = "TypeError: {}".format(str(e.args[0]))
+        except ZeroDivisionError as e:
+            result = "Division by 0: {}".format(str(e.args[0]))
+        except KeyError as e:
+            result = "Key Error: {}".format(str(e.args[0]))
+        except ImportError as e:
+            result = "Import Error: {}".format(str(e.args[0]))
+        except Exception as e:
+            result = "Unspecified exception: {}".format(str(e.args[0]))
+        test_result_field.set(self, str(result))
+
+    def setConversionFormula(self, Formula=None):
+        """Set the Dependent Services from the text of the calculation Formula
+        """
+        bsc = getToolByName(self, 'senaite_catalog_setup')
+        if Formula is None:
+            self.setDependentServices(None)
+            self.getField('ConversionFormula').set(self, Formula)
+        else:
+            keywords = re.compile(r"\[([^.^\]]+)\]").findall(Formula)
+            brains = bsc(portal_type='AnalysisService',
+                         getKeyword=keywords)
+            services = [brain.getObject() for brain in brains]
+            self.getField('DependentServices').set(self, services)
+            self.getField('ConversionFormula').set(self, Formula)
+
+
+    def setConversionTestParameters(self, form_value):
+        """This is called from the objectmodified subscriber, to ensure
+        correct population of the test-parameters field.
+        It collects Keywords for all services that are direct dependencies of
+        this calculatioin, and all of this calculation's InterimFields,
+        and gloms them together.
+        """
+        params = []
+
+        # Set default/existing values for InterimField keywords
+        for interim in self.getInterimFields():
+            keyword = interim.get('keyword')
+            ex = [x.get('value') for x in form_value if
+                  x.get('keyword') == keyword]
+            params.append({'keyword': keyword,
+                           'value': ex[0] if ex else interim.get('value')})
+        # Set existing/blank values for service keywords
+        for service in self.getDependentServices():
+            keyword = service.getKeyword()
+            ex = [x.get('value') for x in form_value if
+                  x.get('keyword') == keyword]
+            params.append({'keyword': keyword,
+                           'value': ex[0] if ex else ''})
+        self.Schema().getField('ConversionTestParameters').set(self, params)
+
+    # noinspection PyUnusedLocal
+    def setConversionTestResult(self, form_value):
+        """Calculate formula with TestParameters and enter result into
+         TestResult field.
+        """
+        # Create mapping from TestParameters
+        mapping = {x['keyword']: x['value'] for x in self.getConversionTestParameters()}
+        # Gather up and parse formula
+        formula = self.getMinifiedFormula()
+        test_result_field = self.Schema().getField('ConversionTestResult')
+
+        # Flush the TestResult field and return
+        if not formula:
+            return test_result_field.set(self, "")
+
+        formula = formula.replace('[', '{').replace(']', '}').replace('  ', '')
+        result = 'Failure'
+
+        try:
+            formula = formula.format(**mapping)
+            result = eval(formula, self._getGlobals())
+        except TypeError as e:
+            # non-numeric arguments in interim mapping?
+            result = "TypeError: {}".format(str(e.args[0]))
+        except ZeroDivisionError as e:
+            result = "Division by 0: {}".format(str(e.args[0]))
+        except KeyError as e:
+            result = "Key Error: {}".format(str(e.args[0]))
+        except ImportError as e:
+            result = "Import Error: {}".format(str(e.args[0]))
+        except Exception as e:
+            result = "Unspecified exception: {}".format(str(e.args[0]))
+        test_result_field.set(self, str(result))
+
+    def setInverseFormula(self, Formula=None):
+        """Set the Dependent Services from the text of the calculation Formula
+        """
+        bsc = getToolByName(self, 'senaite_catalog_setup')
+        if Formula is None:
+            self.setDependentServices(None)
+            self.getField('InverseFormula').set(self, Formula)
+        else:
+            keywords = re.compile(r"\[([^.^\]]+)\]").findall(Formula)
+            brains = bsc(portal_type='AnalysisService',
+                         getKeyword=keywords)
+            services = [brain.getObject() for brain in brains]
+            self.getField('DependentServices').set(self, services)
+            self.getField('InverseFormula').set(self, Formula)
+
+
+    def setInverseTestParameters(self, form_value):
+        """This is called from the objectmodified subscriber, to ensure
+        correct population of the test-parameters field.
+        It collects Keywords for all services that are direct dependencies of
+        this calculatioin, and all of this calculation's InterimFields,
+        and gloms them together.
+        """
+        params = []
+
+        # Set default/existing values for InterimField keywords
+        for interim in self.getInterimFields():
+            keyword = interim.get('keyword')
+            ex = [x.get('value') for x in form_value if
+                  x.get('keyword') == keyword]
+            params.append({'keyword': keyword,
+                           'value': ex[0] if ex else interim.get('value')})
+        # Set existing/blank values for service keywords
+        for service in self.getDependentServices():
+            keyword = service.getKeyword()
+            ex = [x.get('value') for x in form_value if
+                  x.get('keyword') == keyword]
+            params.append({'keyword': keyword,
+                           'value': ex[0] if ex else ''})
+        self.Schema().getField('InverseTestParameters').set(self, params)
+
+    # noinspection PyUnusedLocal
+    def setInverseTestResult(self, form_value):
+        """Calculate formula with TestParameters and enter result into
+         TestResult field.
+        """
+        # Create mapping from TestParameters
+        mapping = {x['keyword']: x['value'] for x in self.getInverseTestParameters()}
+        # Gather up and parse formula
+        formula = self.getMinifiedInverseFormula()
+        test_result_field = self.Schema().getField('InverseTestResult')
 
         # Flush the TestResult field and return
         if not formula:

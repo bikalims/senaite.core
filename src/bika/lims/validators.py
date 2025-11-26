@@ -537,6 +537,71 @@ class FormulaValidator:
 
 validation.register(FormulaValidator())
 
+class InverseFormulaValidator:
+    """ Validate keywords in calculation formula entry
+    """
+    implements(IValidator)
+    name = "inverseformulavalidator"
+
+    def __call__(self, value, *args, **kwargs):
+        if not value:
+            return True
+        instance = kwargs["instance"]
+        request = api.get_request()
+        form = request.form
+        interim_fields = form.get("ConversionInterimFields", [])
+        translate = getToolByName(instance, "translation_service").translate
+        catalog = api.get_tool(SETUP_CATALOG)
+        interim_keywords = filter(None, map(
+            lambda i: i.get("keyword"), interim_fields))
+        keywords = re.compile(r"\[([^\.^\]]+)\]").findall(value)
+
+        for keyword in keywords:
+            # Check if the service keyword exists and is active.
+            dep_service = catalog(getKeyword=keyword, is_active=True)
+            if not dep_service and keyword not in interim_keywords:
+                msg = _(
+                    "Validation failed: Keyword '${keyword}' is invalid",
+                    mapping={
+                        'keyword': safe_unicode(keyword)
+                    })
+                return to_utf8(translate(msg))
+
+        # Allow to use Wildcards, LDL, UDL and LLOQ values in calculations
+        allowedwds = [
+            "LDL", "BELOWLDL",
+            "UDL", "ABOVEUDL",
+            "LOQ", "LLOQ", "BELOWLOQ", "BELOWLLOQ",
+            "ULOQ", "ABOVEULOQ",
+        ]
+        keysandwildcards = re.compile(r"\[([^\]]+)\]").findall(value)
+        keysandwildcards = [k for k in keysandwildcards if "." in k]
+        keysandwildcards = [k.split(".", 1) for k in keysandwildcards]
+        errwilds = [k[1] for k in keysandwildcards if k[0] not in keywords]
+        if len(errwilds) > 0:
+            msg = _(
+                "Wildcards for interims are not allowed: ${wildcards}",
+                mapping={
+                    "wildcards": safe_unicode(", ".join(errwilds))
+                })
+            return to_utf8(translate(msg))
+
+        wildcards = [k[1] for k in keysandwildcards if k[0] in keywords]
+        wildcards = [wd for wd in wildcards if wd not in allowedwds]
+        if len(wildcards) > 0:
+            msg = _(
+                "Invalid wildcards found: ${wildcards}",
+                mapping={
+                    "wildcards": safe_unicode(", ".join(wildcards))
+                })
+            return to_utf8(translate(msg))
+
+        return True
+
+
+validation.register(FormulaValidator())
+
+
 
 class CoordinateValidator:
     """ Validate latitude or longitude field values

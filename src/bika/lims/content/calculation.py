@@ -173,9 +173,26 @@ schema = BikaSchema.copy() + Schema((
                           "calculation before this value will be calculated."),
         )
     ),
+    InterimFieldsField(
+        'ConversionInterimFields',
+        schemata="Conversion",
+        widget=BikaRecordsWidget(
+            label=_("Conversion Interim Fields"),
+            description=_(
+                "Define interim fields such as vessel mass, dilution factors, "
+                "should your calculation require them. The field title "
+                "specified here will be used as column headers and field "
+                "descriptors where the interim fields are displayed. If "
+                "'Apply wide' is enabled the field will be shown in a "
+                "selection box on the top of the worksheet, allowing to apply "
+                "a specific value to all the corresponding fields on the "
+                "sheet."),
+        )
+    ),
 
     TextField(
         'ConversionFormula',
+        schemata="Conversion",
         required=False,
         validators=('formulavalidator',),
         default_content_type='text/plain',
@@ -198,6 +215,7 @@ schema = BikaSchema.copy() + Schema((
 
     RecordsField(
         'ConversionTestParameters',
+        schemata="Conversion",
         required=False,
         subfields=('keyword', 'value'),
         subfield_labels={'keyword': _('Keyword'), 'value': _('Value')},
@@ -216,6 +234,7 @@ schema = BikaSchema.copy() + Schema((
 
     TextField(
         'ConversionTestResult',
+        schemata="Conversion",
         default_content_type='text/plain',
         allowable_content_types=('text/plain',),
         widget=TextAreaWidget(
@@ -228,8 +247,9 @@ schema = BikaSchema.copy() + Schema((
 
     TextField(
         'InverseFormula',
+        schemata="Inverse",
         required=False,
-        validators=('formulavalidator',),
+        validators=('inverseformulavalidator',),
         default_content_type='text/plain',
         allowable_content_types=('text/plain',),
         widget=TextAreaWidget(
@@ -250,6 +270,7 @@ schema = BikaSchema.copy() + Schema((
 
     RecordsField(
         'InverseTestParameters',
+        schemata="Inverse",
         required=False,
         subfields=('keyword', 'value'),
         subfield_labels={'keyword': _('Keyword'), 'value': _('Value')},
@@ -268,6 +289,7 @@ schema = BikaSchema.copy() + Schema((
 
     TextField(
         'InverseTestResult',
+        schemata="Inverse",
         default_content_type='text/plain',
         allowable_content_types=('text/plain',),
         widget=TextAreaWidget(
@@ -491,6 +513,18 @@ class Calculation(BaseFolder, HistoryAwareMixin):
             result = "Unspecified exception: {}".format(str(e.args[0]))
         test_result_field.set(self, str(result))
 
+    def setConversionInterimFields(self, value):
+        new_value = []
+
+        for x in range(len(value)):
+            row = dict(value[x])
+            keys = row.keys()
+            if 'value' not in keys:
+                row['value'] = 0
+            new_value.append(row)
+
+        self.getField('ConversionInterimFields').set(self, new_value)
+
     def setConversionFormula(self, Formula=None):
         """Set the Dependent Services from the text of the calculation Formula
         """
@@ -517,19 +551,12 @@ class Calculation(BaseFolder, HistoryAwareMixin):
         params = []
 
         # Set default/existing values for InterimField keywords
-        for interim in self.getInterimFields():
+        for interim in self.getConversionInterimFields():
             keyword = interim.get('keyword')
             ex = [x.get('value') for x in form_value if
                   x.get('keyword') == keyword]
             params.append({'keyword': keyword,
                            'value': ex[0] if ex else interim.get('value')})
-        # Set existing/blank values for service keywords
-        for service in self.getDependentServices():
-            keyword = service.getKeyword()
-            ex = [x.get('value') for x in form_value if
-                  x.get('keyword') == keyword]
-            params.append({'keyword': keyword,
-                           'value': ex[0] if ex else ''})
         self.Schema().getField('ConversionTestParameters').set(self, params)
 
     # noinspection PyUnusedLocal
@@ -569,17 +596,7 @@ class Calculation(BaseFolder, HistoryAwareMixin):
     def setInverseFormula(self, Formula=None):
         """Set the Dependent Services from the text of the calculation Formula
         """
-        bsc = getToolByName(self, 'senaite_catalog_setup')
-        if Formula is None:
-            self.setDependentServices(None)
-            self.getField('InverseFormula').set(self, Formula)
-        else:
-            keywords = re.compile(r"\[([^.^\]]+)\]").findall(Formula)
-            brains = bsc(portal_type='AnalysisService',
-                         getKeyword=keywords)
-            services = [brain.getObject() for brain in brains]
-            self.getField('DependentServices').set(self, services)
-            self.getField('InverseFormula').set(self, Formula)
+        self.getField('InverseFormula').set(self, Formula)
 
 
     def setInverseTestParameters(self, form_value):
@@ -592,19 +609,12 @@ class Calculation(BaseFolder, HistoryAwareMixin):
         params = []
 
         # Set default/existing values for InterimField keywords
-        for interim in self.getInterimFields():
+        for interim in self.getConversionInterimFields():
             keyword = interim.get('keyword')
             ex = [x.get('value') for x in form_value if
                   x.get('keyword') == keyword]
             params.append({'keyword': keyword,
                            'value': ex[0] if ex else interim.get('value')})
-        # Set existing/blank values for service keywords
-        for service in self.getDependentServices():
-            keyword = service.getKeyword()
-            ex = [x.get('value') for x in form_value if
-                  x.get('keyword') == keyword]
-            params.append({'keyword': keyword,
-                           'value': ex[0] if ex else ''})
         self.Schema().getField('InverseTestParameters').set(self, params)
 
     # noinspection PyUnusedLocal

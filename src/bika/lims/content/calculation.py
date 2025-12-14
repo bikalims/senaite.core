@@ -375,6 +375,13 @@ class Calculation(BaseFolder, HistoryAwareMixin):
         value = " ".join(self.getFormula().splitlines())
         return value
 
+    def getMinifiedConversionFormula(self):
+        """Return the current formula value as text.
+        The result will have newlines and additional spaces stripped out.
+        """
+        value = " ".join(self.getConversionFormula().splitlines())
+        return value
+
     def getMinifiedInverseFormula(self):
         """Return the current formula value as text.
         The result will have newlines and additional spaces stripped out.
@@ -528,17 +535,7 @@ class Calculation(BaseFolder, HistoryAwareMixin):
     def setConversionFormula(self, Formula=None):
         """Set the Dependent Services from the text of the calculation Formula
         """
-        bsc = getToolByName(self, 'senaite_catalog_setup')
-        if Formula is None:
-            self.setDependentServices(None)
-            self.getField('ConversionFormula').set(self, Formula)
-        else:
-            keywords = re.compile(r"\[([^.^\]]+)\]").findall(Formula)
-            brains = bsc(portal_type='AnalysisService',
-                         getKeyword=keywords)
-            services = [brain.getObject() for brain in brains]
-            self.getField('DependentServices').set(self, services)
-            self.getField('ConversionFormula').set(self, Formula)
+        self.getField('ConversionFormula').set(self, Formula)
 
 
     def setConversionTestParameters(self, form_value):
@@ -567,7 +564,7 @@ class Calculation(BaseFolder, HistoryAwareMixin):
         # Create mapping from TestParameters
         mapping = {x['keyword']: x['value'] for x in self.getConversionTestParameters()}
         # Gather up and parse formula
-        formula = self.getMinifiedFormula()
+        formula = self.getMinifiedConversionFormula()
         test_result_field = self.Schema().getField('ConversionTestResult')
 
         # Flush the TestResult field and return

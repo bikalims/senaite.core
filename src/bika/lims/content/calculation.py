@@ -537,7 +537,6 @@ class Calculation(BaseFolder, HistoryAwareMixin):
         """
         self.getField('ConversionFormula').set(self, Formula)
 
-
     def setConversionTestParameters(self, form_value):
         """This is called from the objectmodified subscriber, to ensure
         correct population of the test-parameters field.
@@ -594,7 +593,6 @@ class Calculation(BaseFolder, HistoryAwareMixin):
         """Set the Dependent Services from the text of the calculation Formula
         """
         self.getField('InverseFormula').set(self, Formula)
-
 
     def setInverseTestParameters(self, form_value):
         """This is called from the objectmodified subscriber, to ensure

@@ -53,6 +53,27 @@
                   Print
                 </a>
               </div>
+              <!-- From date -->
+              <div class="col-sm-12">
+                <div class="row" tal:define="dates view/get_from_to_date">
+                  <div class="form-group">
+                    <label for="chart_from_date" class="mr-2" i18n:translate="">
+                      From
+                    </label>
+                    <input type="date" id="chart_from_date" class="form-control form-control-sm"
+                      value=""
+                      tal:attributes="value python: dates[0]"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="chart_to_date" class="ml-2 mr-2" i18n:translate="">To</label>
+                    <input type="date" id="chart_to_date" class="form-control form-control-sm"
+                      value=""
+                      tal:attributes="value python: dates[1]"
+                    />
+                  </div>
+                </div>
+              </div>
             </form>
 
             <div id="chart" class="mt-4"></div>

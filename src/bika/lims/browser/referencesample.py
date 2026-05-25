@@ -35,6 +35,7 @@ from plone.app.layout.globals.interfaces import IViewView
 from plone.memoize import view
 from Products.ATContentTypes.utils import DT2dt
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from senaite.core.catalog import ANALYSIS_CATALOG
 from senaite.core.i18n import translate as t
 from zope.interface import implements
 
@@ -115,6 +116,24 @@ class ReferenceAnalysesViewView(BrowserView):
         # ensure the graphdata is filled before the template is rendered.
         view.get_folderitems()
         return view
+
+    def get_from_to_date(self):
+        from_date = ""
+        to_date = ""
+        query = {
+            "portal_type": "ReferenceAnalysis",
+            "path": {
+                "query": "/".join(self.context.getPhysicalPath()),
+                "level": 0},
+            "sort_on": "getResultCaptureDate",
+            "sort_order": "descending"
+        }
+        ac = api.get_tool(ANALYSIS_CATALOG)
+        brains = ac(query)
+        if len(brains) > 0:
+            from_date = brains[-1].getResultCaptureDate.strftime("%Y-%m-%d")
+            to_date = brains[0].getResultCaptureDate.strftime("%Y-%m-%d")
+        return [from_date, to_date]
 
 
 class ReferenceAnalysesView(AnalysesView):

@@ -9,6 +9,38 @@ window.ReferenceSampleAnalysesView = class ReferenceSampleAnalysesView {
     this.load = this.load.bind(this);
     this.filterRows = this.filterRows.bind(this);
     this.drawControlChart = this.drawControlChart.bind(this);
+    this.filterDataByDateRange = this.filterDataByDateRange.bind(this);
+  }
+
+  filterDataByDateRange(data) {
+    const fromDate = $("#chart_from_date").val();
+    const toDate = $("#chart_to_date").val();
+
+
+    // No filters selected
+    if (!fromDate && !toDate) {
+      return data;
+    }
+
+    const filtered = data.filter((item) => {
+      const itemDate = item.date.split(" ")[0];
+
+
+      // Filter before FROM date
+      if (fromDate && itemDate < fromDate) {
+        return false;
+      }
+
+      // Filter after TO date
+      if (toDate && itemDate > toDate) {
+        return false;
+      }
+
+      return true;
+    });
+
+
+    return filtered;
   }
 
   load() {
@@ -45,7 +77,9 @@ window.ReferenceSampleAnalysesView = class ReferenceSampleAnalysesView {
       this.filterRows();
     });
 
-    $(document).on("change", "#interpolation", this.drawControlChart);
+    $(document).on("change", "#interpolation", () => {
+      this.drawControlChart();
+    });
 
     $(document).on("mouseover", ".item-listing-tbody tr", function () {
       const uid = $(this).attr("uid");
@@ -68,6 +102,11 @@ window.ReferenceSampleAnalysesView = class ReferenceSampleAnalysesView {
       setTimeout(() => {
         this.filterRows();
       }, 500);
+    });
+
+    $(document).on("change", "#chart_from_date, #chart_to_date", () => {
+      this.drawControlChart();
+      this.filterRows();
     });
 
     $(document).on("click", "#printgraph", (e) => {
@@ -147,22 +186,39 @@ window.ReferenceSampleAnalysesView = class ReferenceSampleAnalysesView {
 
     $("#chart").css({ width: w, height: h }).empty().show();
 
-    let data = $.parseJSON($("#graphdata").val())[analysisKey];
+    // let data = $.parseJSON($("#graphdata").val())[analysisKey];
 
-    if (!data || !data[refType] || data[refType].length === 0) {
+    // if (!data || !data[refType] || data[refType].length === 0) {
+    //   $("#chart").hide();
+    //   return;
+    // }
+    const graphData = $.parseJSON($("#graphdata").val());
+    const analysisData = graphData[analysisKey];
+
+    if (!analysisData || !analysisData[refType] || analysisData[refType].length === 0) {
       $("#chart").hide();
       return;
     }
 
-    data = data[refType];
-    const lastPoint = data[data.length - 1];
+    const chartData = this.filterDataByDateRange(analysisData[refType]);
+
+    if (chartData.length === 0) {
+      $("#chart")
+        .empty()
+        .show()
+        .html("<p>No results found for selected date range.</p>");
+      return;
+    }
+
+
+    const lastPoint = chartData[chartData.length - 1];
     const unit = lastPoint.unit || "";
     const upper = lastPoint.upper;
     const lower = lastPoint.lower;
     const target = lastPoint.target;
 
     const chart = new ControlChart();
-    chart.setData(data);
+    chart.setData(chartData);
     chart.setInterpolation(interpolation);
     chart.setXColumn("date");
     chart.setYColumn("result");

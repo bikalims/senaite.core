@@ -1606,6 +1606,19 @@ def migrate_arreport_to_dx(src, destination=None):
                 filename=u(filename),
                 contentType=content_type
             )
+    # Get CSV file
+
+    csv_data = src.CSV
+    if csv_data:
+        if isinstance(csv_data, BlobWrapper):
+            filename = csv_data.getFilename() or "report.csv"
+            content_type = csv_data.getContentType()
+            data = csv_data.data
+            target.csv = NamedBlobFile(
+                data=data,
+                filename=u(filename),
+                contentType=content_type
+            )
 
     # Get Recipients (RecordsField -> DataGridField)
     recipients = src.getRecipients()

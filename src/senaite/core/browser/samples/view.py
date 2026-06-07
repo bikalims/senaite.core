@@ -217,7 +217,7 @@ class SamplesView(ListingView):
                 "toggle": False}),
             ("getSampler", {
                 "title": _("Sampler"),
-                "toggle": sampling_enabled}),
+                "toggle": False}),
             ("getPreserver", {
                 "title": _("Preserver"),
                 "sortable": False,
@@ -619,9 +619,15 @@ class SamplesView(ListingView):
         else:
             item["ClientContact"] = ""
 
+        sampler = obj.getSampler
+        if sampler:
+            item["getSampler"] = sampler
+            item["replace"]["getSampler"] = self.user_fullname(sampler)
+
         # Sampling workflow — inline edits for Sampler and Date Sampled.
         # The to_be_sampled branch needs the full sample for the
         # permission check and getUsers; wake only there.
+
         if obj.getSamplingWorkflowEnabled:
             sampler = obj.getSampler
             if sampler:

@@ -179,11 +179,6 @@ class SamplingFieldsVisibility(SenaiteATWidgetVisibility):
                 # sampling deactivated, do not display this field
                 return "invisible"
 
-        elif field_name == "Sampler":
-            if not sampling:
-                # sampling deactivated, do not display this field
-                return "invisible"
-
         return default
 
 

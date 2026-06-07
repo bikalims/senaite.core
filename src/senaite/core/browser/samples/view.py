@@ -642,16 +642,6 @@ class SamplesView(ListingView):
                     date = obj.getDateSampled or DateTime()
                     item["getDateSampled"] = \
                         self.to_datetime_input_value(date)
-                    sampler_roles = ["Sampler", "LabManager", ""]
-                    samplers = getUsers(sample, sampler_roles)
-                    users = [({
-                        "ResultValue": u,
-                        "ResultText": samplers.getValue(u)
-                    }) for u in samplers]
-                    item["choices"] = {"getSampler": users}
-                    if not sampler and "Sampler" in self.roles:
-                        sampler = self.member.getUserName()
-                        item["getSampler"] = sampler
 
         # These don't exist on ARs
         # XXX This should be a list of preservers

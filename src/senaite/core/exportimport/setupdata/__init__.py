@@ -884,8 +884,11 @@ class Instruments(WorksheetImporter):
                 addDocument(self, row_dict, obj)
 
             obj.unmarkCreationFlag()
-            renameAfterCreation(obj)
-            notify(ObjectInitializedEvent(obj))
+            try:
+                renameAfterCreation(obj)
+                notify(ObjectInitializedEvent(obj))
+            except Exception as e:
+                import pdb; pdb.set_trace()
 
 
 class Instrument_Validations(WorksheetImporter):

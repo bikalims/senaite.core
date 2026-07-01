@@ -860,13 +860,16 @@ class AnalysesView(ListingView):
         interim_keys = self.interim_columns.keys()
         interim_keys.reverse()
 
-        # Check if interims should be visible based on
-        # whether AdditionalValues is in the selected
-        # columns order (empty = no restriction = show all)
         columns_order = self.get_default_columns_order()
+
+        has_interim_columns = any(
+            key in columns_order for key in interim_keys
+        ) if columns_order else False
+
         show_interims = (
             not columns_order
             or "AdditionalValues" in columns_order
+            or has_interim_columns
         )
 
         # add InterimFields keys to columns
@@ -884,15 +887,31 @@ class AnalysesView(ListingView):
         if self.allow_edit:
             new_states = []
             for state in self.review_states:
+                columns = list(state.get("columns", []))
+
                 if show_interims:
-                    pos = self.calculate_interim_columns_position(
-                        state)
-                    for col_id in interim_keys:
-                        if col_id not in state["columns"]:
-                            state["columns"].insert(pos, col_id)
-                new_states.append(state)
-            self.review_states = new_states
-            # Allow selecting individual analyses
+                    # remove existing interim columns first
+                    columns = [c for c in columns if c not in interim_keys]
+
+                    if columns_order and has_interim_columns:
+                        # user explicitly ordered interim columns
+                        ordered = [
+                            c for c in columns_order
+                            if c in self.columns or c in interim_keys
+                        ]
+                        remaining = [c for c in columns if c not in ordered]
+                        columns = ordered + remaining
+
+                    else:
+                        # old/default placeholder behaviour
+                        pos = self.calculate_interim_columns_position({
+                            "columns": columns
+                        })
+                        for col_id in interim_keys:
+                            columns.insert(pos, col_id)
+
+                state["columns"] = columns
+
             self.show_select_column = True
 
         if self.show_categories:

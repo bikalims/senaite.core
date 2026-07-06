@@ -68,6 +68,14 @@ class ISamplePointSchema(model.Schema):
         required=False,
     )
 
+    registration_number = schema.TextLine(
+        title=_(
+            u"title_samplepoint_registration_number",
+            default=u"Registration Number"
+        ),
+        required=False,
+    )
+
     location = GPSCoordinatesField(
         title=_(
             u"title_samplepoint_location",
@@ -232,6 +240,19 @@ class SamplePoint(Container, ClientAwareMixin):
 
     # BBB: AT schema field property
     Elevation = property(getElevation, setElevation)
+
+    @security.protected(permissions.View)
+    def getRegistrationNumber(self):
+        accessor = self.accessor("registration_number")
+        return accessor(self)
+
+    @security.protected(permissions.ModifyPortalContent)
+    def setRegistrationNumber(self, value):
+        mutator = self.mutator("registration_number")
+        mutator(self, value)
+
+    # BBB: AT schema field property
+    RegistrationNumber = property(getRegistrationNumber, setRegistrationNumber)
 
     @security.protected(permissions.View)
     def getSamplingFrequency(self):

@@ -76,6 +76,13 @@ class SamplePointsView(ControlPanelListingView):
                 ),
                 "toggle": True
             }),
+            ("RegistrationNumber", {
+                "title": _(
+                    u"listing_samplepoints_column_registration",
+                    default=u"Registration Number"
+                ),
+                "toggle": True
+            }),
             ("SampleTypes", {
                 "title": _(
                     u"listing_samplepoints_column_sampletypes",
@@ -118,6 +125,7 @@ class SamplePointsView(ControlPanelListingView):
         obj = api.get_object(obj)
         item["replace"]["Title"] = get_link_for(obj)
         item["Description"] = obj.Description()
+        item["RegistrationNumber"] = obj.getRegistrationNumber()
 
         sample_types = obj.getSampleTypes()
         titles = map(api.get_title, sample_types)

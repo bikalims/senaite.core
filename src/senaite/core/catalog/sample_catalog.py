@@ -87,6 +87,7 @@ COLUMNS = BASE_COLUMNS + [
     "getProfilesTitleStr",
     "getProgress",
     "getRawParentAnalysisRequest",
+    "getSamplePointRegistrationNumber",
     "getSamplePointTitle",
     "getSampler",
     "getSampleTypeTitle",

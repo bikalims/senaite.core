@@ -217,6 +217,10 @@ class SamplesView(ListingView):
                 "title": _("Sample Point"),
                 "sortable": True,
                 "toggle": False}),
+            ("getSamplePointRegistrationNumber", {
+                "title": _("Registration Number"),
+                "sortable": False,
+                "toggle": False}),
             ("getStorageLocation", {
                 "title": _("Storage Location"),
                 "sortable": True,

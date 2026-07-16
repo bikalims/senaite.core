@@ -1143,6 +1143,24 @@ schema = BikaSchema.copy() + Schema((
         ),
     ),
 
+    StringField(
+        'SamplePointRegistrationNumber',
+        mode="rw",
+        read_permission=View,
+        write_permission=FieldEditSamplePoint,
+        widget=StringWidget(
+            label=_("Registration Number"),
+            description=_("Registration number of the selected Sample Point"),
+            visible={
+                'add': 'edit',
+                'edit': 'visible',
+                'view': 'visible',
+                'header_table': 'visible',
+            },
+            render_own_label=True,
+        ),
+    ),
+
     ComputedField(
         'ContactUID',
         expression="here.getContact() and here.getContact().UID() or ''",
@@ -2669,6 +2687,21 @@ class AnalysisRequest(BaseFolder, ClientAwareMixin):
             "sort_order": "ascending",
         }
         return query
+
+    def getSamplePointRegistrationNumber(self):
+        """Return the stored value, falling back to the selected Sample Point."""
+        field = self.getField("SamplePointRegistrationNumber")
+        storage = field.getStorage(self)
+        try:
+            value = storage.get(field.getName(), self) or ""
+        except (AttributeError, KeyError):
+            value = ""
+        if value:
+            return value
+        samplepoint = self.getSamplePoint()
+        if not samplepoint:
+            return ""
+        return samplepoint.getRegistrationNumber() or ""
 
     def get_sample_points_query(self):
         """Returns the query for the Sample Point field, so only active sample

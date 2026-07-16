@@ -645,6 +645,8 @@ class window.AnalysisRequestAdd
 
         # set the value
         if value.value?
+          if value.readonly?
+            field.prop "readonly", value.readonly
           if typeof value.value == "boolean"
             field.prop "checked", value.value
           else

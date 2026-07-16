@@ -2353,6 +2353,28 @@ def add_sample_catalog_indexes(tool):
 
 
 @upgradestep(product, version)
+def add_samplepoint_registration_number_metadata(tool):
+    """Expose the Sample Point registration number as sample metadata."""
+    column = "getSamplePointRegistrationNumber"
+    catalog = api.get_tool(SAMPLE_CATALOG)
+    add_catalog_column(catalog, column)
+
+    brains = catalog(portal_type="AnalysisRequest")
+    total = len(brains)
+    logger.info("Refreshing %s metadata of %s samples ..." %
+                (column, total))
+    for num, brain in enumerate(brains):
+        if num and num % 1000 == 0:
+            logger.info("Refreshed %s/%s samples ..." % (num, total))
+        obj = api.get_object(brain, default=None)
+        if obj is None:
+            continue
+        catalog.catalog_object(obj, api.get_path(obj), idxs=[],
+                               update_metadata=[column])
+    logger.info("Refreshing %s metadata [DONE]" % column)
+
+
+@upgradestep(product, version)
 def add_sample_analyses_keywords_metadata(tool):
     """Expose getAnalysesKeywords as metadata in senaite_catalog_sample
 

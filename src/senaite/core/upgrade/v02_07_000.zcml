@@ -3,6 +3,16 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
 
   <genericsetup:upgradeStep
+      title="SENAITE.CORE 2.7.0: Expose Sample Point registration number as sample metadata"
+      description="Add getSamplePointRegistrationNumber to the sample catalog
+                   metadata and refresh existing Samples so the value is
+                   available in Sample views and listings."
+      source="2750"
+      destination="2751"
+      handler=".v02_07_000.add_samplepoint_registration_number_metadata"
+      profile="senaite.core:default"/>
+
+  <genericsetup:upgradeStep
       title="SENAITE.CORE 2.7.0: Register the 'dispose' sample workflow transition"
       description="Register the new `senaite.core: Transition: Dispose Sample`
                    permission (granted to LabManager, Manager), the 'disposed'

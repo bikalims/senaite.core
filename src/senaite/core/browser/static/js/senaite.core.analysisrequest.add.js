@@ -988,6 +988,9 @@ window.AnalysisRequestAdd = class AnalysisRequestAdd {
         }
         // set the value
         if (value.value != null) {
+          if (value.readonly != null) {
+            field.prop("readonly", value.readonly);
+          }
           if (typeof value.value === "boolean") {
             return field.prop("checked", value.value);
           } else {

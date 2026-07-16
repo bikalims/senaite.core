@@ -1279,6 +1279,19 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
         return info
 
     @cache(cache_key)
+    def get_samplepoint_info(self, obj):
+        """Return Sample Point info and registration-number field state."""
+        info = self.get_base_info(obj)
+        registration_number = obj.getRegistrationNumber() or ""
+        info["field_values"].update({
+            "SamplePointRegistrationNumber": {
+                "value": registration_number,
+                "readonly": bool(registration_number),
+            },
+        })
+        return info
+
+    @cache(cache_key)
     def get_primaryanalysisrequest_info(self, obj):
         """Returns the info for a Primary Sample
         """
@@ -2431,6 +2444,16 @@ class ajaxAnalysisRequestAddView(AnalysisRequestAddView):
         # if sample creation fails (e.g., ID generation error)
         sp = transaction.savepoint()
         try:
+            samplepoint = api.get_object(record.get("SamplePoint"), None)
+            registration_number = record.get(
+                "SamplePointRegistrationNumber", "")
+            if samplepoint:
+                existing = samplepoint.getRegistrationNumber() or ""
+                if existing:
+                    record["SamplePointRegistrationNumber"] = existing
+                elif registration_number:
+                    samplepoint.setRegistrationNumber(registration_number)
+
             # Create the sample
             sample = crar(client, self.request, record)
 

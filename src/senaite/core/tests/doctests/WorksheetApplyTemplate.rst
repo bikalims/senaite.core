@@ -366,15 +366,45 @@ Then, we create the associated Reference Samples:
     ...                      Blank=False, ExpiryDate=date_future,
     ...                      ReferenceResults=control_refs)
 
+A template containing only controls must create the configured QC analyses and
+must not assign matching routine analyses:
+
+    >>> controls_layout = [
+    ...     {'pos': 1, 'type': 'c',
+    ...      'blank_ref': [],
+    ...      'control_ref': [controldef.UID()],
+    ...      'reference_proxy': controldef.UID(),
+    ...      'dup_proxy': None,
+    ...      'dup': None},
+    ...     {'pos': 2, 'type': 'c',
+    ...      'blank_ref': [],
+    ...      'control_ref': [controldef.UID()],
+    ...      'reference_proxy': controldef.UID(),
+    ...      'dup_proxy': None,
+    ...      'dup': None},
+    ... ]
+    >>> controls_template = api.create(
+    ...     setup.worksheettemplates, "WorksheetTemplate",
+    ...     title="Controls only", Layout=controls_layout,
+    ...     Services=[Cu.UID(), Fe.UID()])
+    >>> controls_worksheet = api.create(portal.worksheets, "Worksheet")
+    >>> controls_worksheet.applyWorksheetTemplate(controls_template)
+    >>> controls_worksheet.getRegularAnalyses()
+    []
+    >>> len(controls_worksheet.getReferenceAnalyses())
+    4
+    >>> controls_worksheet.get_slot_positions(type='c')
+    [1, 2]
+
 Apply the blank and control to the Worksheet Template layout:
 
     >>> layout = template.getTemplateLayout()
     >>> layout[5] = {'pos': '6', 'type': 'c',
     ...              'blank_ref': '',
-    ...              'control_ref': controldef.UID(),
+    ...              'control_ref': [controldef.UID()],
     ...              'dup': ''}
     >>> layout[6] = {'pos': '7', 'type': 'b',
-    ...              'blank_ref': blankdef.UID(),
+    ...              'blank_ref': [blankdef.UID()],
     ...              'control_ref': '',
     ...              'dup': ''}
     >>> template.setTemplateLayout(layout)

@@ -1190,7 +1190,13 @@ class Worksheet(Container):
             if slot not in available_slots:
                 continue
 
-            ref_definition_uid = row.get(wst_type, None)
+            # UIDReferenceField values inside the template's data grid are
+            # stored as a one-item list. Older templates can still contain a
+            # scalar UID, so normalise both representations before querying
+            # the scalar catalog index.
+            ref_definition = api.to_list(row.get(wst_type, None))
+            ref_definition_uid = next(
+                (ref for ref in ref_definition if ref), None)
             if not ref_definition_uid:
                 # Only reference analyses with reference definition can be used
                 # in worksheet templates

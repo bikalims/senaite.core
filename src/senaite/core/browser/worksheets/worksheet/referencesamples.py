@@ -163,8 +163,18 @@ class ReferenceSamplesView(ListingView):
         analyses = self.context.getAnalyses()
         routine_analyses = filter(
             lambda an: IRoutineAnalysis.providedBy(an), analyses)
-        services = map(lambda an: an.getAnalysisService(), routine_analyses)
-        return services
+        services = list(map(
+            lambda an: an.getAnalysisService(), routine_analyses))
+        if services:
+            return services
+
+        # A QC-only worksheet has no routine analyses from which services can
+        # be inferred. Use the assigned template's services so eligible blank
+        # and control reference samples remain selectable.
+        template = self.context.getWorksheetTemplate()
+        if template:
+            return template.getServices()
+        return []
 
     @view.memoize
     def get_assigned_services_uids(self):

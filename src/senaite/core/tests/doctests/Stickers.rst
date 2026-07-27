@@ -184,6 +184,17 @@ catalog:
     >>> SAMPLE_TYPE_SMALL_STICKER in template_ids
     True
 
+When stickers are printed from the sample listing, the view context is the
+listing container and the selected samples are passed in the request. The
+templates are obtained from the selected sample rather than the container:
+
+    >>> request["items"] = api.get_uid(sample)
+    >>> listing_view = api.get_view("sticker", context=portal, request=request)
+    >>> listing_template_ids = [t["id"] for t in listing_view.get_available_templates()]
+    >>> SAMPLE_TYPE_SMALL_STICKER in listing_template_ids
+    True
+    >>> request["items"] = ""
+
 A context type with no sticker adapter (e.g. a Batch) is not offered the
 entire sticker catalog. Without a type filter, no templates are available:
 

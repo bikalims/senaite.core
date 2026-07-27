@@ -154,10 +154,29 @@ class StickerView(BrowserView):
         return uids
 
     def get_sticker_template_adapters(self):
-        """Query context adapters for IGetStickerTemplate
+        """Query adapters for the context or the first selected item
+
+        Listing views invoke this view on their container and pass the actual
+        samples through the ``items`` request parameter.  The container does
+        not provide a sticker adapter, so use a selected item as the adapter
+        context in that case.
         """
         try:
-            return getAdapters((self.context, ), IGetStickerTemplates)
+            adapters = list(getAdapters(
+                (self.context, ), IGetStickerTemplates))
+            if adapters:
+                return adapters
+
+            uids = filter(None, self.request.get("items", "").split(","))
+            for uid in uids:
+                item = api.get_object(uid, default=None)
+                if item is None:
+                    continue
+                adapters = list(getAdapters(
+                    (item, ), IGetStickerTemplates))
+                if adapters:
+                    return adapters
+            return []
         except ComponentLookupError:
             logger.debug("No IGetStickerTemplates adapters found for %s."
                          % api.get_path(self.context))

@@ -1028,6 +1028,14 @@ class Worksheet(Container):
         :param analyses: list of analyses
         :returns: None
         """
+        # Do not search for routine analyses when the template defines no
+        # routine slots, e.g. for a controls-only worksheet template.
+        has_routine_slots = any(
+            row.get("type") == "a" for row in wst.getTemplateLayout())
+        if not has_routine_slots:
+            return
+
+        available_slots = self.resolve_available_slots(wst, "a")
         # Get the services from the Worksheet Template
         service_uids = wst.getRawServices()
         if not service_uids:
@@ -1062,8 +1070,6 @@ class Worksheet(Container):
                 assignable_analyses.append(analysis)
             analyses = assignable_analyses
 
-        # Available slots for routine analyses
-        available_slots = self.resolve_available_slots(wst, "a")
         available_slots.sort(reverse=True)
 
         # If there is an instrument assigned to this Worksheet Template, take

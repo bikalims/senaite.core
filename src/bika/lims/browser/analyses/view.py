@@ -1055,6 +1055,16 @@ class AnalysesView(ListingView):
         item["ResultCaptureDate"] = dtime.to_iso_format(capture_date)
         item["replace"]["ResultCaptureDate"] = localized_capture_date
 
+        # The listing normally renders results backed by a calculation as
+        # read-only.  An explicitly selected detection limit is different: if
+        # manual detection limits are enabled, the analyst must be able to
+        # replace the calculated value with the entered MDL/UDL value.
+        if (obj.getCalculation()
+                and obj.getDetectionLimitOperand() in [LDL, UDL]
+                and obj.getAllowManualDetectionLimit()):
+            item.setdefault("field_types", {})["Result"] = \
+                obj.getResultType()
+
         # Add the unit after the result
         unit = item.get("Unit")
         if unit:

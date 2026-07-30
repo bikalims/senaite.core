@@ -256,7 +256,7 @@ class EmailView(BrowserView):
             uids = uids.split(",")
         uids = filter(api.is_uid, uids)
         unique_uids = OrderedDict().fromkeys(uids).keys()
-        return map(self.get_object_by_uid, unique_uids)
+        return filter(None, map(self.get_object_by_uid, unique_uids))
 
     @property
     @view.memoize

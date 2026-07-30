@@ -118,15 +118,6 @@
       name="PrimaryAnalysisRequestFieldVisibility"
     />
 
-    <!-- The Sample Point registration number can only be edited while a
-    Sample is being created. Display it read-only on existing Samples. -->
-    <adapter
-      factory=".widgetvisibility.SamplePointRegistrationNumberFieldVisibility"
-      provides="bika.lims.interfaces.IATWidgetVisibility"
-      for="bika.lims.interfaces.IAnalysisRequest"
-      name="SamplePointRegistrationNumberFieldVisibility"
-    />
-
     <!-- Batch: Hide Client field if the batch is assigned to a Client or the
     batch contains samples from different clients -->
     <adapter

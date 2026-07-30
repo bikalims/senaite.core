@@ -262,25 +262,6 @@ class PrimaryAnalysisRequestFieldVisibility(SenaiteATWidgetVisibility):
         return default
 
 
-class SamplePointRegistrationNumberFieldVisibility(
-        SenaiteATWidgetVisibility):
-    """Keep the Sample Point registration number read-only after creation
-
-    The field must remain editable on the Sample add form so a registration
-    number can be supplied when the selected Sample Point does not have one.
-    """
-    def __init__(self, context):
-        super(SamplePointRegistrationNumberFieldVisibility, self).__init__(
-            context=context,
-            sort=3,
-            field_names=["SamplePointRegistrationNumber"])
-
-    def isVisible(self, field, mode="view", default="visible"):
-        if mode == "edit" and not api.is_temporary(self.context):
-            return "invisible"
-        return default
-
-
 class BatchClientFieldVisibility(SenaiteATWidgetVisibility):
     """Client field in a Batch in only editable while it is being created or
     when the Batch does not contain any sample

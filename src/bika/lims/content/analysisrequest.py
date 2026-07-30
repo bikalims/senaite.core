@@ -1152,8 +1152,8 @@ schema = BikaSchema.copy() + Schema((
             label=_("Registration Number"),
             description=_("Registration number of the selected Sample Point"),
             visible={
-                'add': 'invisible',
-                'edit': 'invisible',
+                'add': 'edit',
+                'edit': 'visible',
                 'view': 'visible',
                 'header_table': 'visible',
             },

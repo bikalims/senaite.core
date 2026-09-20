@@ -27,9 +27,13 @@ from bika.lims import api
 from bika.lims.api import safe_unicode as u
 from bika.lims.api import snapshot as snap_api
 from bika.lims.browser.fields.uidreferencefield import get_backreferences
+from bika.lims.browser.fields.uidreferencefield import \
+    get_storage as get_at_backref_storage
 from bika.lims.interfaces import IAuditable
 from bika.lims.interfaces import IDetachedPartition
 from bika.lims.interfaces import IInvalidated
+from bika.lims.workflow.analysisrequest import do_action_to_analyses
+from senaite.core.interfaces import IDispatched
 from bika.lims.utils import tmpID
 from persistent.list import PersistentList
 from plone.app.blob.field import BlobWrapper
@@ -69,10 +73,14 @@ from senaite.core.upgrade.utils import UpgradeUtils
 from senaite.core.upgrade.utils import blob_to_named_file
 from senaite.core.upgrade.utils import copy_snapshots
 from senaite.core.upgrade.utils import delete_object
+from senaite.core.upgrade.utils import import_typeinfo
+from senaite.core.upgrade.utils import is_stale_uid_catalog_path
 from senaite.core.upgrade.utils import iter_senaite_catalogs
 from senaite.core.upgrade.utils import permanently_allow_type_for
 from senaite.core.upgrade.utils import rebuild_index
 from senaite.core.upgrade.utils import remove_at_portal_types
+from senaite.core.upgrade.utils import repair_uid_catalog_path
+from senaite.core.upgrade.utils import temporary_allow_type
 from senaite.core.upgrade.utils import uncatalog_object
 from senaite.core.upgrade.v02_06_000 import get_setup_folder
 from zope.annotation.interfaces import IAnnotations
@@ -85,10 +93,13 @@ profile = "profile-{0}:default".format(product)
 
 REMOVE_AT_TYPES = [
     "ARReport",
+    "AuditLog",
     "Contact",
     "Laboratory",
     "Calculation",
     "Calculations",
+    "Method",
+    "Methods",
     "Multifile",
     "Worksheet",
     "WorksheetFolder",
@@ -98,6 +109,134 @@ PORTAL_FOLDER_ITEMS = {
     # ID: ID, Title, FTI
     "worksheets": ("worksheets", "Worksheets", "Worksheets"),
 }
+
+
+@upgradestep(product, version)
+def remove_stale_uid_catalog_records(tool):
+    """Remove uid_catalog records that sit under the wrong path
+
+    The AT to DX migrations created the Dexterity object first, which
+    `plone.app.referenceablebehavior` catalogs under the absolute path with
+    the throwaway uuid of `createContent`, and copied the UID of the
+    Archetypes source only afterwards. The `uncatalog_object` of that time
+    only tried the relative path, so the record under the absolute path
+    survived, carrying a UID that belongs to nothing.
+
+    Such a record stays unnoticed until the object is edited: the Dexterity
+    modified handler then re-catalogs it under the absolute path, now with
+    the real UID. From that moment on `uid_catalog(UID=...)` returns two
+    brains, `api.get_brain_by_uid` cannot tell them apart and returns
+    nothing, and every lookup through the SuperModel fails.
+
+    Records are matched against the path convention of their object, so
+    both halves of an already collided pair and the ones still waiting to
+    collide are cleaned up.
+    """
+    logger.info("Removing stale uid_catalog records ...")
+
+    portal = tool.aq_inner.aq_parent
+    catalog = api.get_tool("uid_catalog", context=portal)
+    types_tool = api.get_tool("portal_types", context=portal)
+
+    # take a snapshot, the catalog is modified while repairing
+    records = list(catalog._catalog.uids.items())
+    total = len(records)
+    stale = []
+    skipped = 0
+
+    for num, (path, rid) in enumerate(records):
+        if num and num % 10000 == 0:
+            logger.info("Checking uid_catalog record %s/%s" % (num, total))
+        is_stale = is_stale_uid_catalog_path(types_tool, catalog, path, rid)
+        if is_stale is None:
+            skipped += 1
+        elif is_stale:
+            stale.append(path)
+
+    logger.info("Found %s stale records out of %s" % (len(stale), total))
+    if skipped:
+        logger.info("Skipped %s records of an unknown portal type" % skipped)
+
+    for path in stale:
+        repair_uid_catalog_path(portal, catalog, path)
+
+    logger.info("Removing stale uid_catalog records [DONE]")
+
+
+@upgradestep(product, version)
+def hide_legacy_viewlets(tool):
+    """Hide the analytics, keywords, next/previous navigation and related
+    items viewlets, which are not used in SENAITE, by reimporting the
+    viewlets step.
+    """
+    portal = tool.aq_inner.aq_parent
+    setup = portal.portal_setup
+    logger.info("Hiding unused viewlets ...")
+    setup.runImportStepFromProfile(profile, "viewlets")
+    logger.info("Hiding unused viewlets [DONE]")
+
+
+@upgradestep(product, version)
+def remove_regulatory_inspector_role(tool):
+    """Remove the obsolete 'RegulatoryInspector' role and group.
+
+    The RegulatoryInspector role and the RegulatoryInspectors group are
+    no longer used by SENAITE. This step removes them from existing
+    installations:
+
+    1. Drop the role from the portal_role_manager, which also clears
+       every direct assignment of the role to a principal.
+    2. Remove the RegulatoryInspectors group from portal_groups.
+    3. Drop the role from the portal's known roles (`__ac_roles__`).
+
+    Stale references left behind in workflow definitions or permission
+    maps are inert once the role no longer exists.
+    """
+    role = "RegulatoryInspector"
+    group_id = "RegulatoryInspectors"
+    logger.info("Removing obsolete '%s' role ..." % role)
+
+    # 1. drop the role + its assignments from the role manager
+    acl = api.get_tool("acl_users")
+    prm = getattr(acl, "portal_role_manager", None)
+    if prm is not None and role in prm.listRoleIds():
+        prm.removeRole(role)
+        logger.info("Removed role '%s' from portal_role_manager" % role)
+
+    # 2. remove the group
+    portal_groups = api.get_tool("portal_groups")
+    if portal_groups.getGroupById(group_id) is not None:
+        portal_groups.removeGroup(group_id)
+        logger.info("Removed group '%s'" % group_id)
+
+    # 3. drop the role from the portal's known roles
+    portal = api.get_portal()
+    roles = list(portal.__ac_roles__)
+    if role in roles:
+        roles.remove(role)
+        portal.__ac_roles__ = tuple(roles)
+        logger.info("Removed role '%s' from portal roles" % role)
+
+
+@upgradestep(product, version)
+def reindex_organisation_title(tool):
+    """Rebuild the `title` index in the setup and client catalogs with
+    unicode keys.
+
+    The organisation `title` indexer returned the raw `Name`, so a non-ASCII
+    organisation name (Client, Supplier, Manufacturer, Laboratory) ended up as
+    a byte-string key in the shared `title` FieldIndex. Any query on `title`
+    then raised a UnicodeDecodeError when comparing the unicode query value
+    against those keys. The indexer now normalizes to unicode; the index BTree
+    must be cleared before reindexing (a plain per-object reindex would insert
+    a unicode key next to the old byte-string keys and hit the same error), so
+    `rebuild_index` clears and repopulates it with unicode keys only.
+    """
+    for catalog_id in [SETUP_CATALOG, CLIENT_CATALOG]:
+        catalog = api.get_tool(catalog_id)
+        logger.info("Rebuilding 'title' index on %s ..." % catalog_id)
+        rebuild_index(catalog, "title")
+    logger.info("Rebuilding 'title' index [DONE]")
 
 
 @upgradestep(product, version)
@@ -117,6 +256,57 @@ def upgrade(tool):
 
     logger.info("{0} upgraded to version {1}".format(product, version))
     return True
+
+
+def migrate_auditlog_to_dx(tool):
+    """Move the AuditLog folder to the SENAITE setup as a Dexterity folder
+
+    The AuditLog folder never holds content on its own: it only backs the
+    audit log listing view. The audit snapshots live as annotations on the
+    audited objects and are looked up through the auditlog catalog, not
+    through this folder. It is therefore recreated rather than migrated:
+    the legacy AT folder in `bika_setup` is removed and a fresh DX folder
+    is created in the new SENAITE setup. The legacy AT `AuditLog` class is
+    kept as a stub (`bika.lims.controlpanel.auditlog`) so the old folder
+    still loads as a regular object and deletes cleanly here.
+
+    Traversal to `setup/auditlog` returns this folder: BTreeFolder2 exposes
+    its children via `__getattr__`, so the contained object is resolved
+    before the per-object `auditlog` view. The per-object audit trail stays
+    reachable through the explicit `@@auditlog` form.
+    """
+    logger.info("Convert AuditLog to Dexterity ...")
+
+    # Flush *all* pending AT FTIs, not only the AuditLog one: the typeinfo
+    # step below imports every type of the profile, and applying a DX FTI
+    # over a type that is still Archetypes in the database fails with
+    # `ValueError: undefined property 'add_permission'`
+    remove_at_portal_types(tool, REMOVE_AT_TYPES)
+
+    # re-import the DX FTIs
+    import_typeinfo(tool, profile)
+
+    # the legacy AT folder lived in `bika_setup`; the DX one now lives in
+    # the new SENAITE setup
+    bika_setup = api.get_setup()
+    setup = api.get_senaite_setup()
+
+    # remove the old AT folder and any half-created DX folder
+    for container in [bika_setup, setup]:
+        if "auditlog" in container.objectIds():
+            auditlog = container._getOb("auditlog")
+            uncatalog_object(auditlog)
+            delete_object(auditlog)
+
+    # create the new DX folder in the SENAITE setup. The type is only
+    # allowed temporarily, so AuditLog does not show up in the setup's
+    # "add" menu afterwards.
+    with temporary_allow_type(setup, "AuditLog") as container:
+        auditlog = api.create(
+            container, "AuditLog", id="auditlog", title="Audit Log")
+    auditlog.reindexObject()
+
+    logger.info("Convert AuditLog to Dexterity [DONE]")
 
 
 def drop_client_ordering_annotations(tool):
@@ -321,6 +511,49 @@ def setup_dispose_transition(tool):
 
 
 @upgradestep(product, version)
+def setup_dispatch_workflow(tool):
+    """Set up the now-optional dispatch workflow for existing installations.
+
+    Dispatch used to be always available. The workflow is now optional and
+    disabled by default. Only if the installation already has dispatched
+    samples we enable the workflow (to preserve the current behavior), mark
+    those samples with the IDispatched marker interface (the dispatched
+    viewlet and the analysis lock guard rely on it instead of the sample
+    review_state) and lock their analyses, as a fresh dispatch would.
+    """
+    query = {
+        "portal_type": "AnalysisRequest",
+        "review_state": "dispatched",
+    }
+    brains = api.search(query, SAMPLE_CATALOG)
+    total = len(brains)
+    if not total:
+        # No dispatched samples: leave the workflow disabled (opt-in)
+        logger.info("No dispatched samples found, dispatch workflow stays "
+                    "disabled")
+        return
+
+    # Enable the dispatch workflow to preserve the current behavior
+    setup = api.get_senaite_setup()
+    if setup:
+        setup.setDispatchWorkflowEnabled(True)
+
+    # Mark the dispatched samples and lock their analyses
+    logger.info("Processing dispatched samples: {} to process".format(total))
+    for num, brain in enumerate(brains):
+        if num and num % 100 == 0:
+            logger.info("Processing dispatched samples {}/{}"
+                        .format(num, total))
+        sample = api.get_object(brain)
+        # Mark the sample first so the analysis lock guard allows the lock
+        if not IDispatched.providedBy(sample):
+            alsoProvides(sample, IDispatched)
+        # Lock the analyses of the sample (as a fresh dispatch would)
+        do_action_to_analyses(sample, "lock")
+    logger.info("Processing dispatched samples [DONE]")
+
+
+@upgradestep(product, version)
 def remove_dashboard_registry_visibility(tool):
     """Remove legacy registry-based dashboard panel visibility
 
@@ -429,7 +662,7 @@ def migrate_calculations_to_dx(tool):
     remove_at_portal_types(tool, REMOVE_AT_TYPES)
 
     # run required import steps
-    tool.runImportStepFromProfile(profile, "typeinfo")
+    import_typeinfo(tool, profile)
     tool.runImportStepFromProfile(profile, "workflow")
 
     # get the old container
@@ -791,7 +1024,7 @@ def migrate_contacts_to_dx(tool):
     remove_at_portal_types(tool, REMOVE_AT_TYPES)
 
     # run required import steps
-    tool.runImportStepFromProfile(profile, "typeinfo")
+    import_typeinfo(tool, profile)
 
     # Find all Contact objects (excluding LabContact and SupplierContact)
     query = {
@@ -937,7 +1170,7 @@ def migrate_multifiles_to_dx(tool):
     remove_at_portal_types(tool, REMOVE_AT_TYPES)
 
     # run required import steps
-    tool.runImportStepFromProfile(profile, "typeinfo")
+    import_typeinfo(tool, profile)
 
     # Find all Multifile objects
     query = {
@@ -1077,7 +1310,7 @@ def migrate_laboratory_to_dx(tool):
     remove_at_portal_types(tool, REMOVE_AT_TYPES)
 
     # run required import steps
-    tool.runImportStepFromProfile(profile, "typeinfo")
+    import_typeinfo(tool, profile)
 
     portal_type = "Laboratory"
     query = {
@@ -1323,7 +1556,7 @@ def repair_laboratory_migration(tool):
     logger.info("Repair laboratory migration ...")
 
     # Re-import typeinfo so the FTI picks up IMultiCatalogBehavior
-    tool.runImportStepFromProfile(profile, "typeinfo")
+    import_typeinfo(tool, profile)
 
     setup = api.get_senaite_setup()
     laboratory = setup.get("laboratory") if setup else None
@@ -1381,7 +1614,7 @@ def create_setup_contacts_folder(tool):
     remove_at_portal_types(tool, REMOVE_AT_TYPES)
 
     # run required import steps
-    tool.runImportStepFromProfile(profile, "typeinfo")
+    import_typeinfo(tool, profile)
     tool.runImportStepFromProfile(profile, "actions")
 
     setup = api.get_senaite_setup()
@@ -1412,7 +1645,7 @@ def setup_custom_image_and_file_types(tool):
     # Ensure old AT types are flushed first
     remove_at_portal_types(tool, REMOVE_AT_TYPES)
     portal = tool.aq_inner.aq_parent
-    tool.runImportStepFromProfile(profile, "typeinfo")
+    import_typeinfo(tool, profile)
     tool.runImportStepFromProfile(profile, "workflow")
     # Needed for the updated Client.xml action
     _run_import_step(portal, "typeinfo", "profile-bika.lims:default")
@@ -1638,7 +1871,7 @@ def migrate_arreport_to_resultsreport(tool):
 
     # Remove AT portal type and install DX portal type
     remove_at_portal_types(tool, REMOVE_AT_TYPES)
-    tool.runImportStepFromProfile(profile, "typeinfo")
+    import_typeinfo(tool, profile)
     tool.runImportStepFromProfile(profile, "workflow")
 
     # Update AnalysisRequest to allow ResultsReport as subobject
@@ -1881,7 +2114,7 @@ def migrate_worksheets_to_dx(tool):
     remove_at_portal_types(tool, REMOVE_AT_TYPES)
 
     # run required import steps
-    tool.runImportStepFromProfile(profile, "typeinfo")
+    import_typeinfo(tool, profile)
     tool.runImportStepFromProfile(profile, "workflow")
     tool.runImportStepFromProfile(profile, "rolemap")
     tool.runImportStepFromProfile(profile, "plone.app.registry")
@@ -2750,3 +2983,164 @@ def remove_client_sharing_alias(tool):
     del aliases["sharing"]
     fti.setMethodAliases(aliases)
     logger.info("Removed 'sharing' method alias from Client FTI")
+
+
+def remove_methods_from_sidebar():
+    """Drop the `methods` folder from the sidebar navigation folders.
+
+    The methods folder is moved from the portal root into the setup folder,
+    so it is no longer a top-level folder eligible for the sidebar.
+    """
+    setup = api.get_senaite_setup()
+    folders = list(setup.getSidebarFolders() or [])
+    if "methods" not in folders:
+        return
+    folders = [folder for folder in folders if folder != "methods"]
+    setup.setSidebarFolders(tuple(folders))
+    logger.info("Removed 'methods' from the sidebar navigation folders")
+
+
+@upgradestep(product, version)
+def migrate_methods_to_dx(tool):
+    """Converts existing methods to Dexterity and moves them from the portal
+    root into the setup folder
+    """
+    logger.info("Convert Methods to Dexterity ...")
+
+    # ensure old AT types are flushed first
+    remove_at_portal_types(tool, REMOVE_AT_TYPES)
+
+    # run required import steps
+    import_typeinfo(tool, profile)
+    tool.runImportStepFromProfile(profile, "workflow")
+
+    # the methods folder is no longer a top-level sidebar folder
+    remove_methods_from_sidebar()
+
+    # get the old container from the portal root
+    portal = api.get_portal()
+    origin = portal.get("methods")
+    if not origin:
+        # old container is already gone
+        return
+
+    # get the destination container (under the new setup folder)
+    destination = get_setup_folder("methods")
+
+    # un-catalog the old container
+    uncatalog_object(origin)
+
+    # copy items from old -> new container
+    objects = origin.objectValues()
+    for num, src in enumerate(objects, start=1):
+        migrate_method_to_dx(src, destination)
+        if num % 100 == 0:
+            transaction.savepoint()
+
+    # copy snapshots for the container
+    copy_snapshots(origin, destination)
+
+    # remove old AT folder
+    if len(origin) == 0:
+        delete_object(origin)
+    else:
+        logger.warn("Cannot remove {}. Is not empty".format(origin))
+
+    logger.info("Convert Methods to Dexterity [DONE]")
+
+
+def migrate_method_to_dx(src, destination):
+    """Migrate an AT Method to DX in the destination folder
+
+    :param src: The source AT object
+    :param destination: The destination folder
+    """
+    portal_type = "Method"
+
+    if not api.is_at_content(src):
+        # already migrated -> just move it to the new folder
+        api.move_object(src, destination, check_constraints=False)
+        logger.info("Already migrated: {}".format(api.get_path(src)))
+        return
+
+    if api.get_portal_type(src) != portal_type:
+        logger.error("Not a '{}' object: {}".format(portal_type, src))
+        return
+
+    # origin and destination are different folders, so we can keep the ID
+    src_id = src.getId()
+    target = destination.get(src_id)
+    if not target:
+        # Don't use the api to skip the auto-id generation
+        target = createContent(portal_type, id=src_id)
+        destination._setObject(src_id, target)
+        target = destination._getOb(src_id)
+
+    # Manually set the fields
+    # NOTE: always convert string values to unicode for dexterity fields!
+    target.title = api.safe_unicode(src.Title() or "")
+    target.description = api.safe_unicode(src.Description() or "")
+    target.setMethodID(src.getMethodID() or "")
+    target.setAccredited(src.getAccredited())
+    target.setCalculations(src.getRawCalculations() or [])
+    target.setCalculation(src.getRawCalculation())
+
+    # instructions (AT html text -> DX rich text). The DX setter wraps plain
+    # (html) strings into a rich text value.
+    instructions = src.getInstructions()
+    if instructions:
+        target.setInstructions(api.safe_unicode(instructions))
+
+    # method document (AT blob file -> DX named blob file)
+    method_document = src.getMethodDocument()
+    if method_document:
+        named_file = blob_to_named_file(method_document)
+        if named_file:
+            target.setMethodDocument(named_file)
+
+    # Migrate the contents from AT to DX
+    migrator = getMultiAdapter((src, target), interface=IContentMigrator)
+
+    # copy all (raw) attributes from the source object to the target
+    migrator.copy_attributes(src, target)
+
+    # copy the UID (keeps references from services/worksheets/instruments
+    # valid)
+    migrator.copy_uid(src, target)
+
+    # Copy the Instrument back-references (relationship "InstrumentMethods").
+    # They live in an annotation on the method and are NOT carried over by
+    # `copy_attributes`, so `getRawInstruments` would otherwise return empty.
+    src_backref_storage = get_at_backref_storage(src)
+    if src_backref_storage:
+        target_backref_storage = get_at_backref_storage(target)
+        for relationship, uids in src_backref_storage.items():
+            target_backref_storage[relationship] = PersistentList(uids)
+
+    # copy auditlog
+    migrator.copy_snapshots(src, target)
+
+    # copy creators
+    migrator.copy_creators(src, target)
+
+    # copy workflow history
+    migrator.copy_workflow_history(src, target)
+
+    # copy marker interfaces
+    migrator.copy_marker_interfaces(src, target)
+
+    # copy dates
+    migrator.copy_dates(src, target)
+
+    # uncatalog the source object
+    migrator.uncatalog_object(src)
+
+    # delete the old object
+    migrator.delete_object(src)
+
+    # change the ID *after* the original object was removed
+    migrator.copy_id(src, target)
+
+    target.reindexObject()
+
+    logger.info("Migrated Method from %s -> %s" % (src, target))

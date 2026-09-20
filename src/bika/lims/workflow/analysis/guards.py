@@ -22,6 +22,7 @@ from bika.lims import api
 from bika.lims import logger
 from bika.lims import workflow as wf
 from bika.lims.api import security
+from bika.lims.api.analysis import is_result_complete
 from bika.lims.interfaces import ISubmitted
 from bika.lims.interfaces import IVerified
 from bika.lims.interfaces.analysis import IRequestAnalysis
@@ -52,10 +53,10 @@ def guard_lock(analysis):
     """Return whether the transition "lock" can be performed or not.
 
     The lock takes place automatically when the sample the analysis belongs to
-    is moved to a locking state (e.g. disposed). It cannot be performed
-    manually: this prevents locking an analysis of an active sample, which
-    could not be unlocked afterwards because unlocking only happens when the
-    sample is restored.
+    is moved to a locking state (e.g. disposed or dispatched). It cannot be
+    performed manually: this prevents locking an analysis of an active sample,
+    which could not be unlocked afterwards because unlocking only happens when
+    the sample is restored.
     """
     sample = analysis.getRequest()
     return ILockingState.providedBy(sample)
@@ -133,18 +134,10 @@ def guard_reinstate(analysis):
 def guard_submit(analysis):
     """Return whether the transition "submit" can be performed or not
     """
-    # Cannot submit without a result
-    if not analysis.getResult():
+    # Cannot submit unless the result and all the required result variables
+    # have a value
+    if not is_result_complete(analysis):
         return False
-
-    # Cannot submit with interims without value
-    for interim in analysis.getInterimFields():
-        true_values = ("true", "1", "on", "True", True, 1)
-        if interim.get("allow_empty", False) in true_values:
-            continue
-
-        if interim.get("value") in [None, ""]:
-            return False
 
     # Cannot submit if attachment not set, but is required
     if not analysis.getAttachment():

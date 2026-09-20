@@ -4,6 +4,38 @@ Changelog
 2.7.0 (unreleased)
 ------------------
 
+- #3015 Fix analyses with empty multi-valued results can be submitted
+- #3014 Fix AT to DX upgrade failing with undefined property 'add_permission'
+- #3001 Skip read-only fields when validating objects on create/update
+- #2994 Migrate Method content type to Dexterity
+- #2991 Replace the jQuery DataGrid handler with a ReactJS widget
+- #2990 Vendor the datagrid widget and drop collective.z3cform.datagridfield
+- #2998 Stop leaking exception tracebacks in JSON API error responses
+- #2980 Migrate AuditLog to Dexterity and move audit log machinery to senaite.core
+- #2979 Show precise element-level audit log diffs for lists and record fields
+- #3013 Add a doctest for api.get_uid_catalog_path
+- #3012 Remove stale uid_catalog records that break lookups by UID
+- #2995 Add interactive upgrade, catalog and user console scripts
+- #3008 Filter sidebar root folders by permission instead of by catalog
+- #3007 Fix empty sticker template selection when printing stickers from a listing
+- #3003 Fix colliding reference analyses group IDs within the same transaction
+- #3000 Validate inter-field limits from the instance when there is no form
+- #2999 Pin plone.jsonapi.core to 0.8.0 and add find-links for its sdist
+- #2997 Fix listing widget doctest for the new data-catalog table attribute
+- #2996 Fix missing Dexterity FTI utility registration on typeinfo import
+- #2993 Sync translations and add complete German, Dutch and Spanish translations
+- #2993 Make the dashboard fully translatable
+- #2992 Fix UnicodeEncodeError in Organization.getPrintAddress with non-ASCII address
+- #2988 Fix worksheet template analysis filtering for selected samples
+- #2985 Add a SENAITE-specific Manage Viewlets view
+- #2971 Make the Sample Dispatch workflow optional and lock analyses on dispatch
+- #2970 Add an optional Sample Dispose workflow
+- #2986 Fix UnicodeDecodeError from non-ASCII organisation titles in the title index
+- #2979 Show precise element-level audit log diffs for lists and record fields
+- #2984 Hide the Manage Portlets menu from the toolbar
+- #2983 Fix HiddenProfiles list to actually hide bundled add-on profiles
+- #2981 Forward results override flags to custom auto-import adapters
+- #2962 Remove the obsolete RegulatoryInspector role
 - #2976 Surface orphaned sample partitions as top-level rows in listings
 - #2982 Fix auto log-off logging out active users (session refresh interval)
 - #2978 Move front page and landing page fields to the Appearance fieldset

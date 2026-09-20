@@ -64,6 +64,11 @@ class IHideActionsMenu(Interface):
     """
 
 
+class IAuditLog(Interface):
+    """Marker interface for Audit Log
+    """
+
+
 class IAjaxEditForm(Interface):
     """Ajax edit form adapter
     """
@@ -166,9 +171,14 @@ class ISamplesView(Interface):
 
 class ILockingState(Interface):
     """Marker interface for samples in a state that requires their analyses
-    to be locked (read-only), e.g. disposed. Add-ons can mark their own
-    sample states with an interface that inherits from this one so the
-    analyses get locked without adding a new guard in senaite.core.
+    to be locked (read-only), e.g. disposed or dispatched. Add-ons can mark
+    their own sample states with an interface that inherits from this one so
+    the analyses get locked without adding a new guard in senaite.core.
+    """
+
+
+class IDispatched(ILockingState):
+    """Marker interface for dispatched samples
     """
 
 
@@ -556,6 +566,16 @@ class ICalculation(Interface):
 
 class ICalculations(Interface):
     """Marker interface for calculations folder
+    """
+
+
+class IMethod(Interface):
+    """Marker interface for Method
+    """
+
+
+class IMethods(Interface):
+    """Marker interface for methods folder
     """
 
 

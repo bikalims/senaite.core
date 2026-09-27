@@ -67,6 +67,14 @@ version = "2.6.0"  # Remember version number in metadata.xml and setup.py
 profile = "profile-{0}:default".format(product)
 
 REMOVE_AT_TYPES = [
+    "ARReport",
+    "Worksheet",
+    "Worksheets",
+    "Multifile",
+    "Laboratory",
+    "Contact",
+    "Calculation",
+    "Calculations",
     "AnalysisProfile",
     "AnalysisProfiles",
     "Department",

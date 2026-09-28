@@ -103,6 +103,7 @@ REMOVE_AT_TYPES = [
     "Multifile",
     "Worksheet",
     "WorksheetFolder",
+    "AuditLog",
 ]
 
 PORTAL_FOLDER_ITEMS = {

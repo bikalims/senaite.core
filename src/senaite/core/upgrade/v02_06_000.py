@@ -115,6 +115,9 @@ REMOVE_AT_TYPES = [
     "SampleTypes",
     "WorksheetTemplate",
     "WorksheetTemplates",
+    "AuditLog",
+    "Method",
+    "Methods",
 ]
 
 CONTENT_ACTIONS = [

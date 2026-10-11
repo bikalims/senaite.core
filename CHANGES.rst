@@ -5,6 +5,8 @@ Changelog
 ------------------
 
 - #3027 Fix Sample Points sorting and filtering by Sample Types
+- #3053 Fix TypeError when saving a Method with empty Instruments
+- #3023 Return a 404 when at_download is traversed on non-Archetypes content
 - #3022 Build the JavaScript bundles in CI
 - #3020 Use UnorderedOrdering for Instruments to avoid ZODB conflicts
 - #3021 Update JavaScript dependencies

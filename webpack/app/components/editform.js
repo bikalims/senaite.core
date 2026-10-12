@@ -449,10 +449,7 @@ class EditForm {
 
     // render status messages
     for (const record of messages) {
-      let name, error, rest;
-      ({message, level, ...rest} = record);
-      let level = level || "info";
-      let message = message || "";
+      let {message = "", level = "info", ...rest} = record;
       this.add_statusmessage(message, level, rest);
     }
 

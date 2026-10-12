@@ -19,10 +19,8 @@
 # Some rights reserved, see README and LICENSE.
 
 import tempfile
-import traceback
 
 import transaction
-from bika.lims import PMF
 from bika.lims import api
 from bika.lims import logger
 from bika.lims.browser import BrowserView
@@ -31,7 +29,6 @@ from openpyxl import load_workbook
 from pkg_resources import resource_filename
 from Products.CMFCore.utils import getToolByName
 from zope.component import getAdapters
-from zope.component.hooks import getSite
 
 
 class LoadSetupData(BrowserView):
@@ -110,7 +107,6 @@ class LoadSetupData(BrowserView):
 
     def __call__(self):
         form = self.request.form
-        portal = getSite()
         workbook = None
 
         if "setupexisting" in form and "existing" in form and form["existing"]:
@@ -120,12 +116,7 @@ class LoadSetupData(BrowserView):
             path = "setupdata/%s/%s.xlsx" % \
                 (self.dataset_name, self.dataset_name)
             filename = resource_filename(self.dataset_project, path)
-            try:
-                workbook = load_workbook(filename=filename)  # , use_iterators=True)
-            except AttributeError:
-                print("")
-                print(traceback.format_exc())
-                print("Error while loading ", path)
+            workbook = load_workbook(filename=filename)
 
         elif "setupfile" in form and "file" in form and form["file"] and "projectname" in form and form["projectname"]:
             self.dataset_project = form["projectname"]
@@ -136,10 +127,9 @@ class LoadSetupData(BrowserView):
             self.dataset_name = "uploaded"
 
         if not workbook:
-            message = PMF("File not found...")
-            self.context.plone_utils.addPortalMessage(message)
-            self.request.RESPONSE.redirect(portal.absolute_url() + "/import")
-            return
+            # Let the form adapter report the error in its JSON response.
+            # Redirecting an AJAX request hides the error from the page.
+            raise ValueError("Select a setup data file to import.")
 
         adapters = [[name, adapter]
                     for name, adapter

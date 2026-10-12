@@ -70,7 +70,7 @@ class EditForm(EditFormAdapterBase):
             return False
         self.add_status_message(
             message=_("Data import successful"),
-            title="Info", level="success", flush=True)
+            title="Success", level="success", flush=True)
         return True
 
     def handle_instrument_import(self):

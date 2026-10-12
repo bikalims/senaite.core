@@ -167,6 +167,19 @@ class WorksheetImporter(object):
         headers = []
         row_nr = 0
         worksheet = worksheet if worksheet else self.worksheet
+        # These sheets also support machine headers followed immediately by
+        # human-readable column labels, with data starting on row three.
+        # Legacy sheets have a description on row two and labels on row three.
+        labels = {"Sample Points": "Sample Point",
+                  "Sample Types": "Sample Type"}
+        if startrow == 3 and worksheet.title in labels:
+            first_row = next(worksheet.iter_rows())
+            names = [cell.value for cell in first_row]
+            if "title" in names:
+                label = worksheet.cell(
+                    row=2, column=names.index("title") + 1).value
+                if label and to_unicode(label).strip() == labels[worksheet.title]:
+                    startrow = 2
         for row in worksheet.rows:  # .iter_rows():
             row_nr += 1
             if row_nr == 1:
@@ -1177,6 +1190,31 @@ class Batch_Labels(WorksheetImporter):
 
 class Sample_Types(WorksheetImporter):
 
+    def get_or_create_sample_type(self, container, catalog, title, description):
+        """Reuse types provisioned by earlier sheets in the same import.
+
+        Title searches also return word matches, so compare full titles and
+        deduplicate catalog results by UID before choosing a record.
+        """
+        def title_key(value):
+            return u" ".join(to_unicode(value).split()).lower()
+
+        matches = {}
+        for brain in catalog(portal_type="SampleType",
+                             title=to_unicode(title)):
+            obj = brain.getObject()
+            if title_key(obj.Title()) == title_key(title):
+                matches[obj.UID()] = obj
+        if len(matches) > 1:
+            raise ValueError("Sample Types: multiple records have the exact "
+                             "title '%s'; resolve the duplicate records" % title)
+        if matches:
+            obj = next(iter(matches.values()))
+            obj.setDescription(description)
+            return obj
+        return api.create(container, "SampleType", title=title,
+                          description=description)
+
     def Import(self):
         container = self.context.setup.sampletypes
         sc = api.get_tool(SETUP_CATALOG)
@@ -1186,8 +1224,8 @@ class Sample_Types(WorksheetImporter):
             if not title:
                 continue
 
-            obj = api.create(container, "SampleType", title=title,
-                             description=row.get("description"))
+            obj = self.get_or_create_sample_type(
+                container, sc, title, row.get("description"))
 
             samplematrix = self.get_object(
                 sc, 'SampleMatrix', row.get('SampleMatrix_title'))

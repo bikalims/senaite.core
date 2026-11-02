@@ -88,6 +88,29 @@ class TestLaboratoryConsolidation(BaseTestCase):
         lab = setup._getOb("laboratory")
         self.assertEqual(api.get_title(lab), "My Real Lab")
 
+    def test_consolidate_keeps_populated_dx_lab_over_empty_legacy_lab(self):
+        setup = api.get_senaite_setup()
+        bika_setup = api.get_bika_setup()
+        lab = setup._getOb("laboratory")
+        lab.title = u"My Real Lab"
+        lab.phone = u"+27 11 123 4567"
+        lab.email = u"lab@example.com"
+        from plone.namedfile.file import NamedBlobImage
+        lab.accreditation_body_logo = NamedBlobImage(
+            data=b"laboratory-logo", filename=u"logo.png")
+
+        empty = createContent("Laboratory", id="laboratory", title=u"")
+        bika_setup._setObject("laboratory", empty)
+        consolidate_laboratory(api.get_tool("portal_setup"))
+
+        result = setup._getOb("laboratory")
+        self.assertEqual(result.title, u"My Real Lab")
+        self.assertEqual(result.phone, u"+27 11 123 4567")
+        self.assertEqual(result.email, u"lab@example.com")
+        self.assertEqual(result.accreditation_body_logo.data,
+                         b"laboratory-logo")
+        self.assertEqual(self.get_laboratory_ids(bika_setup), [])
+
     def test_consolidate_is_idempotent(self):
         setup = api.get_senaite_setup()
 

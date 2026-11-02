@@ -1487,9 +1487,8 @@ def get_laboratory_objects(containers):
 def pick_primary_laboratory(setup, bika_setup):
     """Pick the Laboratory that holds the live data
 
-    The former `SenaiteSetup.laboratory` property returned
-    `bika_setup.laboratory`, so any data entered through the UI lives
-    there. Fall back to the setup folder otherwise.
+    Prefer the populated lab over an empty duplicate, regardless of its
+    location. On a tie, prefer the legacy location as before.
     """
     candidates = []
     if bika_setup is not None and "laboratory" in bika_setup.objectIds():
@@ -1500,7 +1499,31 @@ def pick_primary_laboratory(setup, bika_setup):
         candidates.append(setup._getOb("laboratory-1"))
     # any other Laboratory as last resort
     candidates.extend(get_laboratory_objects([setup, bika_setup]))
-    return candidates[0] if candidates else None
+    def data_score(laboratory):
+        # A stale lab in bika_setup can be empty while setup contains the
+        # populated DX lab. Location alone must not decide which to delete.
+        fields = api.get_fields(laboratory)
+        score = 0
+        for name, field in fields.items():
+            if name in ("title", "Name"):
+                continue
+            # Metadata and field defaults are not evidence of entered data.
+            if name in ("description", "subject", "language", "creators",
+                        "contributors", "rights", "effective", "expires",
+                        "effectiveDate", "expirationDate", "creation_date",
+                        "modification_date", "id", "allowDiscussion"):
+                continue
+            value = field.get(laboratory)
+            if value and value != field.default:
+                score += 1
+        title = api.get_title(laboratory)
+        if title and title != "Laboratory":
+            score += 1
+        return score
+
+    # max preserves candidate order on a tie, retaining the old-location
+    # preference when both labs carry the same amount of data.
+    return max(candidates, key=data_score) if candidates else None
 
 
 def consolidate_laboratory(tool):

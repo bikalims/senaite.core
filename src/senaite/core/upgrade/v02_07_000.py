@@ -22,6 +22,7 @@
 import json
 from datetime import timedelta
 
+import six
 import transaction
 from bika.lims import api
 from bika.lims.api import safe_unicode as u
@@ -91,6 +92,10 @@ from zope.interface import noLongerProvides
 version = "2.7.0"  # Remember version number in metadata.xml and setup.py
 profile = "profile-{0}:default".format(product)
 
+# Single valued reference sub-fields of a partition record,
+# which are stored as a list of one UID
+PARTITION_REFERENCES = ("container", "preservation", "sampletype")
+
 REMOVE_AT_TYPES = [
     "ARReport",
     "AuditLog",
@@ -110,6 +115,90 @@ PORTAL_FOLDER_ITEMS = {
     # ID: ID, Title, FTI
     "worksheets": ("worksheets", "Worksheets", "Worksheets"),
 }
+
+
+EXCLUDE_FROM_NAV_BEHAVIOR = (
+    "plone.app.dexterity.behaviors.exclfromnav.IExcludeFromNavigationDefault"
+)
+
+
+@upgradestep(product, version)
+def reindex_client_tree_allowed_roles_again(tool):
+    """Add the `client:<uid>` token to the client-tree content again.
+
+    The earlier steps searched the catalogs with an empty query, which
+    returns nothing, so only content modified since carries the token.
+    Client contacts do not find older samples and analyses of their
+    client in the catalogs.
+    """
+    reindex_client_tree_allowed_roles()
+
+
+@upgradestep(product, version)
+def reindex_samplepoint_sampletype_title(tool):
+    """Index the sample type titles of all sample points.
+    """
+    catalog = api.get_tool(SETUP_CATALOG)
+    for brain in catalog(portal_type="SamplePoint"):
+        api.get_object(brain).reindexObject(idxs=["sampletype_title"])
+
+
+@upgradestep(product, version)
+def drop_setup_marker_behavior(tool):
+    """Drop the exclude-from-navigation marker from the Setup FTI.
+
+    It is a marker interface, not a registered behavior, so every lookup
+    of the type's behaviors raises BehaviorRegistrationNotFound. That is
+    enough to refuse any update of the Setup object through the API.
+    The profile no longer ships the line; an existing site keeps it in
+    its FTI until it is removed here.
+    """
+    portal_types = api.get_tool("portal_types")
+    fti = portal_types.getTypeInfo("Setup")
+    if fti is None:
+        logger.warning("Setup type not found [SKIP]")
+        return
+    behaviors = list(fti.behaviors)
+    if EXCLUDE_FROM_NAV_BEHAVIOR not in behaviors:
+        logger.info("Setup FTI has no stale marker behavior [SKIP]")
+        return
+    behaviors.remove(EXCLUDE_FROM_NAV_BEHAVIOR)
+    fti.behaviors = tuple(behaviors)
+    logger.info("Removed the stale marker behavior from the Setup FTI")
+
+
+@upgradestep(product, version)
+def normalize_id_formatting_rows(tool):
+    """Store the ID formatting rows as unicode.
+
+    The rows came over from the Archetypes RecordsField as native
+    strings, and the Dexterity subfields are TextLine, which only
+    accepts unicode. Validating the Setup object therefore fails with
+    WrongContainedType over a field nobody edited, and because the
+    JSON API validates the whole object before saving it, every
+    programmatic update of the setup is refused.
+    """
+    setup = api.get_senaite_setup()
+    if setup is None:
+        logger.warning("SenaiteSetup not found [SKIP]")
+        return
+    # Read the stored value, not the field default: a site that has
+    # never saved the ID server tab has no value of its own, and the
+    # default is unicode already. Writing it out here would pin today's
+    # defaults into that site's database for good.
+    rows = setup.__dict__.get("id_formatting")
+    if not rows:
+        logger.info("No stored ID formatting rows to normalize [SKIP]")
+        return
+    setup.id_formatting = [normalized_row(row) for row in rows]
+    logger.info("Normalized %s ID formatting row(s)" % len(rows))
+
+
+def normalized_row(row):
+    """Return the row with its string values as unicode."""
+    return dict(
+        (u(key), u(value) if isinstance(value, six.string_types) else value)
+        for key, value in row.items())
 
 
 @upgradestep(product, version)
@@ -1760,8 +1849,6 @@ def migrate_setup_fields_to_dx(tool):
         ("MaxNumberOfSamplesAdd", "max_number_of_samples_add", None),
         # Appearance
         ("WorksheetLayout", "worksheet_layout", None),
-        ("DashboardByDefault", "dashboard_by_default", None),
-        ("LandingPage", "landing_page", None),
         ("ShowPartitions", "show_partitions", None),
         ("ShowLabNameInLogin", "show_lab_name_in_login", None),
         # Sampling
@@ -2784,7 +2871,8 @@ def reindex_client_tree_allowed_roles():
         catalog = api.get_tool(catalog_id, default=None)
         if catalog is None:
             continue
-        brains = catalog.unrestrictedSearchResults({})
+        # An empty query returns no results at all, list every entry
+        brains = catalog.searchAll()
         for brain in brains:
             uid = getattr(brain, "UID", None)
             if uid and uid in seen:
@@ -3169,3 +3257,74 @@ def migrate_method_to_dx(src, destination):
     target.reindexObject()
 
     logger.info("Migrated Method from %s -> %s" % (src, target))
+
+
+def to_reference_list(value):
+    """Return a single valued partition reference as the list it is stored in
+
+    :param value: the stored value, a bare UID or a list already
+    :type value: str, list or None
+    :returns: list with the UID, or an empty list
+    :rtype: list
+    """
+    if isinstance(value, (list, tuple)):
+        return list(value)
+    return [value] if value else []
+
+
+def fix_partition_record(record):
+    """Return a partition record with its values in the stored types
+
+    :param record: a single partition of a sample template
+    :type record: dict
+    :returns: the record with list references and a text partition id
+    :rtype: dict
+    """
+    fixed = dict(record)
+    fixed["part_id"] = u(record.get("part_id") or "")
+    for name in PARTITION_REFERENCES:
+        fixed[name] = to_reference_list(record.get(name))
+    return fixed
+
+
+def fix_service_record(record):
+    """Return a service record with its partition id in the stored type
+
+    :param record: a single service setting of a sample template
+    :type record: dict
+    :returns: the record with a text partition id
+    :rtype: dict
+    """
+    fixed = dict(record)
+    fixed["part_id"] = u(record.get("part_id") or "")
+    return fixed
+
+
+def fix_sampletemplate_records(tool):
+    """Store the records of sample templates in the types the schema holds
+
+    `setPartitions` stored the single valued reference sub-fields of a
+    partition as the bare UID, where the record schema holds a list of one,
+    and both setters stored the partition id as a native string, where the
+    schema holds text. Every template that the 2.6.0 migration brought over
+    from Archetypes went through those two setters, and its partitions read
+    back the first character of a UID instead of the reference.
+    """
+    logger.info("Fixing the records of sample templates ...")
+    brains = api.search({"portal_type": "SampleTemplate"}, SETUP_CATALOG)
+    total = len(brains)
+    for num, brain in enumerate(brains):
+        if num and num % 100 == 0:
+            logger.info("Fixing sample template records: %s/%s"
+                        % (num, total))
+        template = api.get_object(brain)
+        partitions = list(getattr(template, "partitions", None) or [])
+        services = list(getattr(template, "services", None) or [])
+        fixed_partitions = [fix_partition_record(r) for r in partitions]
+        fixed_services = [fix_service_record(r) for r in services]
+        if fixed_partitions != partitions:
+            template.partitions = fixed_partitions
+        if fixed_services != services:
+            template.services = fixed_services
+
+    logger.info("Fixing the records of sample templates [DONE]")

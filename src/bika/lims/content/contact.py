@@ -276,16 +276,16 @@ class Contact(Person):
         username = user.getId()
         contact = self.getContactByUsername(username)
 
-        # User is linked to another contact (fix in UI)
-        if contact and contact.UID() != self.UID():
-            raise ValueError("User '{}' is already linked to Contact '{}'"
-                             .format(username, contact.Title()))
-
         # User is linked to multiple other contacts (fix in Data)
         if isinstance(contact, list):
             raise ValueError("User '{}' is linked to multiple Contacts: '{}'"
                              .format(username, ",".join(
                                  map(lambda x: x.Title(), contact))))
+
+        # User is linked to another contact (fix in UI)
+        if contact and contact.UID() != self.UID():
+            raise ValueError("User '{}' is already linked to Contact '{}'"
+                             .format(username, contact.Title()))
 
         # Set the UID as a User Property — write through the mutable
         # properties plugin so it persists for users whose cached

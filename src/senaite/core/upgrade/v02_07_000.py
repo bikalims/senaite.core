@@ -1317,7 +1317,7 @@ def migrate_contact_to_dx(src, destination=None):
 
     # Ensure user is correctly linked to the contact
     if target.getUsername():
-        target.setUser(target.getUsername())
+        link_contact_user(target)
 
     logger.info("Migrated Contact from %s -> %s" % (src, target))
 
@@ -1814,6 +1814,25 @@ def setup_custom_image_and_file_types(tool):
     logger.info("Setup custom File and Image types [DONE]")
 
 
+def link_contact_user(contact):
+    """Link a contact's user unless the username belongs to several contacts.
+    """
+    username = contact.getUsername()
+    if not username:
+        return False
+
+    contacts = contact.getContactByUsername(username)
+    if isinstance(contacts, list):
+        logger.warning(
+            "Skipping user linking for '%s' at %s: username is linked to "
+            "multiple contacts: %s",
+            username, api.get_path(contact),
+            ", ".join(api.get_path(item) for item in contacts))
+        return False
+
+    return contact.setUser(username)
+
+
 @upgradestep(product, version)
 def link_contact_users(tool):
     """This upgrade step ensures that the client contacts are linked correctly
@@ -1833,9 +1852,9 @@ def link_contact_users(tool):
         username = contact.getUsername()
         if not username:
             continue
-        contact.setUser(username)
-        logger.info("Linking user '{}' -> Contact '{}'"
-                    .format(username, api.get_path(contact)))
+        if link_contact_user(contact):
+            logger.info("Linking user '{}' -> Contact '{}'"
+                        .format(username, api.get_path(contact)))
         contact._p_deactivate()
 
     logger.info("Link client contacts to users [DONE]")

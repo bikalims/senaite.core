@@ -400,24 +400,6 @@ class ReferenceSamplesView(ListingView):
         """Before template render hook
         """
         super(ReferenceSamplesView, self).before_render()
-        self.expire_samples()
-
-    def expire_samples(self):
-        """Expire overdue samples before filtering and batching the listing.
-        """
-        now = DateTime()
-        query = {
-            "portal_type": "ReferenceSample",
-            "review_state": "current",
-            "getExpiryDate": {"query": now, "range": "max"},
-        }
-        if "path" in self.contentFilter:
-            query["path"] = self.contentFilter["path"]
-        for brain in api.search(query, self.catalog):
-            obj = api.get_object(brain)
-            expiry = obj.getExpiryDate()
-            if expiry and expiry <= now:
-                self.workflow.doActionFor(obj, "expire")
 
     def folderitem(self, obj, item, index):
         """Applies new properties to the item (Client) that is currently being

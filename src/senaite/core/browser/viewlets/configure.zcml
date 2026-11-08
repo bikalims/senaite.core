@@ -6,6 +6,15 @@
   <!-- package includes -->
   <include package=".sample" />
 
+  <browser:viewlet
+      for="*"
+      name="senaite.core.referencesamples.expiry"
+      manager="plone.app.layout.viewlets.interfaces.IAboveContent"
+      class=".referencesamples.ReferenceSampleExpiryViewlet"
+      permission="senaite.core.permissions.ManageReference"
+      layer="senaite.core.interfaces.ISenaiteCore"
+      />
+
   <!-- Static resources for the viewlets (css, js, images), served at
        ++plone++senaite.core.viewlets -->
   <plone:static

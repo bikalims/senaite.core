@@ -52,6 +52,7 @@ class TestReferenceSampleExpiry(BaseTestCase):
         self.assertEqual(item["state_title"], "Expired")
         self.assertIn("exclamation", item["after"]["ExpiryDate"])
         self.assertIn('title="Expired"', item["after"]["ExpiryDate"])
+        self.assertIn("text-danger", item["after"]["ExpiryDate"])
 
     def test_all_tab_shows_fresh_state_and_no_future_expiry_icon(self):
         items = dict((item["uid"], item) for item in self.listing("all"))

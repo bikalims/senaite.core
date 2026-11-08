@@ -29,6 +29,7 @@ from senaite.core.api import hazard as hazard_api
 from senaite.core.browser.listing.base import ListingView
 from bika.lims.browser.chart.analyses import EvolutionChart
 from bika.lims.utils import get_image
+from bika.lims.utils import get_fas_ico
 from bika.lims.utils import get_link
 from bika.lims.utils import get_link_for
 from plone.app.layout.globals.interfaces import IViewView
@@ -446,8 +447,8 @@ class ReferenceSamplesView(ListingView):
         item["ExpiryDate"] = self.ulocalized_time(obj.getExpiryDate())
         expiry = obj.getExpiryDate()
         if expiry and expiry <= DateTime():
-            item["after"]["ExpiryDate"] = get_image(
-                "exclamation.png", title=t(_("Expired")))
+            item["after"]["ExpiryDate"] = get_fas_ico(
+                "exclamation", title=t(_("Expired")), css_class="text-danger")
 
         manufacturer = obj.getManufacturer()
         item["replace"]["Manufacturer"] = get_link_for(manufacturer)

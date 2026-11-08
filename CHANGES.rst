@@ -4,6 +4,7 @@ Changelog
 2.7.0 (unreleased)
 ------------------
 
+- Expire overdue reference samples from a viewlet and show a red expiry icon
 - #3027 Fix Sample Points sorting and filtering by Sample Types
 - #3051 Draw section headings inside a fieldset
 - #3073 Fix the upgrade step events fire for every migrated multifile

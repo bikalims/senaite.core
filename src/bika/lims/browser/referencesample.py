@@ -19,7 +19,7 @@
 # Some rights reserved, see README and LICENSE.
 
 import collections
-from datetime import datetime
+from DateTime import DateTime
 
 from bika.lims import api
 from bika.lims import bikaMessageFactory as _
@@ -33,7 +33,6 @@ from bika.lims.utils import get_link
 from bika.lims.utils import get_link_for
 from plone.app.layout.globals.interfaces import IViewView
 from plone.memoize import view
-from Products.ATContentTypes.utils import DT2dt
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from senaite.core.i18n import translate as t
 from zope.interface import implements
@@ -400,6 +399,24 @@ class ReferenceSamplesView(ListingView):
         """Before template render hook
         """
         super(ReferenceSamplesView, self).before_render()
+        self.expire_samples()
+
+    def expire_samples(self):
+        """Expire overdue samples before filtering and batching the listing.
+        """
+        now = DateTime()
+        query = {
+            "portal_type": "ReferenceSample",
+            "review_state": "current",
+            "getExpiryDate": {"query": now, "range": "max"},
+        }
+        if "path" in self.contentFilter:
+            query["path"] = self.contentFilter["path"]
+        for brain in api.search(query, self.catalog):
+            obj = api.get_object(brain)
+            expiry = obj.getExpiryDate()
+            if expiry and expiry <= now:
+                self.workflow.doActionFor(obj, "expire")
 
     def folderitem(self, obj, item, index):
         """Applies new properties to the item (Client) that is currently being
@@ -417,25 +434,6 @@ class ReferenceSamplesView(ListingView):
 
         obj = api.get_object(obj)
 
-        # XXX Refactor expiration to a proper place
-        # ---------------------------- 8< -------------------------------------
-        if item.get("review_state", "current") == "current":
-            # Check expiry date
-            exdate = obj.getExpiryDate()
-            if exdate:
-                expirydate = DT2dt(exdate).replace(tzinfo=None)
-                if (datetime.today() > expirydate):
-                    # Trigger expiration
-                    self.workflow.doActionFor(obj, "expire")
-                    item["review_state"] = "expired"
-                    item["obj"] = obj
-
-        if self.contentFilter.get('review_state', '') \
-           and item.get('review_state', '') == 'expired':
-            # This item must be omitted from the list
-            return None
-        # ---------------------------- >8 -------------------------------------
-
         url = api.get_url(obj)
         id = api.get_id(obj)
 
@@ -446,6 +444,10 @@ class ReferenceSamplesView(ListingView):
         item["DateReceived"] = self.ulocalized_time(obj.getDateReceived())
         item["DateOpened"] = self.ulocalized_time(obj.getDateOpened())
         item["ExpiryDate"] = self.ulocalized_time(obj.getExpiryDate())
+        expiry = obj.getExpiryDate()
+        if expiry and expiry <= DateTime():
+            item["after"]["ExpiryDate"] = get_image(
+                "exclamation.png", title=t(_("Expired")))
 
         manufacturer = obj.getManufacturer()
         item["replace"]["Manufacturer"] = get_link_for(manufacturer)

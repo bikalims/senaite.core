@@ -21,6 +21,7 @@
 from bika.lims import api
 from bika.lims import bikaMessageFactory as _
 from bika.lims.browser.workflow import WorkflowActionGenericAdapter
+from bika.lims.interfaces import IDuplicateAnalysis
 from bika.lims.workflow import doActionFor
 from senaite.core.interfaces import IWorksheet
 
@@ -38,6 +39,23 @@ class WorkflowActionRemoveAdapter(WorkflowActionGenericAdapter):
         parent = api.get_parent(worksheet)
         url = api.get_url(parent)
         return self.redirect(redirect_url=url)
+
+
+class WorkflowActionUnassignAdapter(WorkflowActionGenericAdapter):
+    """Exclude duplicates that a selected source analysis removes itself.
+    """
+
+    def do_action(self, action, objects):
+        selected = set(api.get_uid(obj) for obj in objects)
+        analyses = []
+        for obj in objects:
+            if IDuplicateAnalysis.providedBy(obj):
+                source = obj.getAnalysis()
+                if source and api.get_uid(source) in selected:
+                    continue
+            analyses.append(obj)
+        return super(WorkflowActionUnassignAdapter, self).do_action(
+            action, analyses)
 
 
 class WorkflowActionAssignAdapter(WorkflowActionGenericAdapter):

@@ -13,6 +13,16 @@
         permission="zope.Public"
     />
 
+    <!-- Worksheet: "unassign" analyses -->
+    <adapter
+        name="workflow_action_unassign"
+        for="senaite.core.interfaces.IWorksheet
+             zope.publisher.interfaces.browser.IBrowserRequest"
+        factory=".worksheet.WorkflowActionUnassignAdapter"
+        provides="bika.lims.interfaces.IWorkflowActionAdapter"
+        permission="zope.Public"
+    />
+
     <!-- Worksheet: "assign" analyses -->
     <adapter
         name="workflow_action_assign"
